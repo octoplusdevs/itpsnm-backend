@@ -26,6 +26,12 @@ enum PaymentState {
   FAILED
 }
 
+enum EnrollementState {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum FileFormat {
   PDF
   DOCX
@@ -67,189 +73,203 @@ enum MonthName {
 }
 
 // Níveis dos estudantes
-model levels {
-  id         Int        @id @unique @default(autoincrement())
+model Level {
+  id         Int       @id @unique @default(autoincrement())
   name       LevelName
   created_at DateTime
   update_at  DateTime
-  students   students[]
-}
+  students   Student[]
 
-// Cartão de identidade
-model identity_card {
-  id                   Int           @id @unique @default(autoincrement())
-  full_name            String
-  father               String
-  mother               String
-  date_of_birth        DateTime
-  id_province          Int
-  id_county            Int
-  height               Float
-  identity_card_number String
-  gender               Gender
-  emission_date        DateTime
-  expiration_date      DateTime
-  marital_status       MaritalStatus
-  residence            String
-  student              students?     @relation(fields: [studentsId], references: [id])
-  provinces            provinces     @relation(fields: [id_province], references: [id])
-  counties             County        @relation(fields: [id_county], references: [id])
-  studentsId           Int?
+  @@map("levels")
 }
 
 // Províncias
-model provinces {
-  id            Int             @id @unique @default(autoincrement())
-  name          String
-  created_at    DateTime
-  update_at     DateTime
-  identity_card identity_card[]
+model Province {
+  id         Int       @id @unique @default(autoincrement())
+  name       String
+  created_at DateTime
+  update_at  DateTime
+  students   Student[]
+
+  @@map("provinces")
 }
 
 // Detalhes de pagamento do item
-model item_payment_details {
+model ItemPaymentDetail {
   id         Int      @id @unique @default(autoincrement())
   type       Int
   quantity   Int
   price      Float
-  payment_id Int
+  payment    Payment? @relation(fields: [paymentsId], references: [id])
   created_at DateTime
   update_at  DateTime
+  paymentsId Int?
+
+  @@map("items_payment_details")
 }
 
 // Pagamentos
-model payments {
-  id          BigInt       @id @unique @default(autoincrement())
-  student_id  Int
-  state       PaymentState
-  amount_paid Float
-  date        DateTime
-  created_at  DateTime
-  update_at   DateTime
-  students    students     @relation(fields: [student_id], references: [id])
-  receipts    receipts[]
+model Payment {
+  id                   Int                 @id @unique @default(autoincrement())
+  student_id           Int
+  state                PaymentState
+  amount_paid          Float
+  date                 DateTime
+  created_at           DateTime
+  update_at            DateTime
+  students             Student             @relation(fields: [student_id], references: [id])
+  receipts             Receipt[]
+  item_payment_details ItemPaymentDetail[]
+
+  @@map("payments")
 }
 
 // Meses
-model months {
-  id             Int       @id @unique @default(autoincrement())
-  name           MonthName
-  tuition_fee_id Int
-  price          Float
-  trafic_ticket  String
-  tuition_fees   Tuition   @relation(fields: [tuition_fee_id], references: [id])
+model MonthPaid {
+  id            Int       @id @unique @default(autoincrement())
+  name          MonthName
+  price         Float
+  trafic_ticket String
+  tuitions      Tuition?  @relation(fields: [tuitionId], references: [id])
+  tuitionId     Int?
+
+  @@map("month_paids")
 }
 
 // Turmas
-model classes {
-  id           Int        @id @unique @default(autoincrement())
+model Classe {
+  id           Int       @id @unique @default(autoincrement())
   name         String
   course       String
   id_classroom Int
   period       String
   created_at   DateTime
   update_at    DateTime
-  students     students[]
-  classrooms   Classroom  @relation(fields: [id_classroom], references: [id])
+  students     Student[]
+  classrooms   Classroom @relation(fields: [id_classroom], references: [id])
+
+  @@map("classes")
 }
 
 // Estudantes
-model students {
-  id            Int             @id @unique @default(autoincrement())
-  type          StudentType
-  course_id     Int
-  class_id      Int
-  level_id      Int
-  password      String
-  levels        levels          @relation(fields: [level_id], references: [id])
-  courses       Course          @relation(fields: [course_id], references: [id])
-  classes       classes         @relation(fields: [class_id], references: [id])
-  tuition_fees  Tuition[]
-  payments      payments[]
-  files         File[]
-  enrollments   Enrollment[]
-  identity_card identity_card[]
-  contatos      Contato[]
+model Student {
+  id                 Int           @id @unique @default(autoincrement())
+  type               StudentType
+  password           String        @default("123456")
+  fullName           String
+  father             String
+  mother             String
+  dateOfBirth        DateTime
+  height             Float
+  identityCardNumber String        @unique
+  gender             Gender
+  emissionDate       DateTime
+  expirationDate     DateTime
+  maritalStatus      MaritalStatus
+  residence          String
+  phone              Int           @unique
+  email              String        @unique
+  alternativePhone   Int?          @unique
+  provinces          Province?     @relation(fields: [provinceId], references: [id])
+  counties           County?       @relation(fields: [countyId], references: [id])
+  levels             Level?        @relation(fields: [levelId], references: [id])
+  courses            Course?       @relation(fields: [courseId], references: [id])
+  classes            Classe?       @relation(fields: [classeId], references: [id])
+  tuitionFees        Tuition[]
+  payments           Payment[]
+  files              File[]
+  enrollments        Enrollment[]
+  countyId           Int?
+  provinceId         Int?
+  levelId            Int?
+  courseId           Int?
+  classeId           Int?
+
+  @@map("students")
 }
 
 // Documentos
-model documents {
-  id            BigInt     @id @unique @default(autoincrement())
+model Document {
+  id            Int        @id @unique @default(autoincrement())
   enrollment_id Int
   file_id       Int
   enrollments   Enrollment @relation(fields: [enrollment_id], references: [id])
   files         File       @relation(fields: [file_id], references: [id])
+
+  @@map("documents")
 }
 
 // Recibos
-model receipts {
-  id         Int       @id @unique @default(autoincrement())
+model Receipt {
+  id         Int      @id @unique @default(autoincrement())
   tuition_id Int
   path       String
   payment_id DateTime
   created_at DateTime
   update_at  DateTime
-  tuitions   Tuition   @relation(fields: [tuition_id], references: [id])
-  payments   payments? @relation(fields: [paymentsId], references: [id])
-  paymentsId BigInt?
+  tuitions   Tuition  @relation(fields: [tuition_id], references: [id])
+  payments   Payment? @relation(fields: [paymentsId], references: [id])
+  paymentsId Int?
+
+  @@map("receipts")
 }
 
 // Cursos
 model Course {
-  id         Int        @id @unique @default(autoincrement())
+  id         Int       @id @unique @default(autoincrement())
   name       String
   created_at DateTime
   update_at  DateTime
-  students   students[]
+  students   Student[]
 
   @@map("courses")
 }
 
 // propinas
 model Tuition {
-  id          Int        @id @unique @default(autoincrement())
+  id          Int         @id @unique @default(autoincrement())
   student_id  Int
   state       String
   pay_data    DateTime
   quantity    Int
   amount_paid Float
-  students    students   @relation(fields: [student_id], references: [id])
-  months      months[]
-  receipts    receipts[]
+  students    Student     @relation(fields: [student_id], references: [id])
+  months      MonthPaid[]
+  receipts    Receipt[]
 
   @@map("tuition")
 }
 
 // municipios
 model County {
-  id            Int             @id @unique @default(autoincrement())
-  name          String
-  created_at    DateTime
-  update_at     DateTime
-  identity_card identity_card[]
+  id         Int       @id @unique @default(autoincrement())
+  name       String
+  created_at DateTime
+  update_at  DateTime
+  students   Student[]
 
   @@map("counties")
 }
 
 // Salas de aula
 model Classroom {
-  id         Int       @id @unique @default(autoincrement())
+  id         Int      @id @unique @default(autoincrement())
   name       String
   created_at DateTime
   update_at  DateTime
-  classes    classes[]
+  classes    Classe[]
 
   @@map("classrooms")
 }
 
 // Matrículas
 model Enrollment {
-  id         Int         @id @unique @default(autoincrement())
+  id         Int              @id @unique @default(autoincrement())
   created_at DateTime
   update_at  DateTime
-  state      String
-  students   students?   @relation(fields: [studentsId], references: [id])
-  documents  documents[]
+  state      EnrollementState
+  students   Student?         @relation(fields: [studentsId], references: [id])
+  documents  Document[]
   studentsId Int?
 
   @@map("enrollments")
@@ -257,28 +277,16 @@ model Enrollment {
 
 // Arquivos
 model File {
-  id         Int         @id @unique @default(autoincrement())
+  id         Int        @id @unique @default(autoincrement())
   name       String
   pat        String
   format     FileFormat
   type       FileType
   created_at DateTime
   update_at  DateTime
-  students   students?   @relation(fields: [studentsId], references: [id])
-  documents  documents[]
+  students   Student?   @relation(fields: [studentsId], references: [id])
+  documents  Document[]
   studentsId Int?
 
   @@map("files")
-}
-
-// Contatos
-model Contato {
-  id               Int       @id @unique @default(autoincrement())
-  phone            Int
-  email            String
-  alternativePhone Int
-  students         students? @relation(fields: [studentsId], references: [id])
-  studentsId       Int?
-
-  @@map("contatos")
 }
