@@ -1,7 +1,9 @@
-import { Prisma, User } from '@prisma/client'
+import { Prisma, Enrollment, EnrollementState } from '@prisma/client'
 
 export interface EnrollmentsRepository {
-  findById(id: string): Promise<User | null>
-  findByEmail(email: string): Promise<User | null>
-  create(data: Prisma.UserCreateInput): Promise<User>
+  checkStatus(studentId: number): Promise<Enrollment | null>
+  toggleStatus(studentId: number, state: EnrollementState): Promise<Enrollment | null>
+  destroy(studentId: number): Promise<void>
+  create(data: Prisma.StudentCreateInput): Promise<Enrollment>
+  fetchAllPending(): Promise<Enrollment>
 }
