@@ -1,6 +1,7 @@
 import { Gender, MaritalStatus, Student, StudentType } from '@prisma/client'
 
 export interface StudentCreateInput {
+  id?: number
   type: StudentType
   fullName: string
   password: string

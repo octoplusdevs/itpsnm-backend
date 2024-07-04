@@ -14,6 +14,7 @@ export class CreateStudentUseCase {
   constructor(private studentRepository: StudentsRepository) { }
 
   async execute({
+    id,
     classeId,
     countyId,
     courseId,
@@ -61,6 +62,7 @@ export class CreateStudentUseCase {
     }
 
     const student = await this.studentRepository.create({
+      id,
       classeId,
       countyId,
       courseId,

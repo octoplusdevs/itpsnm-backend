@@ -1,5 +1,6 @@
 import { Student } from '@prisma/client'
 import { StudentCreateInput, StudentsRepository } from '../student-repository'
+import { randomInt } from 'crypto'
 
 export class InMemoryStudentRepository implements StudentsRepository {
 
@@ -21,7 +22,7 @@ export class InMemoryStudentRepository implements StudentsRepository {
   }
   async create(data: StudentCreateInput): Promise<Student> {
     const newStudent: Student = {
-      id: 1,
+      id: data.id ?? randomInt(9999),
       type: data.type,
       fullName: data.fullName,
       password: data.password,
@@ -37,7 +38,7 @@ export class InMemoryStudentRepository implements StudentsRepository {
       residence: data.residence,
       phone: data.phone,
       email: data.email,
-      alternativePhone: data.alternativePhone || null,
+      alternativePhone: data.alternativePhone ?? null,
       countyId: data.countyId,
       courseId: data.courseId,
       classeId: data.classeId,
