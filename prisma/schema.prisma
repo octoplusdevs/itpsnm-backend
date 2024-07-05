@@ -190,11 +190,11 @@ model Student {
 
 // Documentos
 model Document {
-  id            Int        @id @unique @default(autoincrement())
-  enrollment_id Int
-  file_id       Int
-  enrollments   Enrollment @relation(fields: [enrollment_id], references: [id])
-  files         File       @relation(fields: [file_id], references: [id])
+  id           Int         @id @unique @default(autoincrement())
+  enrollments  Enrollment? @relation(fields: [enrollmentId], references: [id])
+  files        File?       @relation(fields: [fileId], references: [id])
+  enrollmentId Int?
+  fileId       Int?
 
   @@map("documents")
 }

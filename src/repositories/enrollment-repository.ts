@@ -1,9 +1,16 @@
-import { Prisma, Enrollment, EnrollementState } from '@prisma/client'
+import { Enrollment, EnrollementState } from '@prisma/client'
 
+export interface EnrollmentType {
+  id?: number
+  studentId: number
+  state: EnrollementState
+  created_at?: Date
+  update_at?: Date
+}
 export interface EnrollmentsRepository {
-  checkStatus(studentId: number): Promise<Enrollment | null>
-  toggleStatus(studentId: number, state: EnrollementState): Promise<Enrollment | null>
-  destroy(studentId: number): Promise<void>
-  create(data: Prisma.StudentCreateInput): Promise<Enrollment>
-  fetchAllPending(): Promise<Enrollment>
+  checkStatus(enrollmentId: number): Promise<{id: number; status: EnrollementState } | null>
+  toggleStatus(enrollmentId: number, state: EnrollementState): Promise<{id: number; status: EnrollementState } | null>
+  destroy(enrollmentId: number): Promise<Boolean>
+  create(data: EnrollmentType): Promise<EnrollmentType>
+  fetchAllPending(): Promise<EnrollmentType[]>
 }
