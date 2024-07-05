@@ -8,9 +8,9 @@ export interface EnrollmentType {
   update_at?: Date
 }
 export interface EnrollmentsRepository {
-  checkStatus(enrollmentId: number): Promise<{id: number; status: EnrollementState } | null>
+  checkStatus(enrollmentId: number): Promise<{id: number; state: EnrollementState } | null>
   toggleStatus(enrollmentId: number, state: EnrollementState): Promise<{id: number; status: EnrollementState } | null>
   destroy(enrollmentId: number): Promise<Boolean>
   create(data: EnrollmentType): Promise<EnrollmentType>
-  fetchAllPending(): Promise<EnrollmentType[]>
+  searchMany(state: EnrollementState, page: number): Promise<EnrollmentType[]>
 }
