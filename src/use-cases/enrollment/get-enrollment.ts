@@ -1,30 +1,31 @@
-import { CoursesRepository } from '@/repositories/course-repository'
-import { Course } from '@prisma/client'
+import { EnrollementState } from '@prisma/client'
 import { ResourceNotFoundError } from '../errors/resource-not-found'
+import { EnrollmentsRepository } from '@/repositories/enrollment-repository'
 
-interface GetCourseUseCaseRequest {
-  courseId: number
+interface GetEnrollmentUseCaseRequest {
+  enrollmentId: number
 }
 
-interface GetCourseUseCaseResponse {
-  course: Course | null
+interface GetEnrollmentUseCaseResponse {
+  enrollment: {
+    id: number;
+    state: EnrollementState;
+  }
 }
 
-export class GetCourseUseCase {
-  constructor(private coursesRepository: CoursesRepository) { }
+export class GetEnrollmentUseCase {
+  constructor(private enrollmentsRepository: EnrollmentsRepository) { }
 
   async execute({
-    courseId
-  }: GetCourseUseCaseRequest): Promise<GetCourseUseCaseResponse> {
-    const course = await this.coursesRepository.findById(
-      courseId
-    )
-    if (!course) {
+    enrollmentId
+  }: GetEnrollmentUseCaseRequest): Promise<GetEnrollmentUseCaseResponse> {
+    const enrollment = await this.enrollmentsRepository.checkStatus(enrollmentId)
+    if (!enrollment) {
       throw new ResourceNotFoundError()
     }
 
     return {
-      course,
+      enrollment
     }
   }
 }
