@@ -1,4 +1,4 @@
-import { Prisma, Course } from '@prisma/client'
+import { Course } from '@prisma/client'
 import { randomInt } from 'crypto'
 import { CoursesRepository } from '../course-repository'
 

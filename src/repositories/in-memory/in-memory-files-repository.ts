@@ -7,9 +7,9 @@ export class InMemoryFilesRepository implements FilesRepository {
   async create(data: FilesType): Promise<FilesType> {
     let newFile: FilesType = {
       id: data.id ?? randomInt(9999),
+      name: data.name,
       format: data.format,
       path: data.path,
-      state: data.state,
       studentId: data.studentId,
       type: data.type,
       created_at: data.created_at ?? new Date(),
@@ -21,8 +21,13 @@ export class InMemoryFilesRepository implements FilesRepository {
   async findById(fileId: number): Promise<FilesType | null> {
     return this.items.find(file => file.id === fileId) || null
   }
-  async destroy(fileId: number): Promise<void> {
-    this.items = this.items.filter(file => file.id !== fileId)
+  async destroy(fileId: number): Promise<Boolean> {
+    const index = this.items.findIndex((item) => item.id === fileId)
+    if (index !== -1) {
+      this.items.splice(index, 1)
+      return true
+    }
+    return false
   }
 
 }

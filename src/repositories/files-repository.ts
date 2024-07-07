@@ -1,18 +1,18 @@
-import { EnrollementState, FileFormat, FileType } from '@prisma/client'
+import { FileFormat, FileType } from '@prisma/client'
 
 export interface FilesType {
   id?: number
+  name: string
   studentId: number
   type: FileType
   format: FileFormat
   path: string
-  state: EnrollementState
   created_at?: Date
   update_at?: Date
 }
 export interface FilesRepository {
   create(data: FilesType): Promise<FilesType>
   findById(fileId: number): Promise<FilesType | null>
-  destroy(fileId: number): Promise<void>
+  destroy(fileId: number): Promise<Boolean>
 
 }
