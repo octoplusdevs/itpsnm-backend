@@ -1,4 +1,4 @@
-import { Enrollment, EnrollementState } from '@prisma/client'
+import { EnrollementState } from '@prisma/client'
 
 export interface EnrollmentType {
   id?: number

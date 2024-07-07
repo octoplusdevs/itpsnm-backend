@@ -279,14 +279,14 @@ model Enrollment {
 model File {
   id         Int        @id @unique @default(autoincrement())
   name       String
-  pat        String
+  path       String
   format     FileFormat
   type       FileType
   created_at DateTime
   update_at  DateTime
-  students   Student?   @relation(fields: [studentsId], references: [id])
+  students   Student    @relation(fields: [studentId], references: [id])
   documents  Document[]
-  studentsId Int?
+  studentId  Int
 
   @@map("files")
 }
