@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "students" ALTER COLUMN "phone" SET DATA TYPE BIGINT,
+ALTER COLUMN "alternativePhone" SET DATA TYPE BIGINT;
