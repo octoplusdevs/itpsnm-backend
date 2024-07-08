@@ -1,4 +1,4 @@
-import { EnrollementState } from '@prisma/client'
+import { EnrollementState, Enrollment } from '@prisma/client'
 
 export interface EnrollmentType {
   id?: number
@@ -11,6 +11,6 @@ export interface EnrollmentsRepository {
   checkStatus(enrollmentId: number): Promise<{id: number; state: EnrollementState } | null>
   toggleStatus(enrollmentId: number, state: EnrollementState): Promise<{id: number; status: EnrollementState } | null>
   destroy(enrollmentId: number): Promise<Boolean>
-  create(data: EnrollmentType): Promise<EnrollmentType>
-  searchMany(state: EnrollementState, page: number): Promise<EnrollmentType[]>
+  create(data: Enrollment): Promise<Enrollment>
+  searchMany(state: EnrollementState, page: number): Promise<Enrollment[]>
 }

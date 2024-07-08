@@ -74,11 +74,11 @@ enum MonthName {
 
 // Níveis dos estudantes
 model Level {
-  id         Int       @id @unique @default(autoincrement())
+  id         Int          @id @unique @default(autoincrement())
   name       LevelName
-  created_at DateTime
-  update_at  DateTime
-  students   Student[]
+  created_at DateTime     @default(now())
+  update_at  DateTime     @updatedAt
+  Enrollment Enrollment[]
 
   @@map("levels")
 }
@@ -87,8 +87,8 @@ model Level {
 model Province {
   id         Int       @id @unique @default(autoincrement())
   name       String
-  created_at DateTime
-  update_at  DateTime
+  created_at DateTime  @default(now())
+  update_at  DateTime  @updatedAt
   students   Student[]
 
   @@map("provinces")
@@ -101,8 +101,8 @@ model ItemPaymentDetail {
   quantity   Int
   price      Float
   payment    Payment? @relation(fields: [paymentsId], references: [id])
-  created_at DateTime
-  update_at  DateTime
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
   paymentsId Int?
 
   @@map("items_payment_details")
@@ -138,15 +138,15 @@ model MonthPaid {
 
 // Turmas
 model Classe {
-  id           Int       @id @unique @default(autoincrement())
+  id           Int          @id @unique @default(autoincrement())
   name         String
   course       String
   id_classroom Int
   period       String
-  created_at   DateTime
-  update_at    DateTime
-  students     Student[]
-  classrooms   Classroom @relation(fields: [id_classroom], references: [id])
+  classrooms   Classroom    @relation(fields: [id_classroom], references: [id])
+  Enrollment   Enrollment[]
+  created_at   DateTime     @default(now())
+  update_at    DateTime     @updatedAt
 
   @@map("classes")
 }
@@ -172,18 +172,14 @@ model Student {
   alternativePhone   Int?          @unique
   provinces          Province?     @relation(fields: [provinceId], references: [id])
   counties           County?       @relation(fields: [countyId], references: [id])
-  levels             Level?        @relation(fields: [levelId], references: [id])
-  courses            Course?       @relation(fields: [courseId], references: [id])
-  classes            Classe?       @relation(fields: [classeId], references: [id])
   tuitionFees        Tuition[]
   payments           Payment[]
   files              File[]
   enrollments        Enrollment[]
   countyId           Int?
   provinceId         Int?
-  levelId            Int?
-  courseId           Int?
-  classeId           Int?
+  created_at         DateTime      @default(now())
+  update_at          DateTime      @updatedAt
 
   @@map("students")
 }
@@ -195,6 +191,8 @@ model Document {
   files        File?       @relation(fields: [fileId], references: [id])
   enrollmentId Int?
   fileId       Int?
+  created_at   DateTime    @default(now())
+  update_at    DateTime    @updatedAt
 
   @@map("documents")
 }
@@ -205,8 +203,8 @@ model Receipt {
   tuition_id Int
   path       String
   payment_id DateTime
-  created_at DateTime
-  update_at  DateTime
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
   tuitions   Tuition  @relation(fields: [tuition_id], references: [id])
   payments   Payment? @relation(fields: [paymentsId], references: [id])
   paymentsId Int?
@@ -216,11 +214,11 @@ model Receipt {
 
 // Cursos
 model Course {
-  id         Int       @id @unique @default(autoincrement())
-  name       String
-  created_at DateTime
-  update_at  DateTime
-  students   Student[]
+  id         Int          @id @unique @default(autoincrement())
+  name       String       @unique
+  created_at DateTime     @default(now())
+  update_at  DateTime     @updatedAt
+  Enrollment Enrollment[]
 
   @@map("courses")
 }
@@ -244,8 +242,8 @@ model Tuition {
 model County {
   id         Int       @id @unique @default(autoincrement())
   name       String
-  created_at DateTime
-  update_at  DateTime
+  created_at DateTime  @default(now())
+  update_at  DateTime  @updatedAt
   students   Student[]
 
   @@map("counties")
@@ -255,8 +253,8 @@ model County {
 model Classroom {
   id         Int      @id @unique @default(autoincrement())
   name       String
-  created_at DateTime
-  update_at  DateTime
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
   classes    Classe[]
 
   @@map("classrooms")
@@ -265,12 +263,18 @@ model Classroom {
 // Matrículas
 model Enrollment {
   id         Int              @id @unique @default(autoincrement())
-  created_at DateTime
-  update_at  DateTime
+  created_at DateTime         @default(now())
+  update_at  DateTime         @updatedAt
   state      EnrollementState
-  students   Student?         @relation(fields: [studentsId], references: [id])
+  students   Student?         @relation(fields: [studentId], references: [id])
   documents  Document[]
-  studentsId Int?
+  levels     Level?           @relation(fields: [levelId], references: [id])
+  courses    Course?          @relation(fields: [courseId], references: [id])
+  classes    Classe?          @relation(fields: [classeId], references: [id])
+  studentId  Int?
+  levelId    Int?
+  courseId   Int?
+  classeId   Int?
 
   @@map("enrollments")
 }
@@ -282,8 +286,8 @@ model File {
   path       String
   format     FileFormat
   type       FileType
-  created_at DateTime
-  update_at  DateTime
+  created_at DateTime   @default(now())
+  update_at  DateTime   @updatedAt
   students   Student    @relation(fields: [studentId], references: [id])
   documents  Document[]
   studentId  Int

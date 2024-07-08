@@ -19,9 +19,6 @@ export interface StudentCreateInput {
   email: string
   alternativePhone?: number
   countyId: number
-  courseId: number
-  classeId: number
-  levelId: number
   provinceId: number
 }
 

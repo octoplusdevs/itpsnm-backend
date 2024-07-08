@@ -1,9 +1,9 @@
-import { EnrollementState } from '@prisma/client'
-import { EnrollmentType, EnrollmentsRepository } from '../enrollment-repository'
+import { EnrollementState, Enrollment } from '@prisma/client'
+import { EnrollmentsRepository } from '../enrollment-repository'
 import { randomInt } from 'crypto';
 
 export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
-  public items: EnrollmentType[] = []
+  public items: Enrollment[] = []
 
   async checkStatus(enrollmentId: number): Promise<{ id: number; state: EnrollementState } | null> {
     const enrollment = this.items.find((item) => item.id === enrollmentId)
@@ -34,11 +34,11 @@ export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
     }
     return false
   }
-  async create(data: EnrollmentType): Promise<EnrollmentType> {
+  async create(data: Enrollment): Promise<Enrollment> {
     const enrollment = {
       id: data.id ?? randomInt(9999),
       state: data.state,
-      studentId: data.studentId,
+      studentId: data.studentId!,
       created_at: new Date(),
       update_at: new Date(),
     }
@@ -47,7 +47,7 @@ export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
     return enrollment
 
   }
-  async searchMany(state: EnrollementState, page: number): Promise<EnrollmentType[]> {
+  async searchMany(state: EnrollementState, page: number): Promise<Enrollment[]> {
     return this.items
       .filter((item) => item.state.includes(state))
       .slice((page - 1) * 20, page * 20)

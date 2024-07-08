@@ -1,5 +1,7 @@
 import { EnrollmentType, EnrollmentsRepository } from '@/repositories/enrollment-repository'
-import { EnrollementState, Enrollment } from '@prisma/client'
+import { StudentsRepository } from '@/repositories/student-repository';
+import { EnrollementState } from '@prisma/client'
+import { StudentNotFoundError } from '../errors/student-not-found';
 
 interface CreateEnrollmentUseCaseResponse {
   enrollment: {
@@ -12,7 +14,10 @@ interface CreateEnrollmentUseCaseResponse {
 }
 
 export class CreateEnrollmentUseCase {
-  constructor(private enrollmentRepository: EnrollmentsRepository) { }
+  constructor(
+    private studentsRepository: StudentsRepository,
+    private enrollmentRepository: EnrollmentsRepository,
+  ) { }
 
   async execute({
     id,
@@ -21,12 +26,18 @@ export class CreateEnrollmentUseCase {
     created_at,
     update_at
   }: EnrollmentType): Promise<CreateEnrollmentUseCaseResponse> {
+
+    const studentExists = await this.studentsRepository.findById(studentId);
+    if (!studentExists) {
+      throw new StudentNotFoundError();
+    }
+
     const enrollment = await this.enrollmentRepository.create({
-      id,
+      id: id!,
       state,
       studentId,
-      created_at,
-      update_at
+      created_at: created_at!,
+      update_at: update_at!
     })
 
     return {
