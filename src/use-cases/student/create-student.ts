@@ -5,19 +5,23 @@ import { EmailAlreadyExistsError } from '../errors/email-already-exists-error'
 import { PhoneAlreadyExistsError } from '../errors/phone-already-exists-error'
 import { AlternativePhoneAlreadyExistsError } from '../errors/alternative-phone-already-exists-error'
 import { IdentityCardNumberAlreadyExistsError } from '../errors/id-card-already-exists-error'
+import { prisma } from '@/lib/prisma'
+import { ProvinceNotFoundError } from '../errors/province-not-found'
+import { ProvincesRepository } from '@/repositories/province-repository'
 
 interface CreateStudentUseCaseResponse {
   student: Student
 }
 
 export class CreateStudentUseCase {
-  constructor(private studentRepository: StudentsRepository) { }
+  constructor(
+    private studentRepository: StudentsRepository,
+    private provinceRepository: ProvincesRepository
+  ) { }
 
   async execute({
     id,
-    classeId,
     countyId,
-    courseId,
     dateOfBirth,
     email,
     emissionDate,
@@ -27,7 +31,6 @@ export class CreateStudentUseCase {
     gender,
     height,
     identityCardNumber,
-    levelId,
     maritalStatus,
     mother,
     password,
@@ -61,11 +64,20 @@ export class CreateStudentUseCase {
       throw new IdentityCardNumberAlreadyExistsError()
     }
 
+    const findProvince = await this.provinceRepository.findById(provinceId)
+    if (!findProvince) {
+      throw new ProvinceNotFoundError()
+    }
+
+    //refatorar com um repositorio
+    const findCounty = await prisma.county.findUnique({ where: { id: countyId } })
+    if (!findCounty) {
+      throw new ProvinceNotFoundError()
+    }
+
     const student = await this.studentRepository.create({
       id,
-      classeId,
       countyId,
-      courseId,
       dateOfBirth,
       email,
       emissionDate,
@@ -75,7 +87,6 @@ export class CreateStudentUseCase {
       gender,
       height,
       identityCardNumber,
-      levelId,
       maritalStatus,
       mother,
       password,

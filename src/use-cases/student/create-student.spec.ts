@@ -4,16 +4,23 @@ import { InMemoryStudentRepository } from '@/repositories/in-memory/in-memory-st
 import { EmailAlreadyExistsError } from '../errors/email-already-exists-error'
 import { IdentityCardNumberAlreadyExistsError } from '../errors/id-card-already-exists-error'
 import { AlternativePhoneAlreadyExistsError } from '../errors/alternative-phone-already-exists-error'
+import { InMemoryProvinceRepository } from '@/repositories/in-memory/in-memory-province-repository'
 
 let studentsRepository: InMemoryStudentRepository
+let provincesRepository: InMemoryProvinceRepository
 let sut: CreateStudentUseCase
 
 describe('Create Student Use Case', () => {
   beforeEach(() => {
     studentsRepository = new InMemoryStudentRepository()
-    sut = new CreateStudentUseCase(studentsRepository)
+    provincesRepository = new InMemoryProvinceRepository()
+    sut = new CreateStudentUseCase(studentsRepository, provincesRepository)
   })
   it('should be able to create student', async () => {
+    await provincesRepository.create({
+      name: 'Luanda',
+      id: 1
+    })
     const { student } = await sut.execute({
       fullName: "Wilmy Danguya",
       dateOfBirth: new Date("01/08/2000"),
@@ -32,10 +39,7 @@ describe('Create Student Use Case', () => {
       type: 'SCHOLARSHIP',
       alternativePhone: 22222,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
 
     })
 
@@ -44,6 +48,10 @@ describe('Create Student Use Case', () => {
 
   it('should not be able to register with same email twice', async () => {
     const email = "daniel.yava16@gmail.com";
+    await provincesRepository.create({
+      name: 'Luanda',
+      id: 1
+    })
     await sut.execute({
       fullName: "Wilmy Danguya",
       dateOfBirth: new Date("2000-08-01"),
@@ -62,10 +70,7 @@ describe('Create Student Use Case', () => {
       type: 'SCHOLARSHIP',
       alternativePhone: 987654321,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     });
 
     await expect(sut.execute({
@@ -86,15 +91,16 @@ describe('Create Student Use Case', () => {
       type: 'SCHOLARSHIP',
       alternativePhone: 987654322,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
 
     })).rejects.toBeInstanceOf(EmailAlreadyExistsError)
   })
   it('should not be able to register with same BI twice', async () => {
     const identityCardNumber = "0044578LA012"
+    await provincesRepository.create({
+      name: 'Luanda',
+      id: 1
+    })
     await sut.execute({
       fullName: "Wilmy Danguya",
       dateOfBirth: new Date("2000-08-01"),
@@ -113,10 +119,7 @@ describe('Create Student Use Case', () => {
       type: 'SCHOLARSHIP',
       alternativePhone: 987654321,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     });
 
     await expect(sut.execute({
@@ -137,14 +140,15 @@ describe('Create Student Use Case', () => {
       type: 'SCHOLARSHIP',
       alternativePhone: 987654322,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
 
     })).rejects.toBeInstanceOf(IdentityCardNumberAlreadyExistsError)
   })
   it('should not be able to register with same Alternative Phone twice', async () => {
+    await provincesRepository.create({
+      name: 'Luanda',
+      id: 1
+    })
     const alternativePhone = 987654321
     await sut.execute({
       fullName: "Wilmy Danguya",
@@ -164,10 +168,7 @@ describe('Create Student Use Case', () => {
       type: 'SCHOLARSHIP',
       alternativePhone,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     });
 
     await expect(sut.execute({
@@ -188,10 +189,7 @@ describe('Create Student Use Case', () => {
       type: 'SCHOLARSHIP',
       alternativePhone,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
 
     })).rejects.toBeInstanceOf(AlternativePhoneAlreadyExistsError)
   })
