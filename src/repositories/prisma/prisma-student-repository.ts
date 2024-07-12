@@ -19,7 +19,7 @@ export class PrismaStudentsRepository implements StudentsRepository {
     })
     return findStudent
   }
-  async findByAlternativePhone(phone: number): Promise<Student | null> {
+  async findByAlternativePhone(phone: string): Promise<Student | null> {
     let findStudent = await prisma.student.findUnique({
       where: {
         alternativePhone: phone
@@ -27,7 +27,7 @@ export class PrismaStudentsRepository implements StudentsRepository {
     })
     return findStudent
   }
-  async findByPhone(phone: number): Promise<Student | null> {
+  async findByPhone(phone: string): Promise<Student | null> {
     let findStudent = await prisma.student.findUnique({
       where: {
         phone
@@ -46,7 +46,7 @@ export class PrismaStudentsRepository implements StudentsRepository {
     })
     return findStudent
   }
-  async create(data: StudentCreateInput): Promise<Student> {
+  async create(data: Student): Promise<Student> {
     let {
       id,
       countyId,

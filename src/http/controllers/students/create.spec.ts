@@ -40,9 +40,9 @@ describe('Student (e2e)', () => {
       mother: 'Jane Doe',
       password: 'password123',
       residence: '123 Main St, City',
-      phone: 1234567890,
+      phone: "1234567890",
       type: 'REGULAR',
-      alternativePhone: 9876543210,
+      alternativePhone: "9876543210",
       provinceId: province.id,
       countyId: county.id,
     };

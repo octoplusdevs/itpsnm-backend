@@ -24,9 +24,9 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     mother: z.string(),
     password: z.string(),
     residence: z.string(),
-    phone: z.number(),
+    phone: z.string(),
     type: z.enum(['SCHOLARSHIP', 'REGULAR']),
-    alternativePhone: z.number(),
+    alternativePhone: z.string(),
     provinceId: z.number(),
     countyId: z.number(),
   });

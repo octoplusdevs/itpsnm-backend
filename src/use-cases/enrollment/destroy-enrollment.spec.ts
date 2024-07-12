@@ -14,6 +14,8 @@ describe('Destroy Enrollment Use Case', () => {
     const enrollment = await enrollmentsRepository.create({
       state: 'PENDING',
       studentId: 1,
+      courseId: 1,
+      levelId: 1,
     })
     const response = await sut.execute({ enrollmentId: enrollment.id! })
 

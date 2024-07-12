@@ -15,15 +15,21 @@ describe('Fetch Courses Use Case', () => {
     await enrollmentRepository.create({
       state: 'PENDING',
       studentId: 1,
+      courseId: 1,
+      levelId: 1,
     })
 
     await enrollmentRepository.create({
       state: 'PENDING',
-      studentId: 1,
+      studentId: 2,
+      courseId: 1,
+      levelId: 1,
     })
     await enrollmentRepository.create({
       state: 'APPROVED',
-      studentId: 1,
+      studentId: 3,
+      courseId: 1,
+      levelId: 1,
     })
 
     const { enrollments } = await sut.execute({
@@ -42,7 +48,9 @@ describe('Fetch Courses Use Case', () => {
     for (let i = 1; i <= 22; i++) {
       await enrollmentRepository.create({
         state: 'REJECTED',
-        studentId: 1,
+        studentId: i,
+        courseId: 1,
+        levelId: 1,
       })
     }
 

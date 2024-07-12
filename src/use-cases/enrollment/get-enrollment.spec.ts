@@ -17,6 +17,11 @@ describe('Get Enrollment Use Case', () => {
       id: 1,
       state: 'APPROVED',
       studentId: 1,
+      classeId: 1,
+      courseId: 1,
+      levelId: 1,
+      created_at: new Date(),
+      update_at:  new Date()
     })
     const { enrollment } = await sut.execute({
       enrollmentId: 1

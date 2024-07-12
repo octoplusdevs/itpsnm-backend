@@ -69,8 +69,7 @@ export class CreateStudentUseCase {
       throw new ProvinceNotFoundError()
     }
 
-    //refatorar com um repositorio
-    const findCounty = await prisma.county.findUnique({ where: { id: countyId } })
+    const findCounty = await this.provinceRepository.findById(countyId)
     if (!findCounty) {
       throw new ProvinceNotFoundError()
     }
