@@ -22,8 +22,6 @@ describe('Enrollment (e2e)', () => {
       }
     })
 
-    console.log(county)
-
     const provinceUseCase = makeProvinceUseCase()
     let { province } = await provinceUseCase.execute({
       name: 'Luanda',
@@ -54,10 +52,6 @@ describe('Enrollment (e2e)', () => {
       }
     });
 
-    console.log(student)
-
-
-
     //refactorar
     let course = await prisma.course.create({
       data: {
@@ -65,18 +59,12 @@ describe('Enrollment (e2e)', () => {
       }
     })
 
-    console.log(course)
-
-
     //refactorar
     let level = await prisma.level.create({
       data: {
         name: "CLASS_10"
       }
     })
-
-    console.log(level)
-
 
     const enrollmentResponse = await request(app.server)
     .post('/enrollments')
@@ -89,7 +77,6 @@ describe('Enrollment (e2e)', () => {
       levelId: level.id,
     });
 
-    console.log(enrollmentResponse.body)
     expect(enrollmentResponse.statusCode).toEqual(201);
     expect(enrollmentResponse.body.enrollment.id).toEqual(1);
     expect(enrollmentResponse.body.enrollment.state).toEqual('PENDING');
