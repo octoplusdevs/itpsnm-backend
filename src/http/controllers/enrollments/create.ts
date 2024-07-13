@@ -20,11 +20,14 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
   try {
     const createEnrollmentUseCase = makeCreateEnrollmentUseCase();
-    await createEnrollmentUseCase.execute({
+    let enrollment = await createEnrollmentUseCase.execute({
       identityCardNumber,
       courseId,
       levelId,
     });
+
+    return reply.status(201).send(enrollment)
+
   } catch (err) {
     if (err instanceof StudentNotFoundError) {
       return reply.status(404).send({ message: err.message });
@@ -35,7 +38,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     } else if (err instanceof EnrollmentAlreadyExistsError) {
       return reply.status(409).send({ message: err.message });
     }
-    return reply.status(500).send(err );
+    return reply.status(500).send(err);
   }
 
   return reply.status(201).send();

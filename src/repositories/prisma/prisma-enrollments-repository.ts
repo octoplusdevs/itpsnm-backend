@@ -9,6 +9,25 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
     let enrollment = await prisma.enrollment.findUnique({
       where: {
         id: enrollmentId
+      },
+      include: {
+        students: {
+          select: {
+            fullName: true
+          }
+        },
+        levels: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        courses: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
       }
     })
 
@@ -17,7 +36,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
 
   async findByStudentId(studentId: number): Promise<EnrollmentType | null> {
     let student = await prisma.student.findUnique({ where: { id: studentId } })
-    if(!student){
+    if (!student) {
       throw new StudentNotFoundError()
     }
     let enrollment = await prisma.enrollment.findUnique({ where: { studentId } })
@@ -51,7 +70,10 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
     let enrollment = await prisma.enrollment.create({
       data: {
         state: data.state,
-        studentId: data.studentId
+        studentId: data.studentId,
+        courseId: data.courseId,
+        levelId: data.levelId,
+        classeId: null,
       }
     })
     return {

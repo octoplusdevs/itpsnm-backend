@@ -27,8 +27,6 @@ describe('Enrollment (e2e)', () => {
       name: 'Luanda',
     })
 
-    console.log(province)
-
     const student = await prisma.student.create({
       data: {
         fullName: 'John Doe',
@@ -70,15 +68,13 @@ describe('Enrollment (e2e)', () => {
     .post('/enrollments')
     .set('Content-Type', 'application/json')
     .send({
-      id: 1,
-      state: 'PENDING',
       identityCardNumber: student.identityCardNumber,
       courseId: course.id,
       levelId: level.id,
     });
 
+    console.log(enrollmentResponse.body)
     expect(enrollmentResponse.statusCode).toEqual(201);
-    expect(enrollmentResponse.body.enrollment.id).toEqual(1);
     expect(enrollmentResponse.body.enrollment.state).toEqual('PENDING');
     expect(enrollmentResponse.body.enrollment.studentId).toEqual(student.id);
     expect(enrollmentResponse.body.enrollment.courseId).toEqual(course.id);

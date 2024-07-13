@@ -46,6 +46,8 @@ describe('Create Enrollment Use Case', () => {
       alternativePhone: "9876543210",
       provinceId: 1,
       countyId: 1,
+      created_at: new Date(),
+      update_at: new Date(),
     })
 
     const course = await coursesRepository.create({
@@ -103,6 +105,8 @@ describe('Create Enrollment Use Case', () => {
       alternativePhone: "9876543210",
       provinceId: 1,
       countyId: 1,
+      created_at: new Date(),
+      update_at: new Date(),
     })
 
     await expect(() =>
@@ -137,6 +141,8 @@ describe('Create Enrollment Use Case', () => {
       alternativePhone: "9876543210",
       provinceId: 1,
       countyId: 1,
+      created_at: new Date(),
+      update_at: new Date(),
     })
 
     const course = await coursesRepository.create({
@@ -176,6 +182,8 @@ describe('Create Enrollment Use Case', () => {
       alternativePhone: "9876543210",
       provinceId: 1,
       countyId: 1,
+      created_at: new Date(),
+      update_at: new Date(),
     })
 
     const course = await coursesRepository.create({
