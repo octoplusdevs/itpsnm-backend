@@ -1,11 +1,19 @@
-import { PrismaStudentsRepository } from '@/repositories/prisma/prisma-student-repository'
-import { CreateEnrollmentUseCase } from '../enrollment/create-enrollment'
-import { PrismaEnrollmentsRepository } from '@/repositories/prisma/prisma-enrollments-repository'
+import { PrismaCoursesRepository } from '@/repositories/prisma/prisma-course-repository';
+import { PrismaEnrollmentsRepository } from '@/repositories/prisma/prisma-enrollments-repository';
+import { PrismaStudentsRepository } from '@/repositories/prisma/prisma-student-repository';
+import { CreateEnrollmentUseCase } from '../enrollment/create-enrollment';
+import { PrismaLevelsRepository } from '@/repositories/prisma/prisma-level-repository';
 
-export function makeEnrollmentUseCase() {
-  const enrollmentRepository = new PrismaEnrollmentsRepository()
-  const studentsRepository = new PrismaStudentsRepository()
-  const useCase = new CreateEnrollmentUseCase(studentsRepository, enrollmentRepository)
+export function makeCreateEnrollmentUseCase() {
+  const enrollmentsRepository = new PrismaEnrollmentsRepository();
+  const studentsRepository = new PrismaStudentsRepository();
+  const coursesRepository = new PrismaCoursesRepository();
+  const levelsRepository = new PrismaLevelsRepository();
 
-  return useCase
+  return new CreateEnrollmentUseCase(
+    studentsRepository,
+    levelsRepository,
+    coursesRepository,
+    enrollmentsRepository
+  );
 }

@@ -1,6 +1,6 @@
-import { CourseAlreadyExistsError } from '@/use-cases/errors/course-already-exists-error'
+import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found'
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found'
-import { makeDestroyCourseUseCase } from '@/use-cases/factories/make-destroy-course-use-case'
+import { makeDestroyEnrollmentUseCase } from '@/use-cases/factories/make-destroy-enrollment-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -12,15 +12,12 @@ export async function destroy(request: FastifyRequest, reply: FastifyReply) {
   const { id } = registerBodySchema.parse(request.params)
 
   try {
-    const courseUseCase = makeDestroyCourseUseCase()
-    await courseUseCase.execute({
-      id,
+    const enrollmentUseCase = makeDestroyEnrollmentUseCase()
+    await enrollmentUseCase.execute({
+      enrollmentId: id
     })
   } catch (err) {
-    if (err instanceof CourseAlreadyExistsError) {
-      return reply.status(409).send({ message: err.message })
-    }
-    if (err instanceof ResourceNotFoundError) {
+    if (err instanceof EnrollmentNotFoundError) {
       return reply.status(404).send({ message: err.message })
     }
     return reply.status(500).send(err)

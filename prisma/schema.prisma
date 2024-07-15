@@ -167,9 +167,9 @@ model Student {
   expirationDate     DateTime
   maritalStatus      MaritalStatus
   residence          String
-  phone              BigInt        @unique
+  phone              String        @unique
   email              String        @unique
-  alternativePhone   BigInt?       @unique
+  alternativePhone   String?       @unique
   provinces          Province?     @relation(fields: [provinceId], references: [id])
   counties           County?       @relation(fields: [countyId], references: [id])
   tuitionFees        Tuition[]
@@ -271,7 +271,7 @@ model Enrollment {
   levels     Level?           @relation(fields: [levelId], references: [id])
   courses    Course?          @relation(fields: [courseId], references: [id])
   classes    Classe?          @relation(fields: [classeId], references: [id])
-  studentId  Int?
+  studentId  Int?             @unique
   levelId    Int?
   courseId   Int?
   classeId   Int?

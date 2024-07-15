@@ -1,19 +1,18 @@
-import request from 'supertest';
-import { app } from '@/app';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { prisma } from '@/lib/prisma';
-import { makeProvinceUseCase } from '@/use-cases/factories/make-province-use-case';
+import request from 'supertest'
+import { app } from '@/app'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { prisma } from '@/lib/prisma'
+import { makeProvinceUseCase } from '@/use-cases/factories/make-province-use-case'
+import { makeCourseUseCase } from '@/use-cases/factories/make-course-use-case'
 
-describe('Enrollment (e2e)', () => {
+describe('Enrollment Get (e2e)', () => {
   beforeAll(async () => {
-    await app.ready();
-  });
-
+    await app.ready()
+  })
   afterAll(async () => {
-    await app.close();
-  });
-
-  it('should be able to create an enrollment', async () => {
+    await app.close()
+  })
+  it('should be able to get a enrollment', async () => {
 
     //refactorar
     let county = await prisma.county.create({
@@ -50,11 +49,9 @@ describe('Enrollment (e2e)', () => {
       }
     });
 
-    //refactorar
-    let course = await prisma.course.create({
-      data: {
-        name: "Infermagem"
-      }
+    const courseUseCase = makeCourseUseCase()
+    let { course } = await courseUseCase.execute({
+      name: "Infermagem",
     })
 
     //refactorar
@@ -65,18 +62,18 @@ describe('Enrollment (e2e)', () => {
     })
 
     const enrollmentResponse = await request(app.server)
-    .post('/enrollments')
-    .set('Content-Type', 'application/json')
-    .send({
-      identityCardNumber: student.identityCardNumber,
-      courseId: course.id,
-      levelId: level.id,
-    });
+      .post('/enrollments')
+      .set('Content-Type', 'application/json')
+      .send({
+        id: 1,
+        state: 'PENDING',
+        identityCardNumber: student.identityCardNumber,
+        courseId: course.id,
+        levelId: level.id,
+      });
 
-    expect(enrollmentResponse.statusCode).toEqual(201);
-    expect(enrollmentResponse.body.enrollment.state).toEqual('PENDING');
-    expect(enrollmentResponse.body.enrollment.studentId).toEqual(student.id);
-    expect(enrollmentResponse.body.enrollment.courseId).toEqual(course.id);
-    expect(enrollmentResponse.body.enrollment.levelId).toEqual(level.id);
-  });
-});
+    const response = await request(app.server).get(`/enrollments/${enrollmentResponse.body.enrollment.id}`)
+
+    expect(response.statusCode).toEqual(201)
+  })
+})

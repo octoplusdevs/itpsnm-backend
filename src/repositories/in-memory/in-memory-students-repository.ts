@@ -20,7 +20,7 @@ export class InMemoryStudentRepository implements StudentsRepository {
     }
     return student[0]
   }
-  async create(data: StudentCreateInput): Promise<Student> {
+  async create(data: Student): Promise<Student> {
     const newStudent: Student = {
       id: data.id ?? randomInt(9999),
       type: data.type,
@@ -40,10 +40,9 @@ export class InMemoryStudentRepository implements StudentsRepository {
       email: data.email,
       alternativePhone: data.alternativePhone ?? null,
       countyId: data.countyId,
-      courseId: data.courseId,
-      classeId: data.classeId,
-      levelId: data.levelId,
-      provinceId: data.provinceId
+      provinceId: data.provinceId,
+      created_at: data.created_at,
+      update_at: data.update_at,
     }
     this.items.push(newStudent)
     return newStudent
@@ -68,14 +67,14 @@ export class InMemoryStudentRepository implements StudentsRepository {
     }
     return student
   }
-  async findByPhone(phone: number): Promise<Student | null> {
+  async findByPhone(phone: string): Promise<Student | null> {
     const student = this.items.find((item) => item.phone === phone)
     if (!student) {
       return null
     }
     return student
   }
-  async findByAlternativePhone(phone: number): Promise<Student | null> {
+  async findByAlternativePhone(phone: string): Promise<Student | null> {
     const student = this.items.find((item) => item.alternativePhone === phone)
     if (!student) {
       return null

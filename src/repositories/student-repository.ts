@@ -15,9 +15,9 @@ export interface StudentCreateInput {
   expirationDate: Date
   maritalStatus: MaritalStatus
   residence: string
-  phone: number
+  phone: string
   email: string
-  alternativePhone?: number
+  alternativePhone?: string
   countyId: number
   provinceId: number
 }
@@ -26,11 +26,11 @@ export interface StudentCreateInput {
 export interface StudentsRepository {
   findById(id: number): Promise<Student | null>
   findByIdentityCardNumber(identityCardNumber: string): Promise<Student | null>
-  findByAlternativePhone(phone: number): Promise<Student | null>
-  findByPhone(phone: number): Promise<Student | null>
+  findByAlternativePhone(phone: string): Promise<Student | null>
+  findByPhone(phone: string): Promise<Student | null>
   findByName(name: string): Promise<Student | null>
   findByEmail(email: string): Promise<Student | null>
-  create(data: StudentCreateInput): Promise<Student>
+  create(data: Student): Promise<Student>
   searchMany(query: string, page: number): Promise<Student[]>
   destroy(id: number): Promise<boolean>;
 }

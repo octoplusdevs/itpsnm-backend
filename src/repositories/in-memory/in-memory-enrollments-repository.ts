@@ -1,9 +1,27 @@
-import { EnrollementState, Enrollment } from '@prisma/client'
-import { EnrollmentsRepository } from '../enrollment-repository'
+import { EnrollementState } from '@prisma/client'
+import { EnrollmentType, EnrollmentsRepository } from '../enrollment-repository'
 import { randomInt } from 'crypto';
 
 export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
-  public items: Enrollment[] = []
+
+  public items: EnrollmentType[] = []
+
+
+  async findById(enrollmentId: number): Promise<EnrollmentType | null> {
+    const enrollment = this.items.find((item) => item.id === enrollmentId)
+    if (!enrollment) {
+      return null
+    }
+    return enrollment
+  }
+
+  async findByStudentId(studentId: number): Promise<EnrollmentType | null> {
+    const enrollment = this.items.find((item) => item.id === studentId)
+    if (!enrollment) {
+      return null
+    }
+    return enrollment
+  }
 
   async checkStatus(enrollmentId: number): Promise<{ id: number; state: EnrollementState } | null> {
     const enrollment = this.items.find((item) => item.id === enrollmentId)
@@ -34,11 +52,14 @@ export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
     }
     return false
   }
-  async create(data: Enrollment): Promise<Enrollment> {
-    const enrollment = {
+  async create(data: EnrollmentType): Promise<EnrollmentType> {
+    const enrollment: EnrollmentType = {
       id: data.id ?? randomInt(9999),
       state: data.state,
-      studentId: data.studentId!,
+      studentId: data.studentId,
+      classeId: data.classeId,
+      courseId: data.courseId,
+      levelId: data.levelId,
       created_at: new Date(),
       update_at: new Date(),
     }
@@ -47,7 +68,7 @@ export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
     return enrollment
 
   }
-  async searchMany(state: EnrollementState, page: number): Promise<Enrollment[]> {
+  async searchMany(state: EnrollementState, page: number): Promise<EnrollmentType[]> {
     return this.items
       .filter((item) => item.state.includes(state))
       .slice((page - 1) * 20, page * 20)
