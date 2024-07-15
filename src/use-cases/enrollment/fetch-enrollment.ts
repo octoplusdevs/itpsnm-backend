@@ -7,7 +7,12 @@ interface FetchEnrollmentUseCaseRequest {
 }
 
 interface FetchEnrollmentUseCaseResponse {
-  enrollments: EnrollmentType[]
+  enrollments: {
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: EnrollmentType[];
+  }
 }
 
 export class FetchEnrollmentUseCase {
@@ -22,8 +27,6 @@ export class FetchEnrollmentUseCase {
       page
     )
 
-    return {
-      enrollments,
-    }
+    return { enrollments }
   }
 }

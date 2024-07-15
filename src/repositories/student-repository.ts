@@ -1,4 +1,5 @@
 import { Gender, MaritalStatus, Student, StudentType } from '@prisma/client'
+import { EnrollmentType } from './enrollment-repository'
 
 export interface StudentCreateInput {
   id?: number
@@ -31,6 +32,11 @@ export interface StudentsRepository {
   findByName(name: string): Promise<Student | null>
   findByEmail(email: string): Promise<Student | null>
   create(data: Student): Promise<Student>
-  searchMany(query: string, page: number): Promise<Student[]>
+  searchMany(query: string, page: number): Promise<{
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: Student[];
+  }>
   destroy(id: number): Promise<boolean>;
 }

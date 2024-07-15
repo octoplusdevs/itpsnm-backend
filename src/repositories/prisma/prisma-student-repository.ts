@@ -94,8 +94,17 @@ export class PrismaStudentsRepository implements StudentsRepository {
     })
     return student
   }
-  async searchMany(query: string, page: number): Promise<Student[]> {
+  async searchMany(query: string, page: number): Promise<{
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: Student[];
+  }> {
     let pageSize = 20
+    const totalItems = await prisma.student.count();
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+
     let students = await prisma.student.findMany({
       where: {
         fullName: {
@@ -106,7 +115,12 @@ export class PrismaStudentsRepository implements StudentsRepository {
       skip: (page - 1) * pageSize,
       take: pageSize
     })
-    return students
+    return {
+      totalItems,
+      currentPage: page,
+      totalPages,
+      items: students
+    };
   }
   async destroy(id: number): Promise<boolean> {
     let destroyStudent = await prisma.student.delete({

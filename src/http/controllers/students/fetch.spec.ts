@@ -5,14 +5,14 @@ import { prisma } from '@/lib/prisma'
 import { makeProvinceUseCase } from '@/use-cases/factories/make-province-use-case'
 import { makeCourseUseCase } from '@/use-cases/factories/make-course-use-case'
 
-describe('Enrollment Fetch (e2e)', () => {
+describe('Student Fetch (e2e)', () => {
   beforeAll(async () => {
     await app.ready()
   })
   afterAll(async () => {
     await app.close()
   })
-  it('should be able to fetch a list of enrollments', async () => {
+  it('should be able to fetch a list of students', async () => {
 
     //refactorar
     let county = await prisma.county.create({
@@ -26,7 +26,7 @@ describe('Enrollment Fetch (e2e)', () => {
       name: 'Luanda',
     })
 
-    const student = await prisma.student.create({
+    await prisma.student.create({
       data: {
         fullName: 'John Doe',
         dateOfBirth: new Date('2000-01-01'),
@@ -49,7 +49,7 @@ describe('Enrollment Fetch (e2e)', () => {
       }
     });
 
-    const student1 = await prisma.student.create({
+    await prisma.student.create({
       data: {
         fullName: 'John Doe',
         dateOfBirth: new Date('2000-01-01'),
@@ -66,47 +66,13 @@ describe('Enrollment Fetch (e2e)', () => {
         residence: '123 Main St, City',
         phone: "1234567891",
         type: 'REGULAR',
-        alternativePhone: "9876513210",
+        alternativePhone: "9836543210",
         provinceId: province.id,
         countyId: county.id,
       }
     });
 
-    const courseUseCase = makeCourseUseCase()
-    let { course } = await courseUseCase.execute({
-      name: "Infermagem",
-    })
-
-    //refactorar
-    let level = await prisma.level.create({
-      data: {
-        name: "CLASS_10"
-      }
-    })
-
-    await request(app.server)
-      .post('/enrollments')
-      .set('Content-Type', 'application/json')
-      .send({
-        id: 1,
-        state: 'PENDING',
-        identityCardNumber: student.identityCardNumber,
-        courseId: course.id,
-        levelId: level.id,
-      });
-
-    await request(app.server)
-      .post('/enrollments')
-      .set('Content-Type', 'application/json')
-      .send({
-        id: 2,
-        state: 'PENDING',
-        identityCardNumber: student1.identityCardNumber,
-        courseId: course.id,
-        levelId: level.id,
-      });
-
-    const response = await request(app.server).get(`/enrollments`)
-    expect(response.body.enrollments.totalItems).toEqual(2)
+    const response = await request(app.server).get(`/students`)
+    expect(response.body.students.totalItems).toEqual(2)
   })
 })

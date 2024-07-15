@@ -5,13 +5,13 @@ import { InMemoryStudentRepository } from '@/repositories/in-memory/in-memory-st
 let studentRepository: InMemoryStudentRepository
 let sut: FetchStudentUseCase
 
-describe('Fetch Courses Use Case', () => {
+describe('Fetch Students Use Case', () => {
   beforeEach(async () => {
     studentRepository = new InMemoryStudentRepository()
     sut = new FetchStudentUseCase(studentRepository)
   })
 
-  it('should be able to fetch a course', async () => {
+  it('should be able to fetch a list of students', async () => {
     await studentRepository.create({
       fullName: "Wilmy Danguya",
       dateOfBirth: new Date("2000-08-01"),
@@ -26,23 +26,23 @@ describe('Fetch Courses Use Case', () => {
       mother: "Maria",
       password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654321,
+      alternativePhone: "987654321",
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
+      id: 1,
+      created_at: new Date(),
+      update_at: new Date()
     });
 
     const { students } = await sut.execute({
-      name: 'Wilmy Danguya',
+      query: 'Wilmy Danguya',
       page: 1,
     })
 
-    expect(students).toHaveLength(1)
-    expect(students).toEqual([
+    expect(students.totalItems).toBe(1)
+    expect(students.items).toEqual([
       expect.objectContaining({ fullName: 'Wilmy Danguya' }),
     ])
   })
@@ -63,24 +63,24 @@ describe('Fetch Courses Use Case', () => {
         mother: "Maria",
         password: "password123",
         residence: "Rua Principal, 123",
-        phone: 123456789 + i,
+        phone: "123456789" + i,
         type: 'SCHOLARSHIP',
-        alternativePhone: 987654321 + i,
+        alternativePhone: "987654321" + i,
         provinceId: 1,
-        classeId: 1,
         countyId: 1,
-        courseId: 1,
-        levelId: 1,
+        id: 1,
+        created_at: new Date(),
+        update_at: new Date()
       });
     }
 
     const { students } = await sut.execute({
-      name: 'Wilmy Danguya',
+      query: 'Wilmy Danguya',
       page: 2,
     })
 
-    expect(students).toHaveLength(2)
-    expect(students).toEqual([
+    expect(students.totalItems).toBe(22)
+    expect(students.items).toEqual([
       expect.objectContaining({ fullName: 'Wilmy Danguya 21' }),
       expect.objectContaining({ fullName: 'Wilmy Danguya 22' }),
     ])

@@ -47,10 +47,32 @@ export class InMemoryStudentRepository implements StudentsRepository {
     this.items.push(newStudent)
     return newStudent
   }
-  async searchMany(query: string, page: number): Promise<Student[]> {
-    return this.items
-      .filter((item) => item.fullName.includes(query))
-      .slice((page - 1) * 20, page * 20)
+  async searchMany(query: string, page: number): Promise<{
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: Student[];
+  }> {
+    const pageSize = 20;
+
+    // Filtrar itens pelo nome
+    const filteredItems = this.items.filter((item) => item.fullName.includes(query));
+
+    // Calcular o número total de itens
+    const totalItems = filteredItems.length;
+
+    // Calcular o número total de páginas
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // Pegar itens para a página atual
+    const items = filteredItems.slice((page - 1) * pageSize, page * pageSize);
+
+    return {
+      totalItems,
+      currentPage: page,
+      totalPages,
+      items,
+    };
   }
   async destroy(id: number): Promise<boolean> {
     const index = this.items.findIndex((item) => item.id === id)
