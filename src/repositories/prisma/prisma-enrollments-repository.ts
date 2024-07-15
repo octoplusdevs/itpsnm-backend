@@ -66,6 +66,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
     })
     return isDeletedEnrollment ? true : false
   }
+
   async create(data: EnrollmentType): Promise<EnrollmentType> {
     let enrollment = await prisma.enrollment.create({
       data: {
@@ -84,16 +85,46 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
       classeId: enrollment.classeId!,
     }
   }
-  async searchMany(state: EnrollementState, page: number): Promise<EnrollmentType[]> {
+
+  async searchMany(state: EnrollementState, page: number): Promise<{
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: EnrollmentType[];
+  }> {
     let pageSize = 20
+    const totalItems = await prisma.enrollment.count();
+
+    const totalPages = Math.ceil(totalItems / pageSize);
     let enrollments = await prisma.enrollment.findMany({
-      where: {
-        state
+      include: {
+        students: {
+          select: {
+            fullName: true
+          }
+        },
+        levels: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        courses: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
       },
       skip: (page - 1) * pageSize,
       take: pageSize
     })
-    return enrollments
+    return {
+      totalItems,
+      currentPage: page,
+      totalPages,
+      items: enrollments
+    };
   }
 
 }

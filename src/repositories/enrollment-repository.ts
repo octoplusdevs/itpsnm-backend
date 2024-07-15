@@ -16,5 +16,10 @@ export interface EnrollmentsRepository {
   toggleStatus(enrollmentId: number, state: EnrollementState): Promise<{ id: number; status: EnrollementState } | null>
   destroy(enrollmentId: number): Promise<Boolean>
   create(data: EnrollmentType): Promise<EnrollmentType>
-  searchMany(state: EnrollementState, page: number): Promise<EnrollmentType[]>
+  searchMany(state: EnrollementState, page: number): Promise<{
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: EnrollmentType[];
+  }>
 }

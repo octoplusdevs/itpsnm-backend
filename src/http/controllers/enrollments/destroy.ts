@@ -1,3 +1,4 @@
+import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found'
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found'
 import { makeDestroyEnrollmentUseCase } from '@/use-cases/factories/make-destroy-enrollment-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
@@ -16,7 +17,7 @@ export async function destroy(request: FastifyRequest, reply: FastifyReply) {
       enrollmentId: id
     })
   } catch (err) {
-    if (err instanceof ResourceNotFoundError) {
+    if (err instanceof EnrollmentNotFoundError) {
       return reply.status(404).send({ message: err.message })
     }
     return reply.status(500).send(err)

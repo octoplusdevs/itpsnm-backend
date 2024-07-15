@@ -2,6 +2,7 @@ import { expect, describe, it, beforeEach } from 'vitest'
 import { ResourceNotFoundError } from '../errors/resource-not-found'
 import { GetEnrollmentUseCase } from './get-enrollment'
 import { InMemoryEnrollmentRepository } from '@/repositories/in-memory/in-memory-enrollments-repository'
+import { EnrollmentNotFoundError } from '../errors/enrollment-not-found'
 
 let enrollmentsRepository: InMemoryEnrollmentRepository
 let sut: GetEnrollmentUseCase
@@ -34,6 +35,6 @@ describe('Get Enrollment Use Case', () => {
       sut.execute({
         enrollmentId: -1,
       }),
-    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(EnrollmentNotFoundError)
   })
 })

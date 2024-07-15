@@ -1,6 +1,6 @@
 import { EnrollementState } from '@prisma/client'
-import { ResourceNotFoundError } from '../errors/resource-not-found'
 import { EnrollmentsRepository } from '@/repositories/enrollment-repository'
+import { EnrollmentNotFoundError } from '../errors/enrollment-not-found'
 
 interface GetEnrollmentUseCaseRequest {
   enrollmentId: number
@@ -21,7 +21,7 @@ export class GetEnrollmentUseCase {
   }: GetEnrollmentUseCaseRequest): Promise<GetEnrollmentUseCaseResponse> {
     const enrollment = await this.enrollmentsRepository.checkStatus(enrollmentId)
     if (!enrollment) {
-      throw new ResourceNotFoundError()
+      throw new EnrollmentNotFoundError()
     }
 
     return {
