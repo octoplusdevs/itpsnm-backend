@@ -1,47 +1,28 @@
-import { FilesRepository, FilesType } from '@/repositories/files-repository'
-import { FileFormat, FileType } from '@prisma/client'
+import { FilesRepository } from '@/repositories/files-repository';
+import { FileFormat, FileType } from '@prisma/client';
 
-interface CreateFileUseCaseRequest {
-  id?: number
-  name: string
-  studentId: number
-  type: FileType
-  format: FileFormat
-  path: string
-  created_at?: Date
-  update_at?: Date
+interface CreateFileRequest {
+  name: string;
+  path: string;
+  format: FileFormat;
+  type: FileType;
+  studentId: number;
 }
 
-interface CreateFileUseCaseResponse {
-  file: FilesType
-}
-
-export class CreateFileUseCase {
+class CreateFileUseCase {
   constructor(private filesRepository: FilesRepository) { }
 
-  async execute({
-    format,
-    path,
-    name,
-    studentId,
-    type,
-    created_at,
-    id,
-    update_at
-  }: CreateFileUseCaseRequest): Promise<CreateFileUseCaseResponse> {
+  async execute({ name, path, format, type, studentId }: CreateFileRequest) {
     const file = await this.filesRepository.create({
-      format,
-      path,
       name,
-      studentId,
+      path,
+      format,
       type,
-      created_at,
-      id,
-      update_at
-    })
+      studentId,
+    });
 
-    return {
-      file,
-    }
+    return file;
   }
 }
+
+export { CreateFileUseCase };

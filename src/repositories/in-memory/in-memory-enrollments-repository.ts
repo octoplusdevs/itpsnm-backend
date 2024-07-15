@@ -68,9 +68,32 @@ export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
     return enrollment
 
   }
-  async searchMany(state: EnrollementState, page: number): Promise<EnrollmentType[]> {
-    return this.items
-      .filter((item) => item.state.includes(state))
-      .slice((page - 1) * 20, page * 20)
+  async searchMany(state: EnrollementState, page: number): Promise<{
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: EnrollmentType[];
+  }> {
+    const pageSize = 20;
+
+    // Filtrar itens pelo estado
+    const filteredItems = this.items.filter((item) => item.state === state);
+
+    // Calcular o número total de itens
+    const totalItems = filteredItems.length;
+
+    // Calcular o número total de páginas
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // Pegar itens para a página atual
+    const items = filteredItems.slice((page - 1) * pageSize, page * pageSize);
+
+    return {
+      totalItems,
+      currentPage: page,
+      totalPages,
+      items,
+    };
   }
+
 }

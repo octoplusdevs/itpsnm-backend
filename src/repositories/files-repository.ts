@@ -1,18 +1,24 @@
-import { FileFormat, FileType } from '@prisma/client'
+import { File, FileFormat, FileType } from '@prisma/client';
 
-export interface FilesType {
-  id?: number
-  name: string
-  studentId: number
-  type: FileType
-  format: FileFormat
-  path: string
-  created_at?: Date
-  update_at?: Date
+export interface CreateFileInput {
+  name: string;
+  path: string;
+  format: FileFormat;
+  type: FileType;
+  studentId: number;
 }
-export interface FilesRepository {
-  create(data: FilesType): Promise<FilesType>
-  findById(fileId: number): Promise<FilesType | null>
-  destroy(fileId: number): Promise<Boolean>
 
+export interface UpdateFileInput {
+  name?: string;
+  path?: string;
+  format?: FileFormat;
+  type?: FileType;
+}
+
+export interface FilesRepository {
+  create(data: CreateFileInput): Promise<File>;
+  findById(id: number): Promise<File | null>;
+  findAllByStudentId(studentId: number): Promise<File[]>;
+  update(id: number, data: UpdateFileInput): Promise<File | null>;
+  destroy(id: number): Promise<void>;
 }

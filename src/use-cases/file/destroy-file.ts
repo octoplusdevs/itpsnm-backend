@@ -1,18 +1,15 @@
-import { FilesRepository } from "@/repositories/files-repository"
+import { FilesRepository } from '@/repositories/files-repository';
 
-interface DestroyFileUseCaseRequest {
-  fileId: number
+interface DeleteFileRequest {
+  id: number;
 }
 
-export class DestroyFileUseCase {
-  constructor(private filesRepository: FilesRepository) { }
+class DeleteFileUseCase {
+  constructor(private filesRepository: FilesRepository) {}
 
-  async execute({
-    fileId,
-  }: DestroyFileUseCaseRequest): Promise<Boolean> {
-    return await this.filesRepository.destroy(
-      fileId,
-    )
-
+  async execute({ id }: DeleteFileRequest) {
+    await this.filesRepository.destroy(id);
   }
 }
+
+export { DeleteFileUseCase };

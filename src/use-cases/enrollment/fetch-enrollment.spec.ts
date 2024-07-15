@@ -37,8 +37,8 @@ describe('Fetch Courses Use Case', () => {
       page: 1,
     })
 
-    expect(enrollments).toHaveLength(1)
-    expect(enrollments).toEqual([
+    expect(enrollments?.items).toHaveLength(1)
+    expect(enrollments?.items).toEqual([
       expect.objectContaining({ state: 'APPROVED' }),
     ])
   })
@@ -59,8 +59,8 @@ describe('Fetch Courses Use Case', () => {
       page: 2,
     })
 
-    expect(enrollments).toHaveLength(2)
-    expect(enrollments).toEqual([
+    expect(enrollments?.items).toHaveLength(2)
+    expect(enrollments?.items).toEqual([
       expect.objectContaining({ state: 'REJECTED' }),
       expect.objectContaining({ state: 'REJECTED' }),
     ])

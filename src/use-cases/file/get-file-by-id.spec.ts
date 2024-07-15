@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { InMemoryFilesRepository } from '@/repositories/in-memory/in-memory-files-repository';
 import { FileFormat, FileType } from '@prisma/client';
-import { DeleteFileUseCase } from './destroy-file';
+import { GetFileByIdUseCase } from './get-file-by-id';
 
-describe('DeleteFileUseCase', () => {
-  let deleteFileUseCase: DeleteFileUseCase;
+describe('GetFileByIdUseCase', () => {
+  let getFileByIdUseCase: GetFileByIdUseCase;
   let filesRepository: InMemoryFilesRepository;
 
   beforeEach(() => {
     filesRepository = new InMemoryFilesRepository();
-    deleteFileUseCase = new DeleteFileUseCase(filesRepository);
+    getFileByIdUseCase = new GetFileByIdUseCase(filesRepository);
   });
 
-  it('should delete a file', async () => {
+  it('should get a file by ID', async () => {
     const createdFile = await filesRepository.create({
       name: 'test-file',
       path: '/path/to/file',
@@ -21,9 +21,9 @@ describe('DeleteFileUseCase', () => {
       studentId: 1,
     });
 
-    await deleteFileUseCase.execute({ id: createdFile.id });
+    const file = await getFileByIdUseCase.execute({ id: createdFile.id });
 
-    const file = await filesRepository.findById(createdFile.id);
-    expect(file).toBeNull();
+    expect(file).not.toBeNull();
+    expect(file?.name).toBe('test-file');
   });
 });

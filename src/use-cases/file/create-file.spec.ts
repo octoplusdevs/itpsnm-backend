@@ -1,24 +1,27 @@
-import { expect, describe, it, beforeEach } from 'vitest'
-import { CreateFileUseCase } from './create-file'
-import { InMemoryFilesRepository } from '@/repositories/in-memory/in-memory-files-repository'
+import { describe, it, expect, beforeEach } from 'vitest';
+import { InMemoryFilesRepository } from '@/repositories/in-memory/in-memory-files-repository';
+import { FileFormat, FileType } from '@prisma/client';
+import { CreateFileUseCase } from './create-file';
 
-let filesRepository: InMemoryFilesRepository
-let sut: CreateFileUseCase
+describe('CreateFileUseCase', () => {
+  let createFileUseCase: CreateFileUseCase;
+  let filesRepository: InMemoryFilesRepository;
 
-describe('Create File Use Case', () => {
   beforeEach(() => {
-    filesRepository = new InMemoryFilesRepository()
-    sut = new CreateFileUseCase(filesRepository)
-  })
-  it('should be able to create file', async () => {
-    const { file } = await sut.execute({
-      format: "PDF",
-      name: "relatorio",
-      path: "local do ficheiro",
-      studentId: 1,
-      type:'REPORT_CARD',
-    })
+    filesRepository = new InMemoryFilesRepository();
+    createFileUseCase = new CreateFileUseCase(filesRepository);
+  });
 
-    expect(file.id).toEqual(expect.any(Number))
-  })
-})
+  it('should create a new file', async () => {
+    const file = await createFileUseCase.execute({
+      name: 'test-file',
+      path: '/path/to/file',
+      format: FileFormat.PDF,
+      type: FileType.TUITION_RECEIPT,
+      studentId: 1,
+    });
+
+    expect(file).toHaveProperty('id');
+    expect(file.name).toBe('test-file');
+  });
+});
