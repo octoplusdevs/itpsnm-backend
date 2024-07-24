@@ -2,7 +2,8 @@ import { EnrollmentType, EnrollmentsRepository } from '@/repositories/enrollment
 import { EnrollementState } from '@prisma/client'
 
 interface FetchEnrollmentUseCaseRequest {
-  state: EnrollementState
+  paymentState: EnrollementState
+  docsState: EnrollementState
   page: number
 }
 
@@ -19,11 +20,13 @@ export class FetchEnrollmentUseCase {
   constructor(private enrollmentsRepository: EnrollmentsRepository) { }
 
   async execute({
-    state,
+    paymentState,
+    docsState,
     page
   }: FetchEnrollmentUseCaseRequest): Promise<FetchEnrollmentUseCaseResponse> {
     const enrollments = await this.enrollmentsRepository.searchMany(
-      state,
+      paymentState,
+      docsState,
       page
     )
 

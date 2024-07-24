@@ -40,6 +40,4 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     }
     return reply.status(500).send(err);
   }
-
-  return reply.status(201).send();
 }

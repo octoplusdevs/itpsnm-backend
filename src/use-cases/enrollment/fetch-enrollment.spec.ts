@@ -5,7 +5,7 @@ import { FetchEnrollmentUseCase } from './fetch-enrollment'
 let enrollmentRepository: InMemoryEnrollmentRepository
 let sut: FetchEnrollmentUseCase
 
-describe('Fetch Courses Use Case', () => {
+describe('Fetch Enrollments Use Case', () => {
   beforeEach(async () => {
     enrollmentRepository = new InMemoryEnrollmentRepository()
     sut = new FetchEnrollmentUseCase(enrollmentRepository)
@@ -13,33 +13,37 @@ describe('Fetch Courses Use Case', () => {
 
   it('should be able to fetch all enrollments', async () => {
     await enrollmentRepository.create({
-      state: 'PENDING',
-      studentId: 1,
+      docsState: 'PENDING',
+      paymentState: 'PENDING',
+      identityCardNumber: "1",
       courseId: 1,
       levelId: 1,
     })
 
     await enrollmentRepository.create({
-      state: 'PENDING',
-      studentId: 2,
+      docsState: 'PENDING',
+      paymentState: 'PENDING',
+      identityCardNumber: "2",
       courseId: 1,
       levelId: 1,
     })
     await enrollmentRepository.create({
-      state: 'APPROVED',
-      studentId: 3,
+      docsState: 'APPROVED',
+      paymentState: 'APPROVED',
+      identityCardNumber: "3",
       courseId: 1,
       levelId: 1,
     })
 
     const { enrollments } = await sut.execute({
-      state: 'APPROVED',
+      docsState: 'APPROVED',
+      paymentState: 'APPROVED',
       page: 1,
     })
 
     expect(enrollments?.items).toHaveLength(1)
     expect(enrollments?.items).toEqual([
-      expect.objectContaining({ state: 'APPROVED' }),
+      expect.objectContaining({ docsState: 'APPROVED', paymentState: 'APPROVED' }),
     ])
   })
 
@@ -47,22 +51,24 @@ describe('Fetch Courses Use Case', () => {
 
     for (let i = 1; i <= 22; i++) {
       await enrollmentRepository.create({
-        state: 'REJECTED',
-        studentId: i,
+        docsState: 'REJECTED',
+        paymentState: 'REJECTED',
+        identityCardNumber: i.toString(),
         courseId: 1,
         levelId: 1,
       })
     }
 
     const { enrollments } = await sut.execute({
-      state: 'REJECTED',
+      docsState: 'REJECTED',
+      paymentState: 'REJECTED',
       page: 2,
     })
 
     expect(enrollments?.items).toHaveLength(2)
     expect(enrollments?.items).toEqual([
-      expect.objectContaining({ state: 'REJECTED' }),
-      expect.objectContaining({ state: 'REJECTED' }),
+      expect.objectContaining({ docsState: 'REJECTED' }),
+      expect.objectContaining({ paymentState: 'REJECTED' }),
     ])
   })
 })

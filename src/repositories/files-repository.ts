@@ -5,7 +5,8 @@ export interface CreateFileInput {
   path: string;
   format: FileFormat;
   type: FileType;
-  studentId: number;
+  identityCardNumber: string;
+  documentId: number
 }
 
 export interface UpdateFileInput {
@@ -13,12 +14,13 @@ export interface UpdateFileInput {
   path?: string;
   format?: FileFormat;
   type?: FileType;
+  documentId: number
 }
 
 export interface FilesRepository {
   create(data: CreateFileInput): Promise<File>;
   findById(id: number): Promise<File | null>;
-  findAllByStudentId(studentId: number): Promise<File[]>;
+  findAllFilesStudentByIdentityCardNumber(identityCardNumber: string): Promise<File[]>;
   update(id: number, data: UpdateFileInput): Promise<File | null>;
   destroy(id: number): Promise<void>;
 }

@@ -6,19 +6,22 @@ interface CreateFileRequest {
   path: string;
   format: FileFormat;
   type: FileType;
-  studentId: number;
+  identityCardNumber: string;
+  documentId: number;
 }
 
 class CreateFileUseCase {
   constructor(private filesRepository: FilesRepository) { }
 
-  async execute({ name, path, format, type, studentId }: CreateFileRequest) {
+  async execute({ name, path, format, type, identityCardNumber,documentId }: CreateFileRequest) {
+
     const file = await this.filesRepository.create({
       name,
       path,
       format,
       type,
-      studentId,
+      identityCardNumber,
+      documentId
     });
 
     return file;

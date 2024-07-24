@@ -15,9 +15,9 @@ describe('Enrollment (e2e)', () => {
 
   it('should be able to create an enrollment', async () => {
 
-    //refactorar
-    let county = await prisma.county.create({
+    await prisma.county.create({
       data: {
+        id: 1,
         name: "Viana"
       }
     })
@@ -27,8 +27,9 @@ describe('Enrollment (e2e)', () => {
       name: 'Luanda',
     })
 
-    const student = await prisma.student.create({
+    await prisma.student.create({
       data: {
+        id: 1,
         fullName: 'John Doe',
         dateOfBirth: new Date('2000-01-01'),
         email: 'john.doe@example.com',
@@ -46,37 +47,38 @@ describe('Enrollment (e2e)', () => {
         type: 'REGULAR',
         alternativePhone: "9876543210",
         provinceId: province.id,
-        countyId: county.id,
+        countyId: 1,
       }
     });
 
-    //refactorar
-    let course = await prisma.course.create({
+    await prisma.course.create({
       data: {
+        id: 1,
         name: "Infermagem"
       }
     })
 
-    //refactorar
-    let level = await prisma.level.create({
+    await prisma.level.create({
       data: {
+        id: 1,
         name: "CLASS_10"
       }
     })
 
     const enrollmentResponse = await request(app.server)
-    .post('/enrollments')
-    .set('Content-Type', 'application/json')
-    .send({
-      identityCardNumber: student.identityCardNumber,
-      courseId: course.id,
-      levelId: level.id,
-    });
+      .post('/enrollments')
+      .set('Content-Type', 'application/json')
+      .send({
+        identityCardNumber: '1234567890',
+        courseId: 1,
+        levelId: 1,
+      });
 
     expect(enrollmentResponse.statusCode).toEqual(201);
-    expect(enrollmentResponse.body.enrollment.state).toEqual('PENDING');
-    expect(enrollmentResponse.body.enrollment.studentId).toEqual(student.id);
-    expect(enrollmentResponse.body.enrollment.courseId).toEqual(course.id);
-    expect(enrollmentResponse.body.enrollment.levelId).toEqual(level.id);
+    expect(enrollmentResponse.body.enrollment.docsState).toEqual('PENDING');
+    expect(enrollmentResponse.body.enrollment.paymentState).toEqual('PENDING');
+    expect(enrollmentResponse.body.enrollment.identityCardNumber).toEqual('1234567890');
+    expect(enrollmentResponse.body.enrollment.courseId).toEqual(1);
+    expect(enrollmentResponse.body.enrollment.levelId).toEqual(1);
   });
 });

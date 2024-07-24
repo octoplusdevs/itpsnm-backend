@@ -1,5 +1,5 @@
 import { Student } from '@prisma/client'
-import { StudentCreateInput, StudentsRepository } from '../student-repository'
+import { StudentsRepository } from '../student-repository'
 import { randomInt } from 'crypto'
 
 export class InMemoryStudentRepository implements StudentsRepository {
@@ -41,8 +41,8 @@ export class InMemoryStudentRepository implements StudentsRepository {
       alternativePhone: data.alternativePhone ?? null,
       countyId: data.countyId,
       provinceId: data.provinceId,
-      created_at: data.created_at,
-      update_at: data.update_at,
+      created_at: data.created_at ?? new Date(),
+      update_at: data.update_at ?? new Date(),
     }
     this.items.push(newStudent)
     return newStudent

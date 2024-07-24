@@ -169,7 +169,7 @@ model Student {
   residence          String
   phone              String        @unique
   email              String        @unique
-  alternativePhone   String?       @unique
+  alternativePhone   String?
   provinces          Province?     @relation(fields: [provinceId], references: [id])
   counties           County?       @relation(fields: [countyId], references: [id])
   tuitionFees        Tuition[]
@@ -188,11 +188,10 @@ model Student {
 model Document {
   id           Int         @id @unique @default(autoincrement())
   enrollments  Enrollment? @relation(fields: [enrollmentId], references: [id])
-  files        File?       @relation(fields: [fileId], references: [id])
   enrollmentId Int?
-  fileId       Int?
   created_at   DateTime    @default(now())
   update_at    DateTime    @updatedAt
+  File         File[]
 
   @@map("documents")
 }
@@ -262,35 +261,38 @@ model Classroom {
 
 // Matrículas
 model Enrollment {
-  id         Int              @id @unique @default(autoincrement())
-  created_at DateTime         @default(now())
-  update_at  DateTime         @updatedAt
-  state      EnrollementState
-  students   Student?         @relation(fields: [studentId], references: [id])
-  documents  Document[]
-  levels     Level?           @relation(fields: [levelId], references: [id])
-  courses    Course?          @relation(fields: [courseId], references: [id])
-  classes    Classe?          @relation(fields: [classeId], references: [id])
-  studentId  Int?             @unique
-  levelId    Int?
-  courseId   Int?
-  classeId   Int?
+  id                 Int              @id @unique @default(autoincrement())
+  docsState          EnrollementState
+  paymentState       EnrollementState
+  students           Student?         @relation(fields: [identityCardNumber], references: [identityCardNumber])
+  documents          Document[]
+  levels             Level?           @relation(fields: [levelId], references: [id])
+  courses            Course?          @relation(fields: [courseId], references: [id])
+  classes            Classe?          @relation(fields: [classeId], references: [id])
+  identityCardNumber String?          @unique
+  levelId            Int?
+  courseId           Int?
+  classeId           Int?
+
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
 
   @@map("enrollments")
 }
 
 // Arquivos
 model File {
-  id         Int        @id @unique @default(autoincrement())
-  name       String
-  path       String
-  format     FileFormat
-  type       FileType
-  created_at DateTime   @default(now())
-  update_at  DateTime   @updatedAt
-  students   Student    @relation(fields: [studentId], references: [id])
-  documents  Document[]
-  studentId  Int
+  id                 Int        @id @unique @default(autoincrement())
+  name               String
+  path               String
+  format             FileFormat
+  type               FileType
+  students           Student?   @relation(fields: [identityCardNumber], references: [identityCardNumber])
+  document           Document?  @relation(fields: [documentId], references: [id])
+  created_at         DateTime   @default(now())
+  update_at          DateTime   @updatedAt
+  documentId         Int?
+  identityCardNumber String?
 
   @@map("files")
 }

@@ -1,27 +1,32 @@
 import { EnrollmentsRepository } from '@/repositories/enrollment-repository'
-import { StudentsRepository } from '@/repositories/student-repository';
 import { EnrollementState } from '@prisma/client'
-import { StudentNotFoundError } from '../errors/student-not-found';
 import { CourseNotFoundError } from '../errors/course-not-found';
 import { CoursesRepository } from '@/repositories/course-repository';
 import { LevelsRepository } from '@/repositories/level-repository';
 import { LevelNotFoundError } from '../errors/level-not-found';
 import { EnrollmentAlreadyExistsError } from '../errors/enrollment-already-exists';
 import { randomInt } from 'crypto';
+import { StudentNotFoundError } from '../errors/student-not-found';
+import { StudentsRepository } from '@/repositories/student-repository';
 
 interface CreateEnrollmentUseCaseResponse {
   enrollment: {
     id?: number;
+    identityCardNumber?: string | null;
     created_at?: Date;
     update_at?: Date;
-    state: EnrollementState;
-    studentId: number | null;
+    courseId?: number | null
+    levelId: number
+    paymentState?: EnrollementState
+    docsState?: EnrollementState
+    classeId?: number | null
   }
 }
 
 interface CreateEnrollmentUseCaseRequest {
   id?: number,
-  state?: EnrollementState,
+  paymentState?: EnrollementState,
+  docsState?: EnrollementState,
   identityCardNumber: string,
   courseId: number,
   levelId: number,
@@ -32,26 +37,22 @@ interface CreateEnrollmentUseCaseRequest {
 
 export class CreateEnrollmentUseCase {
   constructor(
-    private studentsRepository: StudentsRepository,
     private levelsRepository: LevelsRepository,
     private coursesRepository: CoursesRepository,
     private enrollmentRepository: EnrollmentsRepository,
+    private studentRepository: StudentsRepository,
   ) { }
 
   async execute({
     id,
-    state,
+    paymentState,
+    docsState,
     identityCardNumber,
     levelId,
     courseId,
     created_at,
     update_at
   }: CreateEnrollmentUseCaseRequest): Promise<CreateEnrollmentUseCaseResponse> {
-
-    const student = await this.studentsRepository.findByIdentityCardNumber(identityCardNumber);
-    if (!student) {
-      throw new StudentNotFoundError();
-    }
 
     const course = await this.coursesRepository.findById(courseId);
     if (!course) {
@@ -63,7 +64,13 @@ export class CreateEnrollmentUseCase {
       throw new LevelNotFoundError();
     }
 
-    const existingEnrollment = await this.enrollmentRepository.findByStudentId(student.id)
+    const student = await this.studentRepository.findByIdentityCardNumber(identityCardNumber)
+
+    if (!student) {
+      throw new StudentNotFoundError()
+    }
+
+    const existingEnrollment = await this.enrollmentRepository.findByIdentityCardNumber(identityCardNumber)
 
     if (existingEnrollment) {
       throw new EnrollmentAlreadyExistsError()
@@ -71,8 +78,10 @@ export class CreateEnrollmentUseCase {
 
     const enrollment = await this.enrollmentRepository.create({
       id: id ?? randomInt(9999),
-      state: state ?? "PENDING",
-      studentId: student.id,
+      docsState: docsState ?? "PENDING",
+      paymentState: paymentState ?? "PENDING",
+      identityCardNumber: identityCardNumber,
+      classeId: null,
       courseId,
       levelId,
       created_at: created_at ?? new Date(),

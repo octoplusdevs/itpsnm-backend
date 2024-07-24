@@ -9,7 +9,8 @@ interface GetEnrollmentUseCaseRequest {
 interface GetEnrollmentUseCaseResponse {
   enrollment: {
     id: number;
-    state: EnrollementState;
+    docsState: EnrollementState;
+    paymentState: EnrollementState;
   }
 }
 

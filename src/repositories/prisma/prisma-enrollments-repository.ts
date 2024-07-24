@@ -1,11 +1,10 @@
 
-import { EnrollementState } from '@prisma/client';
+import { EnrollementState, Enrollment } from '@prisma/client';
 import { EnrollmentType, EnrollmentsRepository } from '../enrollment-repository';
 import { prisma } from '@/lib/prisma';
-import { StudentNotFoundError } from '@/use-cases/errors/student-not-found';
 
 export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
-  async checkStatus(enrollmentId: number): Promise<{ id: number; state: EnrollementState; } | null> {
+  async checkStatus(enrollmentId: number): Promise<Enrollment | null> {
     let enrollment = await prisma.enrollment.findUnique({
       where: {
         id: enrollmentId
@@ -34,28 +33,26 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
     return enrollment
   }
 
-  async findByStudentId(studentId: number): Promise<EnrollmentType | null> {
-    let student = await prisma.student.findUnique({ where: { id: studentId } })
-    if (!student) {
-      throw new StudentNotFoundError()
-    }
-    let enrollment = await prisma.enrollment.findUnique({ where: { studentId } })
+  async findByIdentityCardNumber(identityCardNumber: string): Promise<any | null> {
+    let enrollment = await prisma.enrollment.findUnique({ where: { identityCardNumber } })
     return enrollment
   }
 
-  async toggleStatus(enrollmentId: number, state: EnrollementState): Promise<{ id: number; status: EnrollementState; } | null> {
+  async toggleStatus(enrollmentId: number, docsState: EnrollementState, paymentState: EnrollementState): Promise<{ id: number; docsState: EnrollementState; paymentState: EnrollementState; } | null> {
     let enrollment = await prisma.enrollment.update({
       where: {
         id: enrollmentId
       },
       data: {
-        state
+        docsState,
+        paymentState
       }
     })
 
     return {
       ...enrollment,
-      status: enrollment.state
+      docsState: enrollment.docsState,
+      paymentState: enrollment.paymentState,
     }
   }
   async destroy(enrollmentId: number): Promise<Boolean> {
@@ -70,27 +67,28 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
   async create(data: EnrollmentType): Promise<EnrollmentType> {
     let enrollment = await prisma.enrollment.create({
       data: {
-        state: data.state,
-        studentId: data.studentId,
+        docsState: data.docsState,
+        paymentState: data.paymentState,
+        identityCardNumber: data.identityCardNumber,
         courseId: data.courseId,
         levelId: data.levelId,
-        classeId: null,
+        classeId: data.classeId,
       }
     })
     return {
       ...enrollment,
-      studentId: enrollment.studentId!,
+      identityCardNumber: enrollment.identityCardNumber!,
       levelId: enrollment.levelId!,
       courseId: enrollment.courseId!,
       classeId: enrollment.classeId!,
     }
   }
 
-  async searchMany(state: EnrollementState, page: number): Promise<{
+  async searchMany(paymentState: EnrollementState, docsState: EnrollementState, page: number): Promise<{
     totalItems: number;
     currentPage: number;
     totalPages: number;
-    items: EnrollmentType[];
+    items: EnrollmentType[] | any[];
   }> {
     let pageSize = 20
     const totalItems = await prisma.enrollment.count();

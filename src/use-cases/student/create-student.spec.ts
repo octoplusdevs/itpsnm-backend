@@ -35,9 +35,9 @@ describe('Create Student Use Case', () => {
       mother: "222",
       password: "2222",
       residence: "www",
-      phone: 222222,
+      phone: "222222",
       type: 'SCHOLARSHIP',
-      alternativePhone: 22222,
+      alternativePhone: "22222",
       provinceId: 1,
       countyId: 1,
 
@@ -66,9 +66,9 @@ describe('Create Student Use Case', () => {
       mother: "Maria",
       password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654321,
+      alternativePhone: "987654321",
       provinceId: 1,
       countyId: 1,
     });
@@ -87,9 +87,9 @@ describe('Create Student Use Case', () => {
       mother: "Maria",
       password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456781,
+      phone: "123456781",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654322,
+      alternativePhone: "987654322",
       provinceId: 1,
       countyId: 1,
 
@@ -115,9 +115,9 @@ describe('Create Student Use Case', () => {
       mother: "Maria",
       password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654321,
+      alternativePhone: "987654321",
       provinceId: 1,
       countyId: 1,
     });
@@ -136,61 +136,13 @@ describe('Create Student Use Case', () => {
       mother: "Maria",
       password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456781,
+      phone: "123456781",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654322,
+      alternativePhone: "987654322",
       provinceId: 1,
       countyId: 1,
 
     })).rejects.toBeInstanceOf(IdentityCardNumberAlreadyExistsError)
   })
-  it('should not be able to register with same Alternative Phone twice', async () => {
-    await provincesRepository.create({
-      name: 'Luanda',
-      id: 1
-    })
-    const alternativePhone = 987654321
-    await sut.execute({
-      fullName: "Wilmy Danguya",
-      dateOfBirth: new Date("2000-08-01"),
-      email: "daniel.yava16@gmail.com",
-      emissionDate: new Date(),
-      expirationDate: new Date(),
-      father: "Marcos",
-      gender: "MALE",
-      height: 1.78,
-      identityCardNumber: "0044578LA012",
-      maritalStatus: 'SINGLE',
-      mother: "Maria",
-      password: "password123",
-      residence: "Rua Principal, 123",
-      phone: 123456789,
-      type: 'SCHOLARSHIP',
-      alternativePhone,
-      provinceId: 1,
-      countyId: 1,
-    });
 
-    await expect(sut.execute({
-      fullName: "Wilmy Danguya",
-      dateOfBirth: new Date("2000-08-01"),
-      email: "daniel.yava17@gmail.com",
-      emissionDate: new Date(),
-      expirationDate: new Date(),
-      father: "Marcos",
-      gender: "MALE",
-      height: 1.78,
-      identityCardNumber: "0044578LA012",
-      maritalStatus: 'SINGLE',
-      mother: "Maria",
-      password: "password123",
-      residence: "Rua Principal, 123",
-      phone: 123456781,
-      type: 'SCHOLARSHIP',
-      alternativePhone,
-      provinceId: 1,
-      countyId: 1,
-
-    })).rejects.toBeInstanceOf(AlternativePhoneAlreadyExistsError)
-  })
 })

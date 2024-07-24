@@ -18,7 +18,7 @@ export interface StudentCreateInput {
   residence: string
   phone: string
   email: string
-  alternativePhone?: string
+  alternativePhone?: string | null
   countyId: number
   provinceId: number
 }

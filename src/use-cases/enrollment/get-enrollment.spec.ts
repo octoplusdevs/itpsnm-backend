@@ -16,19 +16,21 @@ describe('Get Enrollment Use Case', () => {
   it('should be able to get a enrollment by id', async () => {
     await enrollmentsRepository.create({
       id: 1,
-      state: 'APPROVED',
-      studentId: 1,
+      docsState: 'APPROVED',
+      paymentState: 'REJECTED',
+      identityCardNumber: "1",
       classeId: 1,
       courseId: 1,
       levelId: 1,
       created_at: new Date(),
-      update_at:  new Date()
+      update_at: new Date()
     })
     const { enrollment } = await sut.execute({
       enrollmentId: 1
     })
     expect(enrollment?.id).toBe(1)
-    expect(enrollment?.state).toEqual('APPROVED')
+    expect(enrollment?.docsState).toEqual('APPROVED')
+    expect(enrollment?.paymentState).toEqual('REJECTED')
   })
   it('should not be able to get enrollment with wrong id', async () => {
     await expect(() =>

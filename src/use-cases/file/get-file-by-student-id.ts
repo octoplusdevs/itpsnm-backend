@@ -1,16 +1,16 @@
 import { FilesRepository } from '@/repositories/files-repository';
 
-interface GetFilesByStudentIdRequest {
-  studentId: number;
+interface GetFilesByStudentIdentityCardNumberRequest {
+  identityCardNumber: string;
 }
 
-class GetFilesByStudentIdUseCase {
+class GetFilesByStudentsIdentityCardNumberUseCase {
   constructor(private filesRepository: FilesRepository) {}
 
-  async execute({ studentId }: GetFilesByStudentIdRequest) {
-    const files = await this.filesRepository.findAllByStudentId(studentId);
+  async execute({ identityCardNumber }: GetFilesByStudentIdentityCardNumberRequest) {
+    const files = await this.filesRepository.findAllFilesStudentByIdentityCardNumber(identityCardNumber);
     return files;
   }
 }
 
-export { GetFilesByStudentIdUseCase };
+export { GetFilesByStudentsIdentityCardNumberUseCase };

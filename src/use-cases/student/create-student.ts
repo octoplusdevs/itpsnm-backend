@@ -3,9 +3,7 @@ import { Student } from '@prisma/client'
 import { StudentCreateInput } from '@/repositories/student-repository'
 import { EmailAlreadyExistsError } from '../errors/email-already-exists-error'
 import { PhoneAlreadyExistsError } from '../errors/phone-already-exists-error'
-import { AlternativePhoneAlreadyExistsError } from '../errors/alternative-phone-already-exists-error'
 import { IdentityCardNumberAlreadyExistsError } from '../errors/id-card-already-exists-error'
-import { prisma } from '@/lib/prisma'
 import { ProvinceNotFoundError } from '../errors/province-not-found'
 import { ProvincesRepository } from '@/repositories/province-repository'
 
@@ -52,13 +50,6 @@ export class CreateStudentUseCase {
       throw new PhoneAlreadyExistsError()
     }
 
-    if (alternativePhone != null && alternativePhone != undefined) {
-      const userWithSameAlternativePhone = await this.studentRepository.findByAlternativePhone(alternativePhone)
-      if (userWithSameAlternativePhone) {
-        throw new AlternativePhoneAlreadyExistsError()
-      }
-    }
-
     const userWithSameBI = await this.studentRepository.findByIdentityCardNumber(identityCardNumber)
     if (userWithSameBI) {
       throw new IdentityCardNumberAlreadyExistsError()
@@ -75,7 +66,7 @@ export class CreateStudentUseCase {
     }
 
     const student = await this.studentRepository.create({
-      id,
+      id: id!,
       countyId,
       dateOfBirth,
       email,
@@ -93,7 +84,7 @@ export class CreateStudentUseCase {
       provinceId,
       residence,
       type,
-      alternativePhone
+      alternativePhone: alternativePhone!,
     })
 
     return {

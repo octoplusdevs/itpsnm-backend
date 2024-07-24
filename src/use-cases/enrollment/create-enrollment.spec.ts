@@ -22,7 +22,7 @@ describe('Create Enrollment Use Case', () => {
     levelsRepository = new InMemoryLevelsRepository()
     coursesRepository = new InMemoryCoursesRepository()
     enrollmentsRepository = new InMemoryEnrollmentRepository()
-    sut = new CreateEnrollmentUseCase(studentsRepository, levelsRepository, coursesRepository, enrollmentsRepository)
+    sut = new CreateEnrollmentUseCase(levelsRepository, coursesRepository, enrollmentsRepository, studentsRepository)
   })
 
   it('should be able to create an enrollment', async () => {
@@ -62,21 +62,36 @@ describe('Create Enrollment Use Case', () => {
 
     const { enrollment } = await sut.execute({
       id: 1,
-      state: EnrollementState.PENDING,
+      docsState: EnrollementState.PENDING,
+      paymentState: EnrollementState.PENDING,
       identityCardNumber: '1234567890',
       courseId: course.id,
       levelId: level.id,
+      created_at: new Date(),
+      update_at: new Date()
     })
 
-    expect(enrollment.studentId).toBe(student.id)
-    expect(enrollment.state).toBe(EnrollementState.PENDING)
+    console.table(enrollment)
+    expect(enrollment.identityCardNumber).toBe('1234567890')
+    expect(enrollment.docsState).toBe(EnrollementState.PENDING)
+    expect(enrollment.paymentState).toBe(EnrollementState.PENDING)
   })
 
   it('should throw StudentNotFoundError if student is not found', async () => {
+    await coursesRepository.create({
+      id: 1,
+      name: 'Computer Science',
+    })
+
+    await levelsRepository.create({
+      id: 1,
+      name: 'CLASS_10',
+    })
     await expect(() =>
       sut.execute({
         id: 1,
-        state: EnrollementState.PENDING,
+        docsState: EnrollementState.PENDING,
+        paymentState: EnrollementState.PENDING,
         identityCardNumber: '1234567890',
         courseId: 1,
         levelId: 1,
@@ -112,7 +127,8 @@ describe('Create Enrollment Use Case', () => {
     await expect(() =>
       sut.execute({
         id: 1,
-        state: EnrollementState.PENDING,
+        docsState: EnrollementState.PENDING,
+        paymentState: EnrollementState.PENDING,
         identityCardNumber: '1234567890',
         courseId: 1,
         levelId: 1,
@@ -153,7 +169,8 @@ describe('Create Enrollment Use Case', () => {
     await expect(() =>
       sut.execute({
         id: 1,
-        state: EnrollementState.PENDING,
+        docsState: EnrollementState.PENDING,
+        paymentState: EnrollementState.PENDING,
         identityCardNumber: '1234567890',
         courseId: course.id,
         levelId: 1,
@@ -198,10 +215,12 @@ describe('Create Enrollment Use Case', () => {
 
     await enrollmentsRepository.create({
       id: 1,
-      state: EnrollementState.PENDING,
-      studentId: student.id,
+      docsState: EnrollementState.PENDING,
+      paymentState: EnrollementState.PENDING,
+      identityCardNumber: student.identityCardNumber,
       courseId: course.id,
       levelId: level.id,
+      classeId: null,
       created_at: new Date(),
       update_at: new Date(),
     })
@@ -209,7 +228,8 @@ describe('Create Enrollment Use Case', () => {
     await expect(() =>
       sut.execute({
         id: 2,
-        state: EnrollementState.PENDING,
+        docsState: EnrollementState.PENDING,
+        paymentState: EnrollementState.PENDING,
         identityCardNumber: '1234567890',
         courseId: course.id,
         levelId: level.id,

@@ -1,13 +1,7 @@
-export interface DocumentsType {
-  id?: number
-  enrollment_id: number
-  created_at?: Date
-  update_at?: Date
-}
+import { Document } from "@prisma/client";
 
 export interface DocumentsRepository {
-  create(data: DocumentsType): Promise<DocumentsType>
-  findById(fileId: number): Promise<DocumentsType | null>
+  create(data: { enrollmentId: number; }): Promise<Document>
+  findById(fileId: number): Promise<Document | null>
   destroy(fileId: number): Promise<Boolean>
-
 }

@@ -4,13 +4,14 @@ import { CreateFileInput, FilesRepository, UpdateFileInput } from '../files-repo
 
 class PrismaFilesRepository implements FilesRepository {
   async create(data: CreateFileInput): Promise<File> {
-    const newFile = await prisma.file.create({
+    const newFile: File = await prisma.file.create({
       data: {
         name: data.name,
         path: data.path,
         format: data.format,
         type: data.type,
-        studentId: data.studentId,
+        identityCardNumber: data.identityCardNumber,
+        documentId: data.documentId,
       },
     });
     return newFile;
@@ -23,9 +24,9 @@ class PrismaFilesRepository implements FilesRepository {
     return file;
   }
 
-  async findAllByStudentId(studentId: number): Promise<File[]> {
+  async findAllFilesStudentByIdentityCardNumber(identityCardNumber: string): Promise<File[]> {
     const files = await prisma.file.findMany({
-      where: { studentId },
+      where: { identityCardNumber },
     });
     return files;
   }

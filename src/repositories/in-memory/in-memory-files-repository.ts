@@ -1,50 +1,49 @@
-import { File } from '@prisma/client';
-import { CreateFileInput, FilesRepository, UpdateFileInput } from '../files-repository';
+import { File, FileFormat, FileType } from '@prisma/client';
+import { FilesRepository, UpdateFileInput } from '../files-repository';
 
-class InMemoryFilesRepository implements FilesRepository {
-  private files: File[] = [];
-  private fileIdSequence: number = 1;
+export class InMemoryFilesRepository implements FilesRepository {
+  private items: File[] = [];
 
-  async create(data: CreateFileInput): Promise<File> {
-    const newFile: File = {
-      id: this.fileIdSequence++,
+  async create(data: { name: string; path: string; format: FileFormat; type: FileType; identityCardNumber: string; documentId: number }): Promise<File> {
+    const file: File = {
+      id: this.items.length + 1,
       name: data.name,
       path: data.path,
       format: data.format,
       type: data.type,
-      studentId: data.studentId,
       created_at: new Date(),
       update_at: new Date(),
+      identityCardNumber: data.identityCardNumber,
+      documentId: data.documentId,
     };
-    this.files.push(newFile);
-    return newFile;
-  }
 
+    this.items.push(file);
+    return file;
+  }
   async findById(id: number): Promise<File | null> {
-    const file = this.files.find(file => file.id === id);
+    const file = this.items.find(file => file.id === id);
     return file || null;
   }
 
-  async findAllByStudentId(studentId: number): Promise<File[]> {
-    return this.files.filter(file => file.studentId === studentId);
+  async findAllFilesStudentByIdentityCardNumber(identityCardNumber: string): Promise<File[]> {
+    return this.items.filter(file => file.identityCardNumber === identityCardNumber);
   }
 
   async update(id: number, data: UpdateFileInput): Promise<File | null> {
-    const fileIndex = this.files.findIndex(file => file.id === id);
+    const fileIndex = this.items.findIndex(file => file.id === id);
     if (fileIndex === -1) return null;
 
     const updatedFile: File = {
-      ...this.files[fileIndex],
+      ...this.items[fileIndex],
       ...data,
       update_at: new Date(),
     };
-    this.files[fileIndex] = updatedFile;
+    this.items[fileIndex] = updatedFile;
     return updatedFile;
   }
 
   async destroy(id: number): Promise<void> {
-    this.files = this.files.filter(file => file.id !== id);
+    this.items = this.items.filter(file => file.id !== id);
   }
-}
 
-export { InMemoryFilesRepository };
+}

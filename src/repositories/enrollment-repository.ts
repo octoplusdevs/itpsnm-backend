@@ -2,21 +2,22 @@ import { EnrollementState, Enrollment } from '@prisma/client'
 
 export interface EnrollmentType {
   id?: number
-  studentId: number | null
-  state: EnrollementState
+  courseId?: number | null
+  levelId: number
+  docsState: EnrollementState
+  paymentState: EnrollementState
+  identityCardNumber: string
   classeId?: number | null
-  courseId: number | null
-  levelId: number | null
   created_at?: Date
   update_at?: Date
 }
 export interface EnrollmentsRepository {
-  findByStudentId(studentId: number): Promise<EnrollmentType | null>
-  checkStatus(enrollmentId: number): Promise<{ id: number; state: EnrollementState } | null>
-  toggleStatus(enrollmentId: number, state: EnrollementState): Promise<{ id: number; status: EnrollementState } | null>
+  findByIdentityCardNumber(identityCardNumber: string): Promise<EnrollmentType | null>
+  checkStatus(enrollmentId: number): Promise<Enrollment | null>
+  toggleStatus(enrollmentId: number, docsState: EnrollementState, paymentState: EnrollementState): Promise<{ id: number; docsState: EnrollementState; paymentState: EnrollementState } | null>
   destroy(enrollmentId: number): Promise<Boolean>
   create(data: EnrollmentType): Promise<EnrollmentType>
-  searchMany(state: EnrollementState, page: number): Promise<{
+  searchMany(paymentState: EnrollementState, docsState: EnrollementState, page: number): Promise<{
     totalItems: number;
     currentPage: number;
     totalPages: number;
