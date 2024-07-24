@@ -94,15 +94,22 @@ model Province {
   @@map("provinces")
 }
 
+enum PaymentType {
+  A
+  B
+  C
+  D
+}
+
 // Detalhes de pagamento do item
 model ItemPaymentDetail {
-  id         Int      @id @unique @default(autoincrement())
-  type       Int
+  id         Int         @id @unique @default(autoincrement())
+  type       PaymentType
   quantity   Int
   price      Float
-  payment    Payment? @relation(fields: [paymentsId], references: [id])
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
+  payment    Payment?    @relation(fields: [paymentsId], references: [id])
+  created_at DateTime    @default(now())
+  update_at  DateTime    @updatedAt
   paymentsId Int?
 
   @@map("items_payment_details")
@@ -111,13 +118,13 @@ model ItemPaymentDetail {
 // Pagamentos
 model Payment {
   id                   Int                 @id @unique @default(autoincrement())
-  student_id           Int
+  identityCardNumber   String
   state                PaymentState
   amount_paid          Float
   date                 DateTime
   created_at           DateTime
   update_at            DateTime
-  students             Student             @relation(fields: [student_id], references: [id])
+  students             Student             @relation(fields: [identityCardNumber], references: [identityCardNumber])
   receipts             Receipt[]
   item_payment_details ItemPaymentDetail[]
 
@@ -201,12 +208,11 @@ model Receipt {
   id         Int      @id @unique @default(autoincrement())
   tuition_id Int
   path       String
-  payment_id DateTime
+  payment_id Int
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
   tuitions   Tuition  @relation(fields: [tuition_id], references: [id])
-  payments   Payment? @relation(fields: [paymentsId], references: [id])
-  paymentsId Int?
+  payments   Payment? @relation(fields: [payment_id], references: [id])
 
   @@map("receipts")
 }
