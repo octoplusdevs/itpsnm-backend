@@ -27,7 +27,7 @@ export class CreateDocumentWithFilesUseCase {
 
     const findEnrollment = await this.enrollmentRepository.checkStatus(enrollmentId)
 
-    if(!findEnrollment){
+    if(findEnrollment === null || !findEnrollment){
       throw new EnrollmentNotFoundError();
     }
 
