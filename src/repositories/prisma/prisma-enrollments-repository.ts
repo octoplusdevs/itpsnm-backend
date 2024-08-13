@@ -12,7 +12,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
       include: {
         students: {
           select: {
-            fullName: true
+            fullName: true,
           }
         },
         levels: {
@@ -94,11 +94,30 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
     const totalItems = await prisma.enrollment.count();
 
     const totalPages = Math.ceil(totalItems / pageSize);
+
     let enrollments = await prisma.enrollment.findMany({
       include: {
         students: {
           select: {
-            fullName: true
+            email: true,
+            dateOfBirth: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            fullName: true,
+            countyId: true,
+            alternativePhone: true,
+            emissionDate: true,
+            expirationDate: true,
+            father: true,
+            files: true,
+            id: true,
+            maritalStatus: true,
+            mother: true,
+            phone: true,
+            provinceId: true,
+            residence: true,
+            type: true,
           }
         },
         levels: {
@@ -111,6 +130,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       },

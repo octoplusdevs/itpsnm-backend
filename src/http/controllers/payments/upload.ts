@@ -9,7 +9,7 @@ import { promisify } from 'util';
 import { pipeline } from 'stream';
 const pump = promisify(pipeline);
 
-export async function upload(request: FastifyRequest, reply: FastifyReply) {
+export async function payment(request: FastifyRequest, reply: FastifyReply) {
   const fileSchema = z.object({
     name: z.string(),
     format: z.nativeEnum(FileFormat),
