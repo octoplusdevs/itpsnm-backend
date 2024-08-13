@@ -140,7 +140,11 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
         }
       },
       skip: (page - 1) * pageSize,
-      take: pageSize
+      take: pageSize,
+      where:{
+        docsState,
+        paymentState
+      }
     })
     return {
       totalItems,

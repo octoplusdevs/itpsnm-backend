@@ -9,13 +9,13 @@ export async function fetch(request: FastifyRequest, reply: FastifyReply) {
     page: z.coerce.number().int().positive().optional(),
   })
 
-  const { paymentState = "APPROVED", docsState = "APPROVED", page = 1 } = registerBodySchema.parse(request.query)
+  const { paymentState, docsState,  page = 1 } = registerBodySchema.parse(request.query)
 
   try {
     const fetchEnrollmentUseCase = makeFetchEnrollmentUseCase();
     let enrollments = await fetchEnrollmentUseCase.execute({
-      docsState,
-      paymentState,
+      docsState: docsState || 'PENDING',
+      paymentState: paymentState || 'PENDING',
       page
     });
 
