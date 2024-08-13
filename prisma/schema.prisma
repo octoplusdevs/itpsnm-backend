@@ -43,6 +43,7 @@ enum FileType {
   IDENTITY_CARD
   REPORT_CARD
   TUITION_RECEIPT
+  PHOTO
 }
 
 enum StudentType {

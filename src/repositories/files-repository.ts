@@ -5,8 +5,8 @@ export interface CreateFileInput {
   path: string;
   format: FileFormat;
   type: FileType;
-  identityCardNumber: string;
-  documentId: number
+  identityCardNumber: string | undefined;
+  documentId?: number | null
 }
 
 export interface UpdateFileInput {
@@ -14,7 +14,7 @@ export interface UpdateFileInput {
   path?: string;
   format?: FileFormat;
   type?: FileType;
-  documentId: number
+  documentId?: number | null
 }
 
 export interface FilesRepository {

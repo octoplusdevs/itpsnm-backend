@@ -7,6 +7,7 @@ import { coursesRoutes } from './http/controllers/courses/routes'
 import { studentsRoutes } from './http/controllers/students/routes'
 import { enrollmentsRoutes } from './http/controllers/enrollments/routes'
 import { documentsRoutes } from './http/controllers/documents/routes'
+import { photosRoutes } from './http/controllers/photos/routes'
 import fastifyMultipart from '@fastify/multipart';
 export const app = fastify()
 
@@ -31,6 +32,7 @@ app.register(coursesRoutes)
 app.register(studentsRoutes)
 app.register(enrollmentsRoutes)
 app.register(documentsRoutes)
+app.register(photosRoutes)
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {

@@ -6,8 +6,8 @@ interface CreateFileRequest {
   path: string;
   format: FileFormat;
   type: FileType;
-  identityCardNumber: string;
-  documentId: number;
+  identityCardNumber: string | undefined;
+  documentId?: number | null;
 }
 
 class CreateFileUseCase {
