@@ -71,7 +71,6 @@ describe('Create Enrollment Use Case', () => {
       update_at: new Date()
     })
 
-    console.table(enrollment)
     expect(enrollment.identityCardNumber).toBe('1234567890')
     expect(enrollment.docsState).toBe(EnrollementState.PENDING)
     expect(enrollment.paymentState).toBe(EnrollementState.PENDING)
