@@ -4,6 +4,27 @@ import { CreateFileInput, FilesRepository, UpdateFileInput } from '../files-repo
 
 class PrismaFilesRepository implements FilesRepository {
   async create(data: CreateFileInput): Promise<File> {
+    const findFile = await prisma.file.findFirst({
+      where: {
+        type: data.type,
+        identityCardNumber: data.identityCardNumber
+      }
+    })
+    if (findFile) {
+      return await prisma.file.update({
+        where: {
+          id: findFile.id
+        },
+        data: {
+          name: data.name,
+          path: data.path,
+          format: data.format,
+          type: data.type,
+          identityCardNumber: data.identityCardNumber,
+          documentId: data.documentId,
+        }
+      })
+    }
     const newFile: File = await prisma.file.create({
       data: {
         name: data.name,

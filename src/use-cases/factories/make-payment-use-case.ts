@@ -1,13 +1,11 @@
-import { CreateDocumentWithFilesUseCase } from '../document/create-document-with-files'
-import { PrismaDocumentRepository } from '@/repositories/prisma/prisma-documents-repository'
-import { PrismaEnrollmentsRepository } from '@/repositories/prisma/prisma-enrollments-repository'
-import { PrismaFilesRepository } from '@/repositories/prisma/prisma-files-repository'
+import { CreatePaymentUseCase } from '../payment/create-payment'
+import { PrismaPaymentRepository } from '@/repositories/prisma/prisma-payments-repository'
+import { PrismaStudentsRepository } from '@/repositories/prisma/prisma-student-repository'
 
-export function makeCreateDocumentWithFilesUseCase() {
-  const prismaDocumentRepository = new PrismaDocumentRepository()
-  const prismaFilesRepository = new PrismaFilesRepository()
-  const prismaEnrollmentsRepository = new PrismaEnrollmentsRepository()
-  const createDocumentWithFilesUseCase = new CreateDocumentWithFilesUseCase(prismaDocumentRepository, prismaFilesRepository, prismaEnrollmentsRepository)
+export function makePaymentUseCase() {
+  const prismaPaymentRepository = new PrismaPaymentRepository()
+  const prismaStudentRepository = new PrismaStudentsRepository()
+  const createDocumentWithFilesUseCase = new CreatePaymentUseCase(prismaPaymentRepository, prismaStudentRepository)
 
   return createDocumentWithFilesUseCase
 }

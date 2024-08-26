@@ -1,6 +1,5 @@
-import { CreateFileInput } from '@/repositories/files-repository';
 import { makeCreateDocumentWithFilesUseCase } from '@/use-cases/factories/make-document-use-case';
-import { File, FileFormat, FileType } from '@prisma/client';
+import { FileFormat, FileType } from '@prisma/client';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import path from 'path';
 import fs from 'fs';
@@ -79,7 +78,6 @@ export async function payment(request: FastifyRequest, reply: FastifyReply) {
     if (enrollmentId === undefined) {
       return reply.status(400).send({ message: 'enrollmentId is required' });
     }
-
 
     const createDocumentWithFilesUseCase = makeCreateDocumentWithFilesUseCase();
     const result = await createDocumentWithFilesUseCase.execute({ enrollmentId, files });
