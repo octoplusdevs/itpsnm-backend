@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { EnrollementState, FileFormat, FileType } from '@prisma/client';
+import { FileFormat, FileType } from '@prisma/client';
 import { CreateDocumentWithFilesUseCase } from './create-document-with-files';
 import { InMemoryFilesRepository } from '@/repositories/in-memory/in-memory-files-repository';
 import { InMemoryDocumentsRepository } from '@/repositories/in-memory/in-memory-documents-repository';
 import { InMemoryEnrollmentRepository } from '@/repositories/in-memory/in-memory-enrollments-repository';
 import { InMemoryStudentRepository } from '@/repositories/in-memory/in-memory-students-repository';
 import { InMemoryLevelsRepository } from '@/repositories/in-memory/in-memory-level-repository';
-import { InMemoryCoursesRepository } from '@/repositories/in-memory/in-memory-courses-repository copy';
+import { InMemoryCoursesRepository } from '@/repositories/in-memory/in-memory-courses-repository';
 
 describe('Create Document With Files Use Case', () => {
   let documentRepository: InMemoryDocumentsRepository;
@@ -65,10 +65,11 @@ describe('Create Document With Files Use Case', () => {
 
     await enrollmentRepository.create({
       id: 1,
-      state: EnrollementState.PENDING,
       identityCardNumber: student.identityCardNumber,
       courseId: course.id,
       levelId: level.id,
+      docsState: 'PENDING',
+      paymentState: 'PENDING'
     })
 
     const { document, files } = await createDocumentWithFilesUseCase.execute({
