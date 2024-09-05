@@ -3,12 +3,12 @@ import { GetDocumentUseCase } from './get-document'
 import { ResourceNotFoundError } from '../errors/resource-not-found'
 import { InMemoryDocumentsRepository } from '@/repositories/in-memory/in-memory-documents-repository'
 import { CreateDocumentWithFilesUseCase } from './create-document-with-files'
-import { EnrollementState, FileFormat, FileType } from '@prisma/client'
+import { FileFormat, FileType } from '@prisma/client'
 import { InMemoryFilesRepository } from '@/repositories/in-memory/in-memory-files-repository'
 import { InMemoryEnrollmentRepository } from '@/repositories/in-memory/in-memory-enrollments-repository'
 import { InMemoryStudentRepository } from '@/repositories/in-memory/in-memory-students-repository'
 import { InMemoryLevelsRepository } from '@/repositories/in-memory/in-memory-level-repository'
-import { InMemoryCoursesRepository } from '@/repositories/in-memory/in-memory-courses-repository copy'
+import { InMemoryCoursesRepository } from '@/repositories/in-memory/in-memory-courses-repository'
 
 let filesRepository: InMemoryFilesRepository
 let documentsRepository: InMemoryDocumentsRepository
@@ -72,12 +72,13 @@ describe('Get Document Use Case', () => {
 
     await enrollmentsRepository.create({
       id: 1,
-      state: EnrollementState.PENDING,
       identityCardNumber: '1234567890',
       courseId: course.id,
       levelId: level.id,
       created_at: new Date(),
-      update_at: new Date()
+      update_at: new Date(),
+      docsState: 'PENDING',
+      paymentState: 'PENDING'
     })
 
     await createDocumentWithFilesUseCase.execute({
