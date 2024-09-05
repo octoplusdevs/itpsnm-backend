@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { Document, ItemPaymentDetail, Payment, Prisma } from '@prisma/client';
-import { DocumentsRepository } from '../documents-repository';
+import { ItemPaymentDetail, Payment } from '@prisma/client';
 import { PaymentsRepository } from '../payments-repository';
 
 export class PrismaPaymentRepository implements PaymentsRepository {
