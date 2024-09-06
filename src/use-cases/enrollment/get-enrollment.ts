@@ -1,4 +1,4 @@
-import { EnrollementState } from '@prisma/client'
+import { EnrollementState, Student } from '@prisma/client'
 import { EnrollmentsRepository } from '@/repositories/enrollment-repository'
 import { EnrollmentNotFoundError } from '../errors/enrollment-not-found'
 
@@ -11,6 +11,7 @@ interface GetEnrollmentUseCaseResponse {
     id: number;
     docsState: EnrollementState;
     paymentState: EnrollementState;
+    student: Student
   }
 }
 

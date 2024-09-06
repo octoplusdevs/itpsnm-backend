@@ -11,5 +11,5 @@ export async function notesRoutes(app: FastifyInstance) {
 
   app.get('/notes/search', searchMany)
 
-  app.get('/notes/:studentId/grades', getNoteWithFullGrades)
+  app.get('/notes/:enrollmentId/grades', getNoteWithFullGrades)
 }

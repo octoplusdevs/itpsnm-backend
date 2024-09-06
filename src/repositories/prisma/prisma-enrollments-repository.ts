@@ -13,6 +13,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
         students: {
           select: {
             fullName: true,
+            id: true
           }
         },
         levels: {

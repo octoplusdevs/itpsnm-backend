@@ -92,21 +92,29 @@ export class PrismaNotesRepository implements NotesRepository {
     }));
   }
 
-  async getNoteWithFullGrades(studentId: number, classLevel: 'CLASS_10' | 'CLASS_11' | 'CLASS_12' | 'CLASS_13'): Promise<NotesData | null> {
-    const note = await prisma.note.findFirst({
+  async getNoteWithFullGrades(studentId: number, classLevel: 'CLASS_10' | 'CLASS_11' | 'CLASS_12' | 'CLASS_13'): Promise<NotesData[] | null> {
+    const notes = await prisma.note.findMany({
       where: {
         studentId,
         level: classLevel,
       },
+      include: {
+        students: false,  // Inclui os dados do estudante
+        subjects: true,  // Inclui os dados da disciplina
+      },
     });
 
-    if (!note) return null;
+    if (!notes.length) return null;
 
-    const grades = this.calculateGrades(note);
+    const notesWithGrades = notes.map((note) => {
+      const grades = this.calculateGrades(note);
+      return {
+        ...note,
+        ...grades,
+      };
+    });
 
-    return {
-      ...note,
-      ...grades,
-    };
+    return notesWithGrades;
   }
+
 }
