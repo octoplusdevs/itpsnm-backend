@@ -49,7 +49,6 @@ describe('Search Many Notes Use Case', () => {
     expect(response[0].studentId).toEqual(123);
     expect(response[0].subjectId).toEqual(1);
 
-    console.log(response)
     // Verify the calculated grades
     expect(response[0].mt1).toBeCloseTo((10 + 15 + 12) / 3);
     expect(response[1].mt2).toBeCloseTo((5 + 10 + 8) / 3);

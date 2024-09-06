@@ -1,11 +1,12 @@
 import { NotesRepository } from "@/repositories/notes-repository"
-import { Mester, Note } from "@prisma/client";
+import { LevelName, Mester, Note } from "@prisma/client";
 import { randomInt } from "crypto";
 
 interface CreateNoteUseCaseRequest {
   p1?: number;
   p2?: number;
   exam?: number;
+  level: LevelName;
   nee?: number;
   resource?: number;
   mester: Mester;
@@ -18,7 +19,7 @@ interface CreateNoteUseCaseResponse {
 }
 
 export class CreateNoteUseCase {
-  constructor(private notesRepository: NotesRepository) {}
+  constructor(private notesRepository: NotesRepository) { }
 
   async execute({
     p1 = 0,
@@ -27,6 +28,7 @@ export class CreateNoteUseCase {
     nee = 0,
     resource = 0,
     mester,
+    level,
     studentId,
     subjectId
   }: CreateNoteUseCaseRequest): Promise<CreateNoteUseCaseResponse> {
@@ -43,7 +45,7 @@ export class CreateNoteUseCase {
       subjectId,
       created_at: new Date(),
       update_at: new Date(),
-      level: "CLASS_10"
+      level
     });
 
     return {
