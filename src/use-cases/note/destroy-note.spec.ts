@@ -22,6 +22,7 @@ describe('Destroy Note Use Case', () => {
       nee: 5,
       resource: 7,
       mester: Mester.FIRST,
+      level: 'CLASS_10',
       studentId: 123,
       subjectId: 1,
       created_at: new Date(),

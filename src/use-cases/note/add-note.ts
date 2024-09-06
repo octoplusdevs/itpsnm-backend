@@ -1,5 +1,5 @@
-import { NotesRepository, notes } from "@/repositories/notes-repository"
-import { Mester } from "@prisma/client";
+import { NotesRepository } from "@/repositories/notes-repository"
+import { Mester, Note } from "@prisma/client";
 import { randomInt } from "crypto";
 
 interface CreateNoteUseCaseRequest {
@@ -14,7 +14,7 @@ interface CreateNoteUseCaseRequest {
 }
 
 interface CreateNoteUseCaseResponse {
-  note: notes;
+  note: Note;
 }
 
 export class CreateNoteUseCase {
@@ -43,6 +43,7 @@ export class CreateNoteUseCase {
       subjectId,
       created_at: new Date(),
       update_at: new Date(),
+      level: "CLASS_10"
     });
 
     return {
