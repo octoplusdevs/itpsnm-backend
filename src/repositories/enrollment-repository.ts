@@ -22,6 +22,7 @@ export interface EnrollT {
 export interface EnrollmentsRepository {
   findByIdentityCardNumber(identityCardNumber: string): Promise<EnrollmentType | null>
   checkStatus(enrollmentId: number): Promise<EnrollT | null>
+  findByEnrollmentNumber(enrollmentId: number): Promise<Enrollment | null>
   toggleStatus(enrollmentId: number, docsState: EnrollementState, paymentState: EnrollementState): Promise<{ id: number; docsState: EnrollementState; paymentState: EnrollementState } | null>
   destroy(enrollmentId: number): Promise<Boolean>
   create(data: EnrollmentType): Promise<EnrollmentType>

@@ -16,7 +16,7 @@ export type NotesData = {
   level: LevelName;
   created_at?: Date;
   update_at?: Date;
-  studentId: number;
+  enrollmentId: number;
   subjectId: number;
 }
 
@@ -25,5 +25,5 @@ export interface NotesRepository {
   update(id: number, data: Partial<Note>): Promise<Note | null>;
   destroy(id: number): Promise<boolean>;
   searchMany(criteria: Partial<Note>): Promise<NotesData[]>;
-  getNoteWithFullGrades(studentId: number, classLevel: 'CLASS_10' | 'CLASS_11' | 'CLASS_12' | 'CLASS_13'): Promise<any | null>;
+  getNoteWithFullGrades(criteria: NotesData): Promise<any | null>;
 }

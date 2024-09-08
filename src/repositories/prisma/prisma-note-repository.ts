@@ -13,6 +13,9 @@ export class PrismaNotesRepository implements NotesRepository {
     let mfd = null;
     let mf = null;
 
+    // if (!((p1 | p2) >= 0 && (p1 | p2) <= 20)) {
+    //   return
+    // }
     if (mester === 'FIRST') {
       mt1 = (p1! + p2! + (resource || 0)) / 3;
     }
@@ -39,7 +42,33 @@ export class PrismaNotesRepository implements NotesRepository {
   }
 
   async addNote(data: NotesData): Promise<Note> {
-    const note = await prisma.note.create({
+    const findNote = await prisma.note.findFirst({
+      where: {
+        mester: data.mester,
+        level: data.level,
+        enrollmentId: data.enrollmentId,
+        subjectId: data.subjectId,
+      }
+    })
+    if (!findNote) {
+      return await prisma.note.create({
+        data: {
+          p1: data.p1 ?? 0,
+          p2: data.p2 ?? 0,
+          exam: data.exam ?? 0,
+          nee: data.nee ?? 0,
+          resource: data.resource ?? 0,
+          mester: data.mester,
+          level: data.level,
+          enrollmentId: data.enrollmentId,
+          subjectId: data.subjectId,
+          created_at: data.created_at ?? new Date(),
+          update_at: data.update_at ?? new Date(),
+        },
+      });
+    }
+
+    const update = await prisma.note.update({
       data: {
         p1: data.p1 ?? 0,
         p2: data.p2 ?? 0,
@@ -47,15 +76,14 @@ export class PrismaNotesRepository implements NotesRepository {
         nee: data.nee ?? 0,
         resource: data.resource ?? 0,
         mester: data.mester,
-        level: data.level,
-        studentId: data.studentId,
-        subjectId: data.subjectId,
-        created_at: data.created_at ?? new Date(),
-        update_at: data.update_at ?? new Date(),
+        level: data.level
       },
-    });
+      where: {
+        id: findNote.id
+      }
+    })
 
-    return note;
+    return findNote
   }
 
   async update(id: number, data: Partial<Note>): Promise<Note | null> {
@@ -92,14 +120,19 @@ export class PrismaNotesRepository implements NotesRepository {
     }));
   }
 
-  async getNoteWithFullGrades(studentId: number, classLevel: 'CLASS_10' | 'CLASS_11' | 'CLASS_12' | 'CLASS_13'): Promise<NotesData[] | null> {
+  async getNoteWithFullGrades(criteria: NotesData
+  ): Promise<NotesData[] | null> {
     const notes = await prisma.note.findMany({
       where: {
-        studentId,
-        level: classLevel,
+        enrollmentId: criteria.enrollmentId,
+        OR: {
+          level: criteria.level,
+          subjectId: criteria.subjectId,
+          mester: criteria.mester
+        }
       },
       include: {
-        students: false,  // Inclui os dados do estudante
+        enrollments: false,  // Inclui os dados do estudante
         subjects: true,  // Inclui os dados da disciplina
       },
     });

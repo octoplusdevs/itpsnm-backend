@@ -1,10 +1,8 @@
-import { NotesRepository } from "@/repositories/notes-repository";
-import { LevelName } from "@prisma/client";
+import { NotesData, NotesRepository } from "@/repositories/notes-repository";
 
-interface GetNoteWithGradesUseCaseRequest {
-  studentId: number;
-  classLevel: LevelName;
-}
+type GetNoteWithGradesUseCaseRequest =
+  NotesData
+
 
 interface GetNoteWithGradesUseCaseResponse {
   note: any | null;
@@ -13,11 +11,10 @@ interface GetNoteWithGradesUseCaseResponse {
 export class GetNoteWithGradesUseCase {
   constructor(private notesRepository: NotesRepository) { }
 
-  async execute({
-    studentId,
-    classLevel,
-  }: GetNoteWithGradesUseCaseRequest): Promise<GetNoteWithGradesUseCaseResponse> {
-    const note = await this.notesRepository.getNoteWithFullGrades(studentId, classLevel);
+  async execute(
+    criteria
+      : GetNoteWithGradesUseCaseRequest): Promise<GetNoteWithGradesUseCaseResponse> {
+    const note = await this.notesRepository.getNoteWithFullGrades(criteria);
 
     return {
       note,

@@ -21,6 +21,7 @@ export class GetEnrollmentUseCase {
   async execute({
     enrollmentId
   }: GetEnrollmentUseCaseRequest): Promise<GetEnrollmentUseCaseResponse> {
+
     const enrollment = await this.enrollmentsRepository.checkStatus(enrollmentId)
     if (!enrollment) {
       throw new EnrollmentNotFoundError()

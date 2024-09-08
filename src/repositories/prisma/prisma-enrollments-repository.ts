@@ -1,10 +1,10 @@
 
 import { EnrollementState, Enrollment } from '@prisma/client';
-import { EnrollmentType, EnrollmentsRepository } from '../enrollment-repository';
+import { EnrollT, EnrollmentType, EnrollmentsRepository } from '../enrollment-repository';
 import { prisma } from '@/lib/prisma';
 
 export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
-  async checkStatus(enrollmentId: number): Promise<Enrollment | null> {
+  async checkStatus(enrollmentId: number): Promise<EnrollT | any | null> {
     let enrollment = await prisma.enrollment.findUnique({
       where: {
         id: enrollmentId
@@ -29,6 +29,16 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
           }
         }
       }
+    })
+
+    return enrollment
+  }
+
+  async findByEnrollmentNumber(enrollmentId: number): Promise<Enrollment | null> {
+    let enrollment = await prisma.enrollment.findUnique({
+      where: {
+        id: enrollmentId
+      },
     })
 
     return enrollment
@@ -142,7 +152,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
-      where:{
+      where: {
         docsState,
         paymentState
       }

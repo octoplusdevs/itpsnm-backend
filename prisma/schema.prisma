@@ -110,20 +110,20 @@ enum Mester {
 
 // Tabela de notas do estudantes
 model Note {
-  id         Int       @id @unique @default(autoincrement())
-  p1         Float
-  p2         Float
-  exam       Float
-  nee        Float
-  resource   Float
-  mester     Mester
-  level      LevelName
-  students   Student   @relation(fields: [studentId], references: [id])
-  subjects   Subject   @relation(fields: [subjectId], references: [id])
-  created_at DateTime
-  update_at  DateTime
-  studentId  Int
-  subjectId  Int
+  id           Int        @id @unique @default(autoincrement())
+  p1           Float
+  p2           Float
+  exam         Float
+  nee          Float
+  resource     Float
+  mester       Mester
+  level        LevelName
+  enrollments  Enrollment @relation(fields: [enrollmentId], references: [id])
+  subjects     Subject    @relation(fields: [subjectId], references: [id])
+  created_at   DateTime
+  update_at    DateTime
+  subjectId    Int
+  enrollmentId Int
 
   @@map("notes")
 }
@@ -225,7 +225,6 @@ model Student {
   provinceId         Int?
   created_at         DateTime      @default(now())
   update_at          DateTime      @updatedAt
-  Note               Note[]
 
   @@map("students")
 }
@@ -321,6 +320,7 @@ model Enrollment {
 
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
+  Note       Note[]
 
   @@map("enrollments")
 }
