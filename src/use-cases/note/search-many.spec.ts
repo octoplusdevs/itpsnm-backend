@@ -19,7 +19,7 @@ describe('Search Many Notes Use Case', () => {
       resource: 12,
       level: 'CLASS_10',
       mester: Mester.FIRST,
-      studentId: 123,
+      enrollmentId: 123,
       subjectId: 1,
       created_at: new Date(),
       update_at: new Date(),
@@ -34,19 +34,19 @@ describe('Search Many Notes Use Case', () => {
       resource: 8,
       mester: Mester.SECOND,
       level: 'CLASS_10',
-      studentId: 123,
+      enrollmentId: 123,
       subjectId: 1,
       created_at: new Date(),
       update_at: new Date(),
     });
 
     const response = await notesRepository.searchMany({
-      studentId: 123,
+      enrollmentId: 123,
       subjectId: 1,
     });
 
     expect(response.length).toBe(2);
-    expect(response[0].studentId).toEqual(123);
+    expect(response[0].enrollmentId).toEqual(123);
     expect(response[0].subjectId).toEqual(1);
 
     // Verify the calculated grades

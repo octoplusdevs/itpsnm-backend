@@ -18,14 +18,17 @@ describe('Get Note With Grades Use Case', () => {
       resource: 12,
       mester: 'FIRST',
       level: 'CLASS_10',
-      studentId: 123,
+      enrollmentId: 123,
       subjectId: 456,
     });
 
     const { note } = await getNoteWithGradesUseCase.execute({
-      studentId: 123,
-      classLevel: 'CLASS_13',
+      enrollmentId: 123,
+      level: 'CLASS_10',
+      mester: 'FIRST',
+      subjectId: 456
     });
+
     expect(note).toBeTruthy();
     expect(note.mt1).toBe((10 + 15 + 12) / 3); // Exemplo de cálculo
   });

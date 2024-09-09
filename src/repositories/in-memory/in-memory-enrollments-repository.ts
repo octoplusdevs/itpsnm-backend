@@ -1,5 +1,5 @@
 import { EnrollementState, Enrollment } from '@prisma/client'
-import { EnrollmentType, EnrollmentsRepository } from '../enrollment-repository'
+import { EnrollT, EnrollmentType, EnrollmentsRepository } from '../enrollment-repository'
 import { randomInt } from 'crypto';
 
 export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
@@ -23,7 +23,7 @@ export class InMemoryEnrollmentRepository implements EnrollmentsRepository {
     return enrollment
   }
 
-  async checkStatus(enrollmentId: number): Promise<Enrollment | null> {
+  async checkStatus(enrollmentId: number): Promise<EnrollT | null> {
     const enrollment = this.items.find((item) => item.id === enrollmentId)
     if (!enrollment) {
       return null

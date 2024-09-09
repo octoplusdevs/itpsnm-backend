@@ -80,7 +80,7 @@
 //         ],
 //       })
 
-//     console.log(response.body)
+//     .log(response.body)
 //     expect(response.status).toEqual(201);
 //     expect(response.body.document).toHaveProperty('id');
 //     expect(response.body.files).toHaveLength(2);

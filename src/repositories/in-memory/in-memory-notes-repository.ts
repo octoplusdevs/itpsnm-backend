@@ -49,7 +49,7 @@ export class InMemoryNotesRepository implements NotesRepository {
       resource: data.resource ?? 0,
       mester: data.mester,
       level: data.level,
-      studentId: data.studentId,
+      enrollmentId: data.enrollmentId,
       subjectId: data.subjectId,
       created_at: new Date(),
       update_at: new Date(),
@@ -76,7 +76,7 @@ export class InMemoryNotesRepository implements NotesRepository {
       resource: data.resource ?? this.items[findNoteIndex].resource,
       mester: data.mester ?? this.items[findNoteIndex].mester,
       level: data.level ?? this.items[findNoteIndex].level,
-      studentId: data.studentId ?? this.items[findNoteIndex].studentId,
+      enrollmentId: data.enrollmentId ?? this.items[findNoteIndex].enrollmentId,
       subjectId: data.subjectId ?? this.items[findNoteIndex].subjectId,
       update_at: new Date(),
     };
@@ -109,8 +109,12 @@ export class InMemoryNotesRepository implements NotesRepository {
       });
   }
 
-  async getNoteWithFullGrades(studentId: number): Promise<any | null> {
-    const note = this.items.find((item) => item.studentId === studentId);
+  async getNoteWithFullGrades(criteria: NotesData): Promise<any | null> {
+    const note = this.items.find((note) => {
+      return Object.entries(criteria).every(([key, value]) => {
+        return note[key as keyof Note] === value;
+      });
+    });
 
     if (!note) return null;
 

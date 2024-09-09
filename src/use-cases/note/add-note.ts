@@ -5,6 +5,7 @@ import { EnrollmentNotFoundError } from "../errors/enrollment-not-found";
 import { EnrollmentsRepository } from "@/repositories/enrollment-repository";
 import { prisma } from "@/lib/prisma";
 import { SubjectNotFoundError } from "../errors/subject-not-found";
+import { SubjectsRepository } from "@/repositories/subject-repository";
 
 interface CreateNoteUseCaseRequest {
   p1?: number;
@@ -26,6 +27,7 @@ export class CreateNoteUseCase {
   constructor(
     private notesRepository: NotesRepository,
     private enrollmentsRepository: EnrollmentsRepository,
+    private subjectsRepository: SubjectsRepository,
 
   ) { }
 
@@ -42,7 +44,7 @@ export class CreateNoteUseCase {
   }: CreateNoteUseCaseRequest): Promise<CreateNoteUseCaseResponse> {
 
     const enrollment = await this.enrollmentsRepository.checkStatus(enrollmentId)
-    const subject = await prisma.subject.findUnique({ where: { id: subjectId } })
+    const subject = await this.subjectsRepository.findById(subjectId)
 
     if (!subject) {
       throw new SubjectNotFoundError()

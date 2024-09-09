@@ -40,7 +40,7 @@ export async function getNoteWithFullGrades(request: FastifyRequest, reply: Fast
     if (err instanceof EnrollmentNotFoundError) {
       return reply.status(404).send({ message: err.message })
     }
-    console.log(err)
+    .log(err)
     return reply.status(500).send({ message: 'Internal Server Error' })
   }
 }
