@@ -7,8 +7,8 @@ app
     port: env.PORT,
   })
   .then((address) => {
-    .log(`HTTP Server Running at ${address}`);
+    console.log(`HTTP Server Running at ${address}`);
   })
   .catch((error) => {
-    .error('Error starting server:', error);
+    console.error('Error starting server:', error);
   });

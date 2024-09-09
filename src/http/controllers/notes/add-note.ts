@@ -32,9 +32,8 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       enrollmentId,
       subjectId
     })
-    return reply.status(201).send(note)
+    return reply.status(200).send(note)
   } catch (err) {
-    .log(err)
     if (err instanceof NoteAlreadyExistsError) {
       return reply.status(409).send({ message: err.message })
     }

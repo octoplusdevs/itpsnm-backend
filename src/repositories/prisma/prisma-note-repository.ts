@@ -67,8 +67,7 @@ export class PrismaNotesRepository implements NotesRepository {
         },
       });
     }
-
-    const update = await prisma.note.update({
+    return await prisma.note.update({
       data: {
         p1: data.p1 ?? 0,
         p2: data.p2 ?? 0,
@@ -83,7 +82,6 @@ export class PrismaNotesRepository implements NotesRepository {
       }
     })
 
-    return findNote
   }
 
   async update(id: number, data: Partial<Note>): Promise<Note | null> {
