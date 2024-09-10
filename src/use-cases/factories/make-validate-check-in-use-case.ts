@@ -1,4 +1,4 @@
-import { PrismaCheckinsRepository } from '@/repositories/prisma/prisma-check-ins-repository'
+import { PrismaCheckinsRepository } from '@/repositories/prisma/prisma-user-repository'
 import { ValidateCheckInUseCase } from '../validate-check-in'
 
 export function makeValidateCheckInUseCase() {

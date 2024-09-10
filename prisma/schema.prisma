@@ -13,6 +13,19 @@ enum Gender {
   FEMALE
 }
 
+// Níveis de acesso
+enum Role {
+  STUDENT
+  EMPLOYEE
+  ADMIN
+  TEACHER
+}
+
+enum AccessStatus {
+  SUCCESS
+  FAILURE
+}
+
 enum MaritalStatus {
   SINGLE
   MARRIED
@@ -200,7 +213,6 @@ model Classe {
 model Student {
   id                 Int           @id @unique @default(autoincrement())
   type               StudentType
-  password           String        @default("123456")
   fullName           String
   father             String
   mother             String
@@ -213,7 +225,6 @@ model Student {
   maritalStatus      MaritalStatus
   residence          String
   phone              String        @unique
-  email              String        @unique
   alternativePhone   String?
   provinces          Province?     @relation(fields: [provinceId], references: [id])
   counties           County?       @relation(fields: [countyId], references: [id])
@@ -225,6 +236,7 @@ model Student {
   provinceId         Int?
   created_at         DateTime      @default(now())
   update_at          DateTime      @updatedAt
+  User               User?
 
   @@map("students")
 }
@@ -340,4 +352,53 @@ model File {
   identityCardNumber String?
 
   @@map("files")
+}
+
+model Employee {
+  id                 Int           @id @default(autoincrement())
+  fullName           String
+  dateOfBirth        DateTime
+  identityCardNumber String        @unique
+  gender             Gender
+  emissionDate       DateTime
+  expirationDate     DateTime
+  maritalStatus      MaritalStatus
+  residence          String
+  phone              String        @unique
+  alternativePhone   String?
+  created_at         DateTime      @default(now())
+  update_at          DateTime      @updatedAt
+  User               User?
+
+  @@map("employees")
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  password     String
+  loginAttempt Int
+  isBlocked    Boolean
+  role         Role
+  isActive     Boolean
+  lastLogin    DateTime    @updatedAt
+  created_at   DateTime    @default(now())
+  update_at    DateTime    @updatedAt
+  accessLogs   AccessLog[]
+  employee     Employee?   @relation(fields: [employeeId], references: [id])
+  employeeId   Int?        @unique
+  student      Student?    @relation(fields: [studentId], references: [id])
+  studentId    Int?        @unique
+
+  @@map("users")
+}
+
+model AccessLog {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  user      User         @relation(fields: [userId], references: [id])
+  timestamp DateTime     @default(now())
+  status    AccessStatus
+
+  @@map("accesslogs")
 }

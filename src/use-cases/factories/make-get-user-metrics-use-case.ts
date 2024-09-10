@@ -1,4 +1,4 @@
-import { PrismaCheckinsRepository } from '@/repositories/prisma/prisma-check-ins-repository'
+import { PrismaCheckinsRepository } from '@/repositories/prisma/prisma-user-repository'
 import { GetUserMetricsUseCase } from '../get-user-metrics'
 
 export function makeGetUserMetricsUseCase() {
