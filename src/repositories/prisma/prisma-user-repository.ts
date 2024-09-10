@@ -15,12 +15,10 @@ export class PrismaUserRepository implements UsersRepository {
 
   async create(data: CreateUserDTO): Promise<User> {
     // Hashing the password before saving
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-
     return this.prisma.user.create({
       data: {
         email: data.email,
-        password: hashedPassword,
+        password: data.password,
         role: data.role,
         loginAttempt: 0,
         isBlocked: false,

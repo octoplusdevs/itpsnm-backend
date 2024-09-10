@@ -7,12 +7,12 @@ import { InMemoryUserRepository } from '@/repositories/in-memory/in-memory-users
 describe('LoginUseCase', () => {
   let userRepository: InMemoryUserRepository;
   let loginUseCase: LoginUseCase;
-  const jwtSecret = 'your-secret-key'; // Use o mesmo segredo usado no LoginUseCase
+  let jwtSecret: string; // Use o mesmo segredo usado no LoginUseCase
 
   beforeEach(() => {
     userRepository = new InMemoryUserRepository();
     loginUseCase = new LoginUseCase(userRepository);
-    process.env.JWT_SECRET = jwtSecret;
+    jwtSecret = process.env.JWT_SECRET!;
   });
 
   test('should return success and token on successful login', async () => {
@@ -24,6 +24,7 @@ describe('LoginUseCase', () => {
       password: hashedPassword,
       role: 'STUDENT',
     });
+    console.log(hashedPassword)
 
     const response = await loginUseCase.execute({ email, password });
 

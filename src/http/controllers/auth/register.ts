@@ -1,41 +1,40 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { UsersRepository } from '@/repositories/users-repository';
 import { z } from 'zod';
-import { LoginUseCase } from '@/use-cases/authenticate/authenticate';
+import { UsersRepository } from '@/repositories/users-repository';
 import { PrismaUserRepository } from '@/repositories/prisma/prisma-user-repository';
+import { RegisterUseCase } from '@/use-cases/authenticate/register';
 
-export async function loginController(request: FastifyRequest, reply: FastifyReply) {
+export async function registerController(request: FastifyRequest, reply: FastifyReply) {
   // Definição do esquema de validação para o corpo da requisição
-  const loginSchema = z.object({
+  const registerSchema = z.object({
     email: z.string().email(),
-    password: z.string().min(6) // Definindo uma mínima de 6 caracteres para a senha
+    password: z.string().min(6),  // Definindo uma senha com no mínimo 6 caracteres
+    role: z.enum(['STUDENT', 'ADMIN', 'TEACHER'])  // Adicionando um enum para o papel do usuário
   });
 
   // Validação dos dados da requisição
-  const { email, password } = loginSchema.parse(request.body);
+  const { email, password, role } = registerSchema.parse(request.body);
 
   // Instanciação do repositório Prisma e do UseCase
   const usersRepository: UsersRepository = new PrismaUserRepository();
-  const loginUseCase = new LoginUseCase(usersRepository);
+  const registerUseCase = new RegisterUseCase(usersRepository);
 
   try {
     // Execução do UseCase
-    const result = await loginUseCase.execute({ email, password });
-
+    const result = await registerUseCase.execute({ email, password, role });
     if (result.success) {
       // Retornar sucesso
-      return reply.status(200).send({
+      return reply.status(201).send({
         success: result.success,
         message: result.message,
         userId: result.userId,
-        role: result.role,
-        token: result.token
+        token: result.token,
       });
     } else {
       // Retornar erro
       return reply.status(400).send({
         success: result.success,
-        message: result.message
+        message: result.message,
       });
     }
   } catch (error) {
@@ -43,7 +42,7 @@ export async function loginController(request: FastifyRequest, reply: FastifyRep
     console.error(error);
     return reply.status(500).send({
       success: false,
-      message: 'Internal Server Error'
+      message: 'Internal Server Error',
     });
   }
 }
