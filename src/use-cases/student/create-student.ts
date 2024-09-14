@@ -1,11 +1,12 @@
 import { StudentsRepository } from '@/repositories/student-repository'
 import { Student } from '@prisma/client'
 import { StudentCreateInput } from '@/repositories/student-repository'
-import { EmailAlreadyExistsError } from '../errors/email-already-exists-error'
 import { PhoneAlreadyExistsError } from '../errors/phone-already-exists-error'
 import { IdentityCardNumberAlreadyExistsError } from '../errors/id-card-already-exists-error'
 import { ProvinceNotFoundError } from '../errors/province-not-found'
 import { ProvincesRepository } from '@/repositories/province-repository'
+import { CountyRepository } from '@/repositories/county-repository'
+import { CountyNotFoundError } from '../errors/county-not-found'
 
 interface CreateStudentUseCaseResponse {
   student: Student
@@ -14,14 +15,14 @@ interface CreateStudentUseCaseResponse {
 export class CreateStudentUseCase {
   constructor(
     private studentRepository: StudentsRepository,
-    private provinceRepository: ProvincesRepository
+    private provinceRepository: ProvincesRepository,
+    private countyRepository: CountyRepository
   ) { }
 
   async execute({
     id,
     countyId,
     dateOfBirth,
-    email,
     emissionDate,
     expirationDate,
     father,
@@ -31,7 +32,6 @@ export class CreateStudentUseCase {
     identityCardNumber,
     maritalStatus,
     mother,
-    password,
     phone,
     provinceId,
     residence,
@@ -39,11 +39,6 @@ export class CreateStudentUseCase {
     alternativePhone
   }: StudentCreateInput): Promise<CreateStudentUseCaseResponse> {
 
-    const userWithSameEmail = await this.studentRepository.findByEmail(email)
-
-    if (userWithSameEmail) {
-      throw new EmailAlreadyExistsError()
-    }
 
     const userWithSamePhone = await this.studentRepository.findByPhone(phone)
     if (userWithSamePhone) {
@@ -60,16 +55,15 @@ export class CreateStudentUseCase {
       throw new ProvinceNotFoundError()
     }
 
-    const findCounty = await this.provinceRepository.findById(countyId)
+    const findCounty = await this.countyRepository.findById(countyId)
     if (!findCounty) {
-      throw new ProvinceNotFoundError()
+      throw new CountyNotFoundError()
     }
 
     const student = await this.studentRepository.create({
       id: id!,
       countyId,
       dateOfBirth,
-      email,
       emissionDate,
       expirationDate,
       father,
@@ -79,7 +73,6 @@ export class CreateStudentUseCase {
       identityCardNumber,
       maritalStatus,
       mother,
-      password,
       phone,
       provinceId,
       residence,

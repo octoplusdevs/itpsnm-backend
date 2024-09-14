@@ -20,7 +20,7 @@ export class PrismaStudentsRepository implements StudentsRepository {
     return findStudent
   }
   async findByAlternativePhone(phone: string): Promise<Student | null> {
-    let findStudent = await prisma.student.findUnique({
+    let findStudent = await prisma.student.findFirst({
       where: {
         alternativePhone: phone
       }
@@ -38,20 +38,19 @@ export class PrismaStudentsRepository implements StudentsRepository {
   findByName(name: string): Promise<Student | null> {
     throw new Error('Method not implemented.');
   }
-  async findByEmail(email: string): Promise<Student | null> {
-    let findStudent = await prisma.student.findUnique({
-      where: {
-        email
-      }
-    })
-    return findStudent
-  }
-  async create(data: Student): Promise<Student> {
+  // async findByEmail(email: string): Promise<Student | null> {
+  //   let findStudent = await prisma.student.findUnique({
+  //     where: {
+  //       email
+  //     }
+  //   })
+  //   return findStudent
+  // }
+  async create(data: StudentCreateInput): Promise<Student> {
     let {
       id,
       countyId,
       dateOfBirth,
-      email,
       emissionDate,
       expirationDate,
       father,
@@ -61,7 +60,6 @@ export class PrismaStudentsRepository implements StudentsRepository {
       identityCardNumber,
       maritalStatus,
       mother,
-      password,
       phone,
       provinceId,
       residence,
@@ -74,7 +72,6 @@ export class PrismaStudentsRepository implements StudentsRepository {
         id,
         countyId,
         dateOfBirth,
-        email,
         emissionDate,
         expirationDate,
         father,
@@ -84,7 +81,6 @@ export class PrismaStudentsRepository implements StudentsRepository {
         identityCardNumber,
         maritalStatus,
         mother,
-        password,
         phone,
         provinceId,
         residence,

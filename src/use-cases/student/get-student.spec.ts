@@ -1,7 +1,8 @@
 import { expect, describe, it, beforeEach } from 'vitest'
 import { GetStudentUseCase } from './get-student'
 import { InMemoryStudentRepository } from '@/repositories/in-memory/in-memory-students-repository'
-import { ResourceNotFoundError } from '../errors/resource-not-found'
+import { StudentNotFoundError } from '../errors/resource-not-found'
+import { StudentNotFoundError } from '../errors/student-not-found'
 
 let studentRepository: InMemoryStudentRepository
 let sut: GetStudentUseCase
@@ -17,7 +18,6 @@ describe('Get Student Use Case', () => {
       id: 103,
       fullName: "Wilmy Danguya",
       dateOfBirth: new Date("2000-08-01"),
-      email: "daniel.yava16@gmail.com",
       emissionDate: new Date(),
       expirationDate: new Date(),
       father: "Marcos",
@@ -26,16 +26,12 @@ describe('Get Student Use Case', () => {
       identityCardNumber: "0044578LA011",
       maritalStatus: 'SINGLE',
       mother: "Maria",
-      password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654321,
+      alternativePhone: "987654321",
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     })
 
     const student = await sut.execute({
@@ -51,13 +47,12 @@ describe('Get Student Use Case', () => {
       sut.execute({
         id: 1,
       }),
-    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(StudentNotFoundError)
   })
   it('should be able to get a student by identity Card Number', async () => {
     await studentRepository.create({
       fullName: "Wilmy Danguya",
       dateOfBirth: new Date("2000-08-01"),
-      email: "daniel.yava16@gmail.com",
       emissionDate: new Date(),
       expirationDate: new Date(),
       father: "Marcos",
@@ -66,16 +61,12 @@ describe('Get Student Use Case', () => {
       identityCardNumber: "0044578LA011",
       maritalStatus: 'SINGLE',
       mother: "Maria",
-      password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654321,
+      alternativePhone: "987654321",
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     })
 
     const student = await sut.execute({
@@ -90,13 +81,12 @@ describe('Get Student Use Case', () => {
       sut.execute({
         identityCardNumber: "1",
       }),
-    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(StudentNotFoundError)
   })
-  it('should be able to get a student by email', async () => {
+  it('should be able to get a student by identityCardNumber', async () => {
     await studentRepository.create({
       fullName: "Daniel Gustavo",
       dateOfBirth: new Date("2000-08-01"),
-      email: "daniel.yava17@gmail.com",
       emissionDate: new Date(),
       expirationDate: new Date(),
       father: "Marcos",
@@ -105,20 +95,16 @@ describe('Get Student Use Case', () => {
       identityCardNumber: "0044578LA011",
       maritalStatus: 'SINGLE',
       mother: "Maria",
-      password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 987654321,
+      alternativePhone: "987654321",
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     })
 
     const student = await sut.execute({
-      email: "daniel.yava17@gmail.com"
+      identityCardNumber: "0044578LA011"
     })
 
     expect(student?.identityCardNumber).toEqual("0044578LA011")
@@ -129,13 +115,12 @@ describe('Get Student Use Case', () => {
       sut.execute({
         email: "1",
       }),
-    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(StudentNotFoundError)
   })
   it('should be able to get a student by phone', async () => {
     await studentRepository.create({
       fullName: "Daniel Gustavo",
       dateOfBirth: new Date("01/08/2000"),
-      email: "daniel.yava11@gmail.com",
       emissionDate: new Date(),
       expirationDate: new Date(),
       father: "Alguem",
@@ -144,19 +129,14 @@ describe('Get Student Use Case', () => {
       identityCardNumber: "0044578LA011",
       maritalStatus: 'SINGLE',
       mother: "222",
-      password: "2222",
       residence: "www",
-      phone: 935555500,
       type: 'SCHOLARSHIP',
-      alternativePhone: 22222,
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
+      phone: '935555500'
     })
     const student = await sut.execute({
-      phone: 935555500
+      phone: "935555500"
     })
 
     expect(student?.identityCardNumber).toEqual("0044578LA011")
@@ -165,15 +145,14 @@ describe('Get Student Use Case', () => {
   it('should not be able to get student with wrong phone', async () => {
     await expect(() =>
       sut.execute({
-        phone: 123,
+        phone: "123",
       }),
-    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(StudentNotFoundError)
   })
   it('should be able to get a student by alternative phone', async () => {
     await studentRepository.create({
       fullName: "Daniel Gustavo",
       dateOfBirth: new Date("2000-08-01"),
-      email: "daniel.yava17@gmail.com",
       emissionDate: new Date(),
       expirationDate: new Date(),
       father: "Marcos",
@@ -182,20 +161,16 @@ describe('Get Student Use Case', () => {
       identityCardNumber: "0044578LA011",
       maritalStatus: 'SINGLE',
       mother: "Maria",
-      password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 935555777,
+      alternativePhone: "935555777",
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     })
 
     const student = await sut.execute({
-      alternativePhone: 935555777
+      alternativePhone: "935555777"
     })
 
     expect(student?.identityCardNumber).toEqual("0044578LA011")
@@ -204,15 +179,14 @@ describe('Get Student Use Case', () => {
   it('should not be able to get student with wrong alternative phone', async () => {
     await expect(() =>
       sut.execute({
-        alternativePhone: 123,
+        alternativePhone: "123",
       }),
-    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(StudentNotFoundError)
   })
   it('should be able to get a student  by Name', async () => {
     await studentRepository.create({
       fullName: "Daniel Gustavo",
       dateOfBirth: new Date("2000-08-01"),
-      email: "daniel.yava17@gmail.com",
       emissionDate: new Date(),
       expirationDate: new Date(),
       father: "Marcos",
@@ -221,16 +195,12 @@ describe('Get Student Use Case', () => {
       identityCardNumber: "0044578LA011",
       maritalStatus: 'SINGLE',
       mother: "Maria",
-      password: "password123",
       residence: "Rua Principal, 123",
-      phone: 123456789,
+      phone: "123456789",
       type: 'SCHOLARSHIP',
-      alternativePhone: 935555777,
+      alternativePhone: "935555777",
       provinceId: 1,
-      classeId: 1,
       countyId: 1,
-      courseId: 1,
-      levelId: 1,
     })
 
     const student = await sut.execute({
@@ -245,6 +215,6 @@ describe('Get Student Use Case', () => {
       sut.execute({
         name: "non existing name",
       }),
-    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(StudentNotFoundError)
   })
 })

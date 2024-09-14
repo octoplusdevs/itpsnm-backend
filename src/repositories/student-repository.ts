@@ -5,7 +5,6 @@ export interface StudentCreateInput {
   id?: number
   type: StudentType
   fullName: string
-  password: string
   father: string
   mother: string
   dateOfBirth: Date
@@ -17,10 +16,11 @@ export interface StudentCreateInput {
   maritalStatus: MaritalStatus
   residence: string
   phone: string
-  email: string
   alternativePhone?: string | null
   countyId: number
   provinceId: number
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 
@@ -30,8 +30,7 @@ export interface StudentsRepository {
   findByAlternativePhone(phone: string): Promise<Student | null>
   findByPhone(phone: string): Promise<Student | null>
   findByName(name: string): Promise<Student | null>
-  findByEmail(email: string): Promise<Student | null>
-  create(data: Student): Promise<Student>
+  create(data: StudentCreateInput): Promise<Student | StudentCreateInput>
   searchMany(query: string, page: number): Promise<{
     totalItems: number;
     currentPage: number;

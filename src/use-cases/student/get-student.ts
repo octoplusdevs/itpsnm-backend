@@ -1,12 +1,12 @@
 import { Student } from '@prisma/client'
-import { ResourceNotFoundError } from '../errors/resource-not-found'
 import { StudentsRepository } from '@/repositories/student-repository'
+import { StudentNotFoundError } from '../errors/student-not-found';
 
 interface GetStudentUseCaseRequest {
   id?: number;
   identityCardNumber?: string;
-  alternativePhone?: number;
-  phone?: number;
+  alternativePhone?: string;
+  phone?: string;
   name?: string;
   email?: string;
 }
@@ -17,7 +17,6 @@ export class GetStudentUseCase {
   async execute({
     id,
     alternativePhone,
-    email,
     identityCardNumber,
     name,
     phone
@@ -38,11 +37,8 @@ export class GetStudentUseCase {
     if (name !== undefined) {
       student = await this.studentRepository.findByName(name);
     }
-    if (email !== undefined) {
-      student = await this.studentRepository.findByEmail(email);
-    }
     if (!student) {
-      throw new ResourceNotFoundError()
+      throw new StudentNotFoundError()
     }
     return student
   }

@@ -13,7 +13,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   const registerBodySchema = z.object({
     fullName: z.string(),
     dateOfBirth: z.coerce.date(),
-    email: z.string().email(),
     emissionDate: z.coerce.date(),
     expirationDate: z.coerce.date(),
     father: z.string(),
@@ -22,11 +21,10 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     identityCardNumber: z.string(),
     maritalStatus: z.enum(['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED']),
     mother: z.string(),
-    password: z.string(),
     residence: z.string(),
     phone: z.string(),
-    type: z.enum(['SCHOLARSHIP', 'REGULAR']),
-    alternativePhone: z.string(),
+    type: z.enum(['SCHOLARSHIP', 'REGULAR']).default('REGULAR'),
+    alternativePhone: z.string().optional(),
     provinceId: z.number(),
     countyId: z.number(),
   });
@@ -36,7 +34,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       alternativePhone,
       countyId,
       dateOfBirth,
-      email,
       emissionDate,
       expirationDate,
       father,
@@ -46,7 +43,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       identityCardNumber,
       maritalStatus,
       mother,
-      password,
       phone,
       provinceId,
       residence,
@@ -58,7 +54,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       alternativePhone,
       countyId,
       dateOfBirth,
-      email,
       emissionDate,
       expirationDate,
       father,
@@ -68,7 +63,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       identityCardNumber,
       maritalStatus,
       mother,
-      password,
       phone,
       provinceId,
       residence,
@@ -79,7 +73,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   } catch (err) {
     if (err instanceof PhoneAlreadyExistsError ||
         err instanceof AlternativePhoneAlreadyExistsError ||
-        err instanceof EmailAlreadyExistsError ||
         err instanceof ProvinceNotFoundError ||
         err instanceof CountyNotFoundError ||
         err instanceof IdentityCardNumberAlreadyExistsError

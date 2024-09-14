@@ -1,5 +1,5 @@
 import { Student } from '@prisma/client'
-import { StudentsRepository } from '../student-repository'
+import { StudentCreateInput, StudentsRepository } from '../student-repository'
 import { randomInt } from 'crypto'
 
 export class InMemoryStudentRepository implements StudentsRepository {
@@ -20,12 +20,11 @@ export class InMemoryStudentRepository implements StudentsRepository {
     }
     return student[0]
   }
-  async create(data: Student): Promise<Student> {
+  async create(data: StudentCreateInput): Promise<Student | StudentCreateInput> {
     const newStudent: Student = {
       id: data.id ?? randomInt(9999),
       type: data.type,
       fullName: data.fullName,
-      password: data.password,
       father: data.father,
       mother: data.mother,
       dateOfBirth: new Date(data.dateOfBirth),
@@ -37,12 +36,11 @@ export class InMemoryStudentRepository implements StudentsRepository {
       maritalStatus: data.maritalStatus,
       residence: data.residence,
       phone: data.phone,
-      email: data.email,
       alternativePhone: data.alternativePhone ?? null,
       countyId: data.countyId,
       provinceId: data.provinceId,
-      created_at: data.created_at ?? new Date(),
-      update_at: data.update_at ?? new Date(),
+      created_at: data.createdAt ?? new Date(),
+      update_at: data.updatedAt ?? new Date()
     }
     this.items.push(newStudent)
     return newStudent
@@ -81,13 +79,6 @@ export class InMemoryStudentRepository implements StudentsRepository {
       return true
     }
     return false
-  }
-  async findByEmail(email: string): Promise<Student | null> {
-    const student = this.items.find((item) => item.email === email)
-    if (!student) {
-      return null
-    }
-    return student
   }
   async findByPhone(phone: string): Promise<Student | null> {
     const student = this.items.find((item) => item.phone === phone)
