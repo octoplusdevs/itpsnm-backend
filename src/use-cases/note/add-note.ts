@@ -1,20 +1,29 @@
 import { NotesRepository } from "@/repositories/notes-repository"
-import { LevelName, Mester, Note } from "@prisma/client";
+import { LevelName, Note } from "@prisma/client";
 import { randomInt } from "crypto";
 import { EnrollmentNotFoundError } from "../errors/enrollment-not-found";
 import { EnrollmentsRepository } from "@/repositories/enrollment-repository";
-import { prisma } from "@/lib/prisma";
 import { SubjectNotFoundError } from "../errors/subject-not-found";
 import { SubjectsRepository } from "@/repositories/subject-repository";
 
 interface CreateNoteUseCaseRequest {
-  p1?: number;
-  p2?: number;
-  exam?: number;
+  pf1?: number;
+  pf2?: number;
+  pft?: number;
+  ps1?: number;
+  ps2?: number;
+  pst?: number;
+  pt1?: number;
+  pt2?: number;
+  ptt?: number;
   level: LevelName;
   nee?: number;
   resource?: number;
-  mester: Mester;
+  mt1?: number | null;
+  mt2?: number | null;
+  mt3?: number | null;
+  mfd?: number | null;
+  mf?: number | null;
   enrollmentId: number;
   subjectId: number;
 }
@@ -32,12 +41,17 @@ export class CreateNoteUseCase {
   ) { }
 
   async execute({
-    p1 = 0,
-    p2 = 0,
-    exam = 0,
+    pf1 = 0,
+    pf2 = 0,
+    pft = 0,
+    ps1 = 0,
+    ps2 = 0,
+    pst = 0,
+    pt1 = 0,
+    pt2 = 0,
+    ptt = 0,
     nee = 0,
     resource = 0,
-    mester,
     level,
     enrollmentId,
     subjectId
@@ -56,12 +70,17 @@ export class CreateNoteUseCase {
 
     const note = await this.notesRepository.addNote({
       id: randomInt(99999),
-      p1,
-      p2,
-      exam,
+      pf1,
+      pf2,
+      pft,
+      ps1,
+      ps2,
+      pst,
+      pt1,
+      pt2,
+      ptt,
       nee,
       resource,
-      mester,
       enrollmentId,
       subjectId,
       created_at: new Date(),

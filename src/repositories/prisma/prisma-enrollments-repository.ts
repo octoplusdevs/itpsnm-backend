@@ -1,5 +1,5 @@
 
-import { EnrollementState, Enrollment } from '@prisma/client';
+import { EnrollementState } from '@prisma/client';
 import { EnrollT, EnrollmentType, EnrollmentsRepository } from '../enrollment-repository';
 import { prisma } from '@/lib/prisma';
 
@@ -34,7 +34,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
     return enrollment
   }
 
-  async findByEnrollmentNumber(enrollmentId: number): Promise<Enrollment | null> {
+  async findByEnrollmentNumber(enrollmentId: number): Promise<EnrollT | any | null> {
     let enrollment = await prisma.enrollment.findUnique({
       where: {
         id: enrollmentId
@@ -45,7 +45,28 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
   }
 
   async findByIdentityCardNumber(identityCardNumber: string): Promise<any | null> {
-    let enrollment = await prisma.enrollment.findUnique({ where: { identityCardNumber } })
+    let enrollment = await prisma.enrollment.findUnique({
+      where: { identityCardNumber }, include: {
+        students: {
+          select: {
+            fullName: true,
+            id: true
+          }
+        },
+        levels: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        courses: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      }
+    })
     return enrollment
   }
 
@@ -75,7 +96,8 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
     return isDeletedEnrollment ? true : false
   }
 
-  async create(data: EnrollmentType): Promise<EnrollmentType> {
+  //TODO: Mudar o retorno de any
+  async create(data: EnrollmentType): Promise<EnrollmentType | any> {
     let enrollment = await prisma.enrollment.create({
       data: {
         docsState: data.docsState,
@@ -110,7 +132,6 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
       include: {
         students: {
           select: {
-            email: true,
             dateOfBirth: true,
             gender: true,
             height: true,

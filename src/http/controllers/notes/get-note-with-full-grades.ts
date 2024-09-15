@@ -1,6 +1,6 @@
 import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found'
 import { makeGetNoteWithFullGradesUseCase } from '@/use-cases/factories/make-get-note-with-full-grades-use-case'
-import { LevelName, Mester } from '@prisma/client'
+import { LevelName } from '@prisma/client'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -11,12 +11,12 @@ export async function getNoteWithFullGrades(request: FastifyRequest, reply: Fast
   })
 
   const getNoteWithFullGradesQueriesSchema = z.object({
-    level: z.nativeEnum(LevelName),  // Use z.nativeEnum para enums
-    mester: z.nativeEnum(Mester).default('FIRST'), // Use z.nativeEnum para enums
-    subjectId: z.coerce.number()  // Use z.nativeEnum para enums
+    level: z.nativeEnum(LevelName).optional(),  // Use z.nativeEnum para enums
+    resource: z.coerce.number().optional(), // Use z.nativeEnum para enums
+    subjectId: z.coerce.number().optional()  // Use z.nativeEnum para enums
   })
 
-  const { level, mester, subjectId } = getNoteWithFullGradesQueriesSchema.parse(request.query)
+  const { level, subjectId } = getNoteWithFullGradesQueriesSchema.parse(request.query)
   const { enrollmentId } = getNoteWithFullGradesParamsSchema.parse(request.params)
   try {
     // Criação do caso de uso
@@ -26,9 +26,9 @@ export async function getNoteWithFullGrades(request: FastifyRequest, reply: Fast
     // const { enrollment } = await getEnrollmentUseCase.execute({ enrollmentId })
 
     const { note } = await getNoteWithFullGradesUseCase.execute({
-      enrollmentId, level,
-      mester: mester,
-      subjectId: subjectId
+      enrollmentId,
+      level,
+      subjectId
     })
     // Retorno da resposta
     return reply.status(200).send({

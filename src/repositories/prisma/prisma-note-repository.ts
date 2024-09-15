@@ -4,85 +4,63 @@ import { NotesRepository, NotesData } from '../notes-repository';
 const prisma = new PrismaClient();
 
 export class PrismaNotesRepository implements NotesRepository {
-  private calculateGrades(note: Note) {
-    const { p1, p2, exam, resource, mester, level } = note;
-
-    let mt1 = null;
-    let mt2 = null;
-    let mt3 = null;
-    let mfd = null;
-    let mf = null;
-
-    // if (!((p1 | p2) >= 0 && (p1 | p2) <= 20)) {
-    //   return
-    // }
-    if (mester === 'FIRST') {
-      mt1 = (p1! + p2! + (resource || 0)) / 3;
-    }
-
-    if (mester === 'SECOND') {
-      mt2 = (p1! + p2! + (resource || 0)) / 3;
-    }
-
-    if (mester === 'THIRD') {
-      if (level === 'CLASS_10' || level === 'CLASS_11') {
-        mt3 = (p1! + p2! + (resource || 0)) / 3;
-        if (mt1 !== null && mt2 !== null) {
-          mfd = (mt1 + mt2 + mt3!) / 3;
-        }
-      } else if (level === 'CLASS_12') {
-        mfd = (p1! + p2!) / 2;
-        if (exam !== undefined) {
-          mf = mfd * 0.6 + exam * 0.4;
-        }
-      }
-    }
-
-    return { mt1, mt2, mt3, mfd, mf };
-  }
 
   async addNote(data: NotesData): Promise<Note> {
     const findNote = await prisma.note.findFirst({
       where: {
-        mester: data.mester,
         level: data.level,
         enrollmentId: data.enrollmentId,
         subjectId: data.subjectId,
       }
-    })
+    });
+
     if (!findNote) {
       return await prisma.note.create({
         data: {
-          p1: data.p1 ?? 0,
-          p2: data.p2 ?? 0,
-          exam: data.exam ?? 0,
+          pf1: data.pf1 ?? 0,
+          pf2: data.pf2 ?? 0,
+          pft: data.pft ?? 0,
+          ps1: data.ps1 ?? 0,
+          ps2: data.ps2 ?? 0,
+          pst: data.pst ?? 0,
+          pt1: data.pt1 ?? 0,
+          pt2: data.pt2 ?? 0,
+          ptt: data.ptt ?? 0,
           nee: data.nee ?? 0,
           resource: data.resource ?? 0,
-          mester: data.mester,
-          level: data.level,
+          level: data.level!,
           enrollmentId: data.enrollmentId,
-          subjectId: data.subjectId,
+          subjectId: data.subjectId!,
           created_at: data.created_at ?? new Date(),
-          update_at: data.update_at ?? new Date(),
+          update_at: new Date(),
         },
       });
     }
+
     return await prisma.note.update({
-      data: {
-        p1: data.p1 ?? 0,
-        p2: data.p2 ?? 0,
-        exam: data.exam ?? 0,
-        nee: data.nee ?? 0,
-        resource: data.resource ?? 0,
-        mester: data.mester,
-        level: data.level
-      },
       where: {
         id: findNote.id
+      },
+      data: {
+        resource: data.resource ?? findNote.resource,
+        pf1: data.pf1 ?? findNote.pf1,
+        pf2: data.pf2 ?? findNote.pf2,
+        pft: data.pft ?? findNote.pft,
+        ps1: data.pf1 ?? findNote.ps1,
+        ps2: data.pf2 ?? findNote.ps2,
+        pst: data.pft ?? findNote.pst,
+        pt1: data.pf1 ?? findNote.pt1,
+        pt2: data.pf2 ?? findNote.pt2,
+        ptt: data.pft ?? findNote.ptt,
+        nee: data.nee ?? findNote.nee,
+        level: data.level,
+        update_at: new Date(),
       }
-    })
+    });
+
 
   }
+
 
   async update(id: number, data: Partial<Note>): Promise<Note | null> {
     const note = await prisma.note.update({
@@ -112,10 +90,7 @@ export class PrismaNotesRepository implements NotesRepository {
       where: criteria,
     });
 
-    return notes.map(note => ({
-      ...note,
-      ...this.calculateGrades(note),
-    }));
+    return notes
   }
 
   async getNoteWithFullGrades(criteria: NotesData
@@ -123,11 +98,12 @@ export class PrismaNotesRepository implements NotesRepository {
     const notes = await prisma.note.findMany({
       where: {
         enrollmentId: criteria.enrollmentId,
-        OR: {
-          level: criteria.level,
-          subjectId: criteria.subjectId,
-          mester: criteria.mester
-        }
+        OR: [
+          {
+            level: criteria.level,
+            subjectId: criteria.subjectId,
+          }
+        ]
       },
       include: {
         enrollments: false,  // Inclui os dados do estudante
@@ -137,15 +113,7 @@ export class PrismaNotesRepository implements NotesRepository {
 
     if (!notes.length) return null;
 
-    const notesWithGrades = notes.map((note) => {
-      const grades = this.calculateGrades(note);
-      return {
-        ...note,
-        ...grades,
-      };
-    });
-
-    return notesWithGrades;
+    return notes;
   }
 
 }

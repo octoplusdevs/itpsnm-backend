@@ -1,25 +1,21 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
-import { makeGetEnrollmentUseCase } from '@/use-cases/factories/make-get-enrollment-use-case';
 import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found';
+import { makeGetEnrollmentByIdentityCardUseCase } from '@/use-cases/factories/make-get-enrollment-by-identity-card-use-case';
 
-export async function get(request: FastifyRequest, reply: FastifyReply) {
+export async function getByIdentityCard(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
-    enrollmentNumber: z.coerce.number().optional(),
-    identityCardNumber: z.coerce.string().optional(),
+    identityCardNumber: z.string(),
   });
   const {
-    enrollmentNumber,
-    identityCardNumber
-  } = createEnrollmentSchema.parse(request.query);
+    identityCardNumber,
+  } = createEnrollmentSchema.parse(request.params);
 
   try {
-    const getEnrollmentUseCase = makeGetEnrollmentUseCase();
+    const getEnrollmentUseCase = makeGetEnrollmentByIdentityCardUseCase();
     let enrollment = await getEnrollmentUseCase.execute({
-      enrollmentNumber,
       identityCardNumber
-
     });
 
     return reply.status(201).send(enrollment)

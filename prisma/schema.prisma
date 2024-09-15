@@ -124,12 +124,22 @@ enum Mester {
 // Tabela de notas do estudantes
 model Note {
   id           Int        @id @unique @default(autoincrement())
-  p1           Float
-  p2           Float
-  exam         Float
+  pf1          Float
+  pf2          Float
+  pft          Float
+  ps1          Float
+  ps2          Float
+  pst          Float
+  pt1          Float
+  pt2          Float
+  ptt          Float
   nee          Float
+  mt1          Float?
+  mt2          Float?
+  mt3          Float?
+  mf           Float?
   resource     Float
-  mester       Mester
+  mfd          Float?
   level        LevelName
   enrollments  Enrollment @relation(fields: [enrollmentId], references: [id])
   subjects     Subject    @relation(fields: [subjectId], references: [id])
