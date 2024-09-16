@@ -6,7 +6,7 @@ export interface EnrollmentType {
   levelId: number
   docsState: EnrollementState
   paymentState: EnrollementState
-  student: Student
+  student?: Student
   identityCardNumber: string
   classeId?: number | null
   created_at?: Date

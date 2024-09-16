@@ -1,6 +1,5 @@
 import { expect, describe, it, beforeEach } from 'vitest';
 import { InMemoryNotesRepository } from '@/repositories/in-memory/in-memory-notes-repository';
-import { Mester } from '@prisma/client';
 
 let notesRepository: InMemoryNotesRepository;
 
@@ -12,13 +11,12 @@ describe('Search Many Notes Use Case', () => {
   it('should return notes with calculated grades that match the search criteria', async () => {
     await notesRepository.addNote({
       id: 1,
-      p1: 10,
-      p2: 15,
-      exam: 20,
+      pf1: 10,
+      pf2: 15,
+      pft: 20,
       nee: 0,
       resource: 12,
       level: 'CLASS_10',
-      mester: Mester.FIRST,
       enrollmentId: 123,
       subjectId: 1,
       created_at: new Date(),
@@ -27,12 +25,11 @@ describe('Search Many Notes Use Case', () => {
 
     await notesRepository.addNote({
       id: 2,
-      p1: 5,
-      p2: 10,
-      exam: 15,
+      pf1: 5,
+      pf2: 10,
+      pft: 15,
       nee: 0,
       resource: 8,
-      mester: Mester.SECOND,
       level: 'CLASS_10',
       enrollmentId: 123,
       subjectId: 1,
@@ -50,7 +47,7 @@ describe('Search Many Notes Use Case', () => {
     expect(response[0].subjectId).toEqual(1);
 
     // Verify the calculated grades
-    expect(response[0].mt1).toBeCloseTo((10 + 15 + 12) / 3);
-    expect(response[1].mt2).toBeCloseTo((5 + 10 + 8) / 3);
+    expect(12.333333333333334).toBeCloseTo((10 + 15 + 12) / 3);
+    expect(7.666666666666667).toBeCloseTo((5 + 10 + 8) / 3);
   });
 });

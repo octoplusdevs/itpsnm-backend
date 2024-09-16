@@ -23,10 +23,10 @@ describe('Get Enrollment Use Case', () => {
       courseId: 1,
       levelId: 1,
       created_at: new Date(),
-      update_at: new Date()
+      update_at: new Date(),
     })
     const { enrollment } = await sut.execute({
-      enrollmentId: 1
+      enrollmentNumber: 1
     })
     expect(enrollment?.id).toBe(1)
     expect(enrollment?.docsState).toEqual('APPROVED')
@@ -35,7 +35,7 @@ describe('Get Enrollment Use Case', () => {
   it('should not be able to get enrollment with wrong id', async () => {
     await expect(() =>
       sut.execute({
-        enrollmentId: -1,
+        enrollmentNumber: -1,
       }),
     ).rejects.toBeInstanceOf(EnrollmentNotFoundError)
   })

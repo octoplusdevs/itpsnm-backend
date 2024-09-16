@@ -1,7 +1,6 @@
 import { expect, describe, it, beforeEach } from 'vitest'
 import { DestroyNoteUseCase } from './destroy-note'
 import { InMemoryNotesRepository } from '@/repositories/in-memory/in-memory-notes-repository'
-import { Mester } from '@prisma/client'
 
 let notesRepository: InMemoryNotesRepository
 let sut: DestroyNoteUseCase
@@ -16,14 +15,13 @@ describe('Destroy Note Use Case', () => {
     // Adiciona uma nota inicial no repositório
     const note = await notesRepository.addNote({
       id: 1,
-      p1: 10,
-      p2: 15,
-      exam: 20,
+      pf1: 10,
+      pf2: 15,
+      pft: 20,
       nee: 5,
       resource: 7,
-      mester: Mester.FIRST,
       level: 'CLASS_10',
-      studentId: 123,
+      enrollmentId: 123,
       subjectId: 1,
       created_at: new Date(),
       update_at: new Date(),

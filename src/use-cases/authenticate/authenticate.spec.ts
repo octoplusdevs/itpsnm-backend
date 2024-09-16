@@ -24,7 +24,6 @@ describe('LoginUseCase', () => {
       password: hashedPassword,
       role: 'STUDENT',
     });
-    console.log(hashedPassword)
 
     const response = await loginUseCase.execute({ email, password });
 

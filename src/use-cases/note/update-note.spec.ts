@@ -1,7 +1,6 @@
 import { expect, describe, it, beforeEach } from 'vitest'
 import { UpdateNoteUseCase } from './update-note'
 import { InMemoryNotesRepository } from '@/repositories/in-memory/in-memory-notes-repository'
-import { Mester } from '@prisma/client'
 
 let notesRepository: InMemoryNotesRepository
 let sut: UpdateNoteUseCase
@@ -16,13 +15,12 @@ describe('Update Note Use Case', () => {
     // Adiciona uma nota inicial no repositório
     const note = await notesRepository.addNote({
       id: 1,
-      p1: 10,
-      p2: 15,
-      exam: 20,
+      pf1: 10,
+      pf2: 15,
+      pft: 20,
       nee: 5,
       resource: 7,
-      mester: Mester.FIRST,
-      studentId: 123,
+      enrollmentId: 123,
       subjectId: 1,
       created_at: new Date(),
       update_at: new Date(),
@@ -31,22 +29,22 @@ describe('Update Note Use Case', () => {
     // Atualiza a nota criada
     const response = await sut.execute({
       id: 1,
-      p1: 12,
-      p2: 18,
-      exam: 19,
+      pf1: 12,
+      pf2: 18,
+      pft: 19,
     })
 
     expect(response.note).toBeTruthy()
-    expect(response.note?.p1).toEqual(12)
-    expect(response.note?.p2).toEqual(18)
-    expect(response.note?.exam).toEqual(19)
+    expect(response.note?.pf1).toEqual(12)
+    expect(response.note?.pf2).toEqual(18)
+    expect(response.note?.pft).toEqual(19)
   })
 
   it('should return null if note is not found', async () => {
     const response = await sut.execute({
       id: 999, // ID não existente
-      p1: 12,
-      p2: 18,
+      pf1: 12,
+      pf2: 18,
     })
 
     expect(response.note).toBeNull()
