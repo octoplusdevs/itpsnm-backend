@@ -15,8 +15,7 @@ export class PrismaPaymentRepository implements PaymentsRepository {
             data: {
               price: itemDetailsData.price,
               type: itemDetailsData.type,
-              quantity: itemDetailsData,
-              price: itemDetailsData,
+              quantity: itemDetailsData?.quantity,
             }
           }
         }
