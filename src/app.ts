@@ -12,7 +12,15 @@ import { paymentsRoutes } from './http/controllers/payments/routes'
 import { notesRoutes } from './http/controllers/notes/routes'
 import { authRoutes } from './http/controllers/auth/routes'
 import fastifyMultipart from '@fastify/multipart';
+import cors from '@fastify/cors'
+
+
+
 export const app = fastify()
+
+
+
+
 
 // app.register(fastifyJwt, {
 //   secret: env.JWT_SECRET,
@@ -25,20 +33,36 @@ export const app = fastify()
 //   },
 // })
 
+app.register(require('@fastify/cors'), (instance) => {
+  return (req: any, callback: any) => {
+    const corsOptions = {
+      // This is NOT recommended for production as it enables reflection exploits
+      origin: true
+    };
+
+    // do not include CORS headers for requests from localhost
+    if (/^localhost$/m.test(req.headers.origin)) {
+      corsOptions.origin = false
+    }
+
+    // callback expects two parameters: error and options
+    callback(null, corsOptions)
+  }
+})
 app.register(fastifyMultipart, {
   limits: {
     fileSize: 5 * 1024 * 1024, // 2MB
   },
 });
 app.register(fastifyCookie)
-app.register(coursesRoutes)
-app.register(studentsRoutes)
-app.register(enrollmentsRoutes)
-app.register(documentsRoutes)
-app.register(photosRoutes)
-app.register(paymentsRoutes)
-app.register(notesRoutes)
-app.register(authRoutes)
+app.register(coursesRoutes, { prefix: '/api/v1' })
+app.register(studentsRoutes, { prefix: '/api/v1' })
+app.register(enrollmentsRoutes, { prefix: '/api/v1' })
+app.register(documentsRoutes, { prefix: '/api/v1' })
+app.register(photosRoutes, { prefix: '/api/v1' })
+app.register(paymentsRoutes, { prefix: '/api/v1' })
+app.register(notesRoutes, { prefix: '/api/v1' })
+app.register(authRoutes, { prefix: '/api/v1' })
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {

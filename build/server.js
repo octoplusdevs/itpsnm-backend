@@ -2300,6 +2300,18 @@ async function authRoutes(app2) {
 // src/app.ts
 var import_multipart = __toESM(require("@fastify/multipart"));
 var app = (0, import_fastify.default)();
+app.register(require("@fastify/cors"), (instance) => {
+  return (req, callback) => {
+    const corsOptions = {
+      // This is NOT recommended for production as it enables reflection exploits
+      origin: true
+    };
+    if (/^localhost$/m.test(req.headers.origin)) {
+      corsOptions.origin = false;
+    }
+    callback(null, corsOptions);
+  };
+});
 app.register(import_multipart.default, {
   limits: {
     fileSize: 5 * 1024 * 1024
@@ -2307,14 +2319,14 @@ app.register(import_multipart.default, {
   }
 });
 app.register(import_cookie.default);
-app.register(coursesRoutes);
-app.register(studentsRoutes);
-app.register(enrollmentsRoutes);
-app.register(documentsRoutes);
-app.register(photosRoutes);
-app.register(paymentsRoutes);
-app.register(notesRoutes);
-app.register(authRoutes);
+app.register(coursesRoutes, { prefix: "/api/v1" });
+app.register(studentsRoutes, { prefix: "/api/v1" });
+app.register(enrollmentsRoutes, { prefix: "/api/v1" });
+app.register(documentsRoutes, { prefix: "/api/v1" });
+app.register(photosRoutes, { prefix: "/api/v1" });
+app.register(paymentsRoutes, { prefix: "/api/v1" });
+app.register(notesRoutes, { prefix: "/api/v1" });
+app.register(authRoutes, { prefix: "/api/v1" });
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof import_zod18.ZodError) {
     return reply.status(400).send({ message: "Validation error.", issues: error.format() });
@@ -2326,9 +2338,11 @@ app.setErrorHandler((error, _, reply) => {
 });
 
 // src/server.ts
+var port = env.PORT || 3e3;
+var host = "RENDER" in env ? `0.0.0.0` : `localhost`;
 app.listen({
-  host: "0.0.0.0",
-  port: env.PORT
+  host,
+  port: Number(port)
 }).then((address) => {
   console.log(`HTTP Server Running at ${address}`);
 }).catch((error) => {
