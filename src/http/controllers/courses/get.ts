@@ -1,10 +1,10 @@
 import { CourseNotFoundError } from '@/use-cases/errors/course-not-found'
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found'
-import { makeDestroyCourseUseCase } from '@/use-cases/factories/make-destroy-course-use-case'
+import { makeGetCourseUseCase } from '@/use-cases/factories/make-get-course-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-export async function destroy(request: FastifyRequest, reply: FastifyReply) {
+export async function get(request: FastifyRequest, reply: FastifyReply) {
   const registerBodySchema = z.object({
     id: z.coerce.number(),
   })
@@ -12,10 +12,12 @@ export async function destroy(request: FastifyRequest, reply: FastifyReply) {
   const { id } = registerBodySchema.parse(request.params)
 
   try {
-    const courseUseCase = makeDestroyCourseUseCase()
-    await courseUseCase.execute({
-      id,
+    const getCourseUseCase = makeGetCourseUseCase()
+    const course = await getCourseUseCase.execute({
+      courseId: id
     })
+    return reply.send(course)
+
   } catch (err) {
     if (err instanceof CourseNotFoundError) {
       return reply.status(409).send({ message: err.message })
@@ -26,5 +28,4 @@ export async function destroy(request: FastifyRequest, reply: FastifyReply) {
     return reply.status(500).send(err)
   }
 
-  return reply.status(201).send()
 }

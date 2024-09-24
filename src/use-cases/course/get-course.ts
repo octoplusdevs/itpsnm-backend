@@ -1,6 +1,6 @@
 import { CoursesRepository } from '@/repositories/course-repository'
 import { Course } from '@prisma/client'
-import { ResourceNotFoundError } from '../errors/resource-not-found'
+import { CourseNotFoundError } from '../errors/course-not-found'
 
 interface GetCourseUseCaseRequest {
   courseId: number
@@ -20,7 +20,7 @@ export class GetCourseUseCase {
       courseId
     )
     if (!course) {
-      throw new ResourceNotFoundError()
+      throw new CourseNotFoundError()
     }
 
     return {

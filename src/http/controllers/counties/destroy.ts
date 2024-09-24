@@ -1,6 +1,6 @@
-import { CourseNotFoundError } from '@/use-cases/errors/course-not-found'
+import { CountyNotFoundError } from '@/use-cases/errors/county-not-found'
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found'
-import { makeDestroyCourseUseCase } from '@/use-cases/factories/make-destroy-course-use-case'
+import { makeDestroyCountyUseCase } from '@/use-cases/factories/make-destroy-county-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -12,12 +12,12 @@ export async function destroy(request: FastifyRequest, reply: FastifyReply) {
   const { id } = registerBodySchema.parse(request.params)
 
   try {
-    const courseUseCase = makeDestroyCourseUseCase()
-    await courseUseCase.execute({
+    const countyDestroyUseCase = makeDestroyCountyUseCase()
+    await countyDestroyUseCase.execute({
       id,
     })
   } catch (err) {
-    if (err instanceof CourseNotFoundError) {
+    if (err instanceof CountyNotFoundError) {
       return reply.status(409).send({ message: err.message })
     }
     if (err instanceof ResourceNotFoundError) {
