@@ -11,8 +11,8 @@ import { photosRoutes } from './http/controllers/photos/routes'
 import { paymentsRoutes } from './http/controllers/payments/routes'
 import { notesRoutes } from './http/controllers/notes/routes'
 import { authRoutes } from './http/controllers/auth/routes'
+import { provincesRoutes } from './http/controllers/provinces/routes'
 import fastifyMultipart from '@fastify/multipart';
-import cors from '@fastify/cors'
 
 
 
@@ -55,6 +55,7 @@ app.register(fastifyMultipart, {
   },
 });
 app.register(fastifyCookie)
+app.register(provincesRoutes, { prefix: '/api/v1' })
 app.register(coursesRoutes, { prefix: '/api/v1' })
 app.register(studentsRoutes, { prefix: '/api/v1' })
 app.register(enrollmentsRoutes, { prefix: '/api/v1' })

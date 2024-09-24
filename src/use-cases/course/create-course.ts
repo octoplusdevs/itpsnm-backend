@@ -1,5 +1,6 @@
 import { CoursesRepository } from '@/repositories/course-repository'
 import { Course } from '@prisma/client'
+import { CourseAlreadyExistsError } from '../errors/course-already-exists-error'
 
 interface CreateCourseUseCaseRequest {
   name: string
@@ -15,6 +16,12 @@ export class CreateCourseUseCase {
   async execute({
     name,
   }: CreateCourseUseCaseRequest): Promise<CreateCourseUseCaseResponse> {
+
+    const findCourse = await this.coursesRepository.findByName(name)
+
+    if(findCourse){
+      throw new CourseAlreadyExistsError();
+    }
     const course = await this.coursesRepository.create({
       name,
     })
