@@ -41,17 +41,17 @@ export class CreateNoteUseCase {
   ) { }
 
   async execute({
-    pf1 = 0,
-    pf2 = 0,
-    pft = 0,
-    ps1 = 0,
-    ps2 = 0,
-    pst = 0,
-    pt1 = 0,
-    pt2 = 0,
-    ptt = 0,
-    nee = 0,
-    resource = 0,
+    pf1,
+    pf2,
+    pft,
+    ps1,
+    ps2,
+    pst,
+    pt1,
+    pt2,
+    ptt,
+    nee,
+    resource,
     level,
     enrollmentId,
     subjectId

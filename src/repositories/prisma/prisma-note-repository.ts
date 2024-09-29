@@ -15,7 +15,7 @@ export class PrismaNotesRepository implements NotesRepository {
     });
 
     if (!findNote) {
-      return await prisma.note.create({
+      const newNote = await prisma.note.create({
         data: {
           pf1: data.pf1 ?? 0,
           pf2: data.pf2 ?? 0,
@@ -35,9 +35,10 @@ export class PrismaNotesRepository implements NotesRepository {
           update_at: new Date(),
         },
       });
+      return newNote
     }
 
-    return await prisma.note.update({
+    const updated =  await prisma.note.update({
       where: {
         id: findNote.id
       },
@@ -57,7 +58,7 @@ export class PrismaNotesRepository implements NotesRepository {
         update_at: new Date(),
       }
     });
-
+    return updated
 
   }
 
