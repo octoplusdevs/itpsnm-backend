@@ -1,6 +1,5 @@
 import { PrismaClient, User, AccessStatus } from '@prisma/client';
 import { CreateUserDTO, UsersRepository } from '@/repositories/users-repository';
-import bcrypt from 'bcryptjs';
 
 export class PrismaUserRepository implements UsersRepository {
   private prisma = new PrismaClient();
@@ -14,7 +13,6 @@ export class PrismaUserRepository implements UsersRepository {
   }
 
   async create(data: CreateUserDTO): Promise<User> {
-    // Hashing the password before saving
     return this.prisma.user.create({
       data: {
         email: data.email,
@@ -23,10 +21,11 @@ export class PrismaUserRepository implements UsersRepository {
         loginAttempt: 0,
         isBlocked: false,
         isActive: true,
+        employeeId: data.employeeId,
+        studentId: data.studentId,
         lastLogin: new Date(),
         created_at: new Date(),
         update_at: new Date(),
-        // EmployeeId and StudentId should be handled if needed
       },
     });
   }
