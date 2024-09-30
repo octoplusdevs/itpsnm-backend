@@ -8,8 +8,8 @@ export async function registerController(request: FastifyRequest, reply: Fastify
   // Definição do esquema de validação para o corpo da requisição
   const registerSchema = z.object({
     email: z.string().email(),
-    employeeId: z.number(),
-    studentId: z.number(),
+    employeeId: z.number().optional(),
+    studentId: z.number().optional(),
     password: z.string().min(6),  // Definindo uma senha com no mínimo 6 caracteres
     role: z.enum(['STUDENT', 'ADMIN', 'TEACHER'])  // Adicionando um enum para o papel do usuário
   });
