@@ -1,4 +1,4 @@
-import { PrismaClient, User, AccessStatus } from '@prisma/client';
+import { PrismaClient, User, AccessStatus, Role } from '@prisma/client';
 import { CreateUserDTO, UsersRepository } from '@/repositories/users-repository';
 
 export class PrismaUserRepository implements UsersRepository {
@@ -10,6 +10,53 @@ export class PrismaUserRepository implements UsersRepository {
 
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { email } });
+  }
+  async searchMany(query: string, page: number): Promise<{
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+    items: {
+      id: number;
+      email: string;
+      loginAttempt: number;
+      isBlocked: boolean;
+      role: Role;
+      isActive: boolean;
+      lastLogin: Date;
+      created_at: Date;
+      update_at: Date;
+      employeeId?: number | null;
+      studentId?: number | null;
+    }[];
+  }> {
+    let pageSize = 20
+    const totalItems = await this.prisma.user.count();
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    let users = await this.prisma.user.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      select: {
+        id: true,
+        email: true,
+        loginAttempt: true,
+        isBlocked: true,
+        role: true,
+        isActive: true,
+        lastLogin: true,
+        created_at: true,
+        update_at: true,
+        employeeId: true,
+        studentId: true
+      }
+    })
+    return {
+      totalItems,
+      currentPage: page,
+      totalPages,
+      items: users
+    };
   }
 
   async create(data: CreateUserDTO): Promise<User> {

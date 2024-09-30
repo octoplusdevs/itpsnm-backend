@@ -2,13 +2,18 @@ import { UsersRepository } from '@/repositories/users-repository';
 import { Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
+import { EmployeeNotFoundError } from '../errors/employee-not-found';
+import { EmployeeRepository } from '@/repositories/employee-repository';
+import { EnrollmentsRepository } from '@/repositories/enrollment-repository';
+import { EnrollmentNotFoundError } from '../errors/enrollment-not-found';
+import { EmployeeOREnrollmentNotFoundError } from '../errors/employee-student-not-found';
 
 interface RegisterUserDTO {
   email: string;
   password: string;
   role: Role;
   employeeId?: number | null;
-  studentId?: number | null;
+  enrollmentId?: number | null;
 }
 
 interface RegisterResponse {
@@ -19,9 +24,18 @@ interface RegisterResponse {
 }
 
 export class RegisterUseCase {
-  constructor(private usersRepository: UsersRepository) { }
+  constructor(
+    private usersRepository: UsersRepository,
+    private enrollmentRepository: EnrollmentsRepository,
+    private employeesRepository: EmployeeRepository,
+  ) { }
 
-  async execute({ email, password, role, employeeId, studentId }: RegisterUserDTO): Promise<RegisterResponse> {
+  async execute({ email, password, role, employeeId, enrollmentId }: RegisterUserDTO): Promise<RegisterResponse> {
+
+    if (!employeeId && !enrollmentId) {
+      throw new EmployeeOREnrollmentNotFoundError();
+    }
+
     // Verificar se o email já está em uso
     const existingUser = await this.usersRepository.findByEmail(email);
     if (existingUser) {
@@ -29,6 +43,22 @@ export class RegisterUseCase {
         success: false,
         message: 'Email already in use',
       };
+    }
+
+
+    let existingStudent = null
+    if(enrollmentId !== null && enrollmentId != undefined){
+      existingStudent = await this.enrollmentRepository.checkStatus(enrollmentId)
+      if (!existingStudent) {
+        throw new EnrollmentNotFoundError()
+      }
+    }
+
+    if(employeeId !== null && employeeId != undefined){
+      const existingEmployeeId = await this.employeesRepository.findById(employeeId)
+      if (!existingEmployeeId) {
+        throw new EmployeeNotFoundError()
+      }
     }
 
     // Criptografar a senha
@@ -40,7 +70,7 @@ export class RegisterUseCase {
       password: hashedPassword,
       role,
       employeeId,
-      studentId,
+      studentId: existingStudent?.id,
     });
 
     // Gerar o token JWT

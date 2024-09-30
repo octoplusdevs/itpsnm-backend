@@ -13,6 +13,7 @@ import { notesRoutes } from './http/controllers/notes/routes'
 import { authRoutes } from './http/controllers/auth/routes'
 import { provincesRoutes } from './http/controllers/provinces/routes'
 import { countiesRoutes } from './http/controllers/counties/routes'
+import { usersRoutes } from './http/controllers/users/routes'
 import fastifyMultipart from '@fastify/multipart';
 
 
@@ -66,6 +67,7 @@ app.register(photosRoutes, { prefix: '/api/v1' })
 app.register(paymentsRoutes, { prefix: '/api/v1' })
 app.register(notesRoutes, { prefix: '/api/v1' })
 app.register(authRoutes, { prefix: '/api/v1' })
+app.register(usersRoutes, { prefix: '/api/v1' })
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {
