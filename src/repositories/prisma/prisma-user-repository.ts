@@ -2,16 +2,31 @@ import { PrismaClient, User, AccessStatus, Role } from '@prisma/client';
 import { CreateUserDTO, UsersRepository } from '@/repositories/users-repository';
 
 export class PrismaUserRepository implements UsersRepository {
+
   private prisma = new PrismaClient();
 
   async findById(id: number): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { email } });
+  async findByEmail(email: string): Promise<User | null | any> {
+    return this.prisma.user.findUnique({
+      where: { email }, select: {
+        id: true,
+        email: true,
+        loginAttempt: true,
+        isBlocked: true,
+        role: true,
+        isActive: true,
+        lastLogin: true,
+        created_at: true,
+        update_at: true,
+        employeeId: true,
+        studentId: true
+      }
+    });
   }
-  async searchMany(query: string, page: number): Promise<{
+  async searchMany(role: Role, page: number): Promise<{
     totalItems: number;
     currentPage: number;
     totalPages: number;
@@ -37,6 +52,9 @@ export class PrismaUserRepository implements UsersRepository {
     let users = await this.prisma.user.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
+      where: {
+        role
+      },
       select: {
         id: true,
         email: true,
@@ -86,12 +104,22 @@ export class PrismaUserRepository implements UsersRepository {
       },
     });
   }
-
-  async blockUser(id: number): Promise<void> {
+  async resetUserPassword(id: number, password: string): Promise<void> {
     await this.prisma.user.update({
       where: { id },
       data: {
-        isBlocked: true,
+        password,
+        loginAttempt: 0,
+        isBlocked: false,
+        update_at: new Date(),
+      },
+    });
+  }
+  async blockUser(id: number, status: boolean): Promise<void> {
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        isBlocked: Boolean(status),
         update_at: new Date(),
       },
     });

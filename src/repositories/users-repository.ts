@@ -14,9 +14,10 @@ export interface UsersRepository {
   findByEmail(email: string): Promise<User | null>;
   create(data: CreateUserDTO): Promise<User>;
   updateLoginAttempt(id: number, attempts: number): Promise<void>;
-  blockUser(id: number): Promise<void>;
+  blockUser(id: number, status: boolean): Promise<void>;
+  resetUserPassword(id: number, password: string): Promise<void>;
   logAccess(userId: number, status: AccessStatus): Promise<void>;
-  searchMany(email: string, page: number): Promise<{
+  searchMany(role: Role, page: number): Promise<{
     totalItems: number;
     currentPage: number;
     totalPages: number;

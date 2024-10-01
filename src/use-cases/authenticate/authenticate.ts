@@ -13,11 +13,11 @@ interface LoginResponse {
   message: string;
   userId?: number;
   role?: Role;
-  token?: string;  // Adicione o token ao response
+  token?: string;
 }
 
 export class LoginUseCase {
-  private jwtSecret = process.env.JWT_SECRET!; // Use uma variável de ambiente para o segredo
+  private jwtSecret = process.env.JWT_SECRET!;
   private ATTEMPT_LIMIT = 5;
   constructor(private usersRepository: UsersRepository) { }
 
@@ -35,15 +35,13 @@ export class LoginUseCase {
     const passwordMatches = await bcrypt.compare(password, user.password);
 
     if (!passwordMatches) {
-      // Increment login attempts
       let newAttemptCount = user.loginAttempt + 1;
       await this.usersRepository.updateLoginAttempt(user.id, newAttemptCount);
 
       await this.usersRepository.logAccess(user.id, AccessStatus.FAILURE);
 
-      // Block user after 5 failed attempts
       if (newAttemptCount >= this.ATTEMPT_LIMIT) {
-        await this.usersRepository.blockUser(user.id);
+        await this.usersRepository.blockUser(user.id, true);
         return {
           success: false,
           message: 'Account blocked due to multiple failed login attempts.',
@@ -62,14 +60,17 @@ export class LoginUseCase {
         message: 'Account is blocked. Please contact support.',
       };
     }
+    if (!user.isActive) {
+      return {
+        success: false,
+        message: 'Account is not active. Please contact support.',
+      };
+    }
 
-    // Reset login attempts on successful login
     await this.usersRepository.updateLoginAttempt(user.id, 0);
 
-    // Log the successful access
     await this.usersRepository.logAccess(user.id, AccessStatus.SUCCESS);
 
-    // Generate JWT
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       this.jwtSecret,

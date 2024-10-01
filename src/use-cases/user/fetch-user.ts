@@ -2,7 +2,7 @@ import { UsersRepository } from '@/repositories/users-repository'
 import { Role } from '@prisma/client'
 
 interface FetchUserUseCaseRequest {
-  query: string
+  role: Role
   page: number
 }
 
@@ -31,11 +31,11 @@ export class FetchUserUseCase {
   constructor(private usersRepository: UsersRepository) { }
 
   async execute({
-    query,
+    role,
     page
   }: FetchUserUseCaseRequest): Promise<FetchUserUseCaseResponse> {
     const users = await this.usersRepository.searchMany(
-      query,
+      role,
       page
     )
 

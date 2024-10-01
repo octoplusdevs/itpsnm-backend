@@ -1,45 +1,30 @@
-import { Student } from '@prisma/client'
-import { StudentsRepository } from '@/repositories/student-repository'
-import { StudentNotFoundError } from '../errors/student-not-found';
+import { User } from '@prisma/client'
+import { UsersRepository } from '@/repositories/users-repository'
+import { UserNotFoundError } from '../errors/user-not-found'
 
-interface GetStudentUseCaseRequest {
-  id?: number;
-  identityCardNumber?: string;
-  alternativePhone?: string;
-  phone?: string;
-  name?: string;
-  email?: string;
+interface GetUserUseCaseRequest {
+  email: string
 }
 
-export class GetStudentUseCase {
-  constructor(private studentRepository: StudentsRepository) { }
+interface GetUserUseCaseResponse {
+  user: User | null
+}
+
+export class GetUserUseCase {
+  constructor(private usersRepository: UsersRepository) { }
 
   async execute({
-    id,
-    alternativePhone,
-    identityCardNumber,
-    name,
-    phone
-  }: GetStudentUseCaseRequest): Promise<Student | null> {
-    let student: Student | null = null
-    if (id !== undefined) {
-      student = await this.studentRepository.findById(id);
+    email
+  }: GetUserUseCaseRequest): Promise<GetUserUseCaseResponse> {
+    const user = await this.usersRepository.findByEmail(
+      email
+    )
+    if (!user) {
+      throw new UserNotFoundError()
     }
-    if (identityCardNumber !== undefined) {
-      student = await this.studentRepository.findByIdentityCardNumber(identityCardNumber);
+
+    return {
+      user,
     }
-    if (alternativePhone !== undefined) {
-      student = await this.studentRepository.findByAlternativePhone(alternativePhone);
-    }
-    if (phone !== undefined) {
-      student = await this.studentRepository.findByPhone(phone);
-    }
-    if (name !== undefined) {
-      student = await this.studentRepository.findByName(name);
-    }
-    if (!student) {
-      throw new StudentNotFoundError()
-    }
-    return student
   }
 }
