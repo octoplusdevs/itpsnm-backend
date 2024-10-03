@@ -1,7 +1,7 @@
-import { PrismaClient, Note } from '@prisma/client';
+import { Note } from '@prisma/client';
 import { NotesRepository, NotesData } from '../notes-repository';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 
 export class PrismaNotesRepository implements NotesRepository {
 

@@ -32,7 +32,11 @@ export class LoginUseCase {
       };
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.password);
+    console.log({
+      password,
+      t: user
+    })
+    const passwordMatches = await bcrypt.compare(password, user.password!);
 
     if (!passwordMatches) {
       let newAttemptCount = user.loginAttempt + 1;

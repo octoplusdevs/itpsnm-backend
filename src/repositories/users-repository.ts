@@ -8,10 +8,24 @@ export interface CreateUserDTO {
   studentId?: number | null;
 }
 
+export type UserResponse = {
+  id: number;
+  email: string;
+  password?: string;
+  loginAttempt: number;
+  isBlocked: boolean;
+  role: Role;
+  isActive: boolean;
+  lastLogin: Date;
+  created_at: Date;
+  update_at: Date;
+  employeeId: number | null;
+  studentId: number | null;
+}
 
 export interface UsersRepository {
   findById(id: number): Promise<User | null>;
-  findByEmail(email: string): Promise<User | null>;
+  findByEmail(email: string): Promise<UserResponse | null>;
   create(data: CreateUserDTO): Promise<User>;
   updateLoginAttempt(id: number, attempts: number): Promise<void>;
   blockUser(id: number, status: boolean): Promise<void>;

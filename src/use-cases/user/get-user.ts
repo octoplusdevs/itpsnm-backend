@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import { UsersRepository } from '@/repositories/users-repository'
 import { UserNotFoundError } from '../errors/user-not-found'
 
@@ -7,7 +7,20 @@ interface GetUserUseCaseRequest {
 }
 
 interface GetUserUseCaseResponse {
-  user: User | null
+  user: {
+    id: number;
+    email: string;
+    password?: string;
+    loginAttempt: number;
+    isBlocked: boolean;
+    role: Role;
+    isActive: boolean;
+    lastLogin: Date;
+    created_at: Date;
+    update_at: Date;
+    employeeId?: number | null;
+    studentId?: number | null;
+  }
 }
 
 export class GetUserUseCase {
@@ -23,6 +36,8 @@ export class GetUserUseCase {
       throw new UserNotFoundError()
     }
 
+    delete user.password
+    // let {created_at, email, employeeId, id,isActive,isBlocked,lastLogin,loginAttempt,role,studentId} = user
     return {
       user,
     }

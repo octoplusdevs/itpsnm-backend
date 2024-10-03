@@ -1,16 +1,16 @@
-import { PrismaClient, User, AccessStatus, Role } from '@prisma/client';
+import { User, AccessStatus, Role } from '@prisma/client';
 import { CreateUserDTO, UsersRepository } from '@/repositories/users-repository';
+import { prisma } from '@/lib/prisma';
 
 export class PrismaUserRepository implements UsersRepository {
 
-  private prisma = new PrismaClient();
 
   async findById(id: number): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { id } });
+    return prisma.user.findUnique({ where: { id } });
   }
 
   async findByEmail(email: string): Promise<User | null | any> {
-    return this.prisma.user.findUnique({
+    return prisma.user.findUnique({
       where: { email }, select: {
         id: true,
         email: true,
@@ -18,6 +18,7 @@ export class PrismaUserRepository implements UsersRepository {
         isBlocked: true,
         role: true,
         isActive: true,
+        password: true,
         lastLogin: true,
         created_at: true,
         update_at: true,
@@ -45,11 +46,11 @@ export class PrismaUserRepository implements UsersRepository {
     }[];
   }> {
     let pageSize = 20
-    const totalItems = await this.prisma.user.count();
+    const totalItems = await prisma.user.count();
 
     const totalPages = Math.ceil(totalItems / pageSize);
 
-    let users = await this.prisma.user.findMany({
+    let users = await prisma.user.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
       where: {
@@ -78,7 +79,7 @@ export class PrismaUserRepository implements UsersRepository {
   }
 
   async create(data: CreateUserDTO): Promise<User> {
-    return this.prisma.user.create({
+    return prisma.user.create({
       data: {
         email: data.email,
         password: data.password,
@@ -96,7 +97,7 @@ export class PrismaUserRepository implements UsersRepository {
   }
 
   async updateLoginAttempt(id: number, attempts: number): Promise<void> {
-    await this.prisma.user.update({
+    await prisma.user.update({
       where: { id },
       data: {
         loginAttempt: attempts,
@@ -105,7 +106,7 @@ export class PrismaUserRepository implements UsersRepository {
     });
   }
   async resetUserPassword(id: number, password: string): Promise<void> {
-    await this.prisma.user.update({
+    await prisma.user.update({
       where: { id },
       data: {
         password,
@@ -116,7 +117,7 @@ export class PrismaUserRepository implements UsersRepository {
     });
   }
   async blockUser(id: number, status: boolean): Promise<void> {
-    await this.prisma.user.update({
+    await prisma.user.update({
       where: { id },
       data: {
         isBlocked: Boolean(status),
@@ -126,7 +127,7 @@ export class PrismaUserRepository implements UsersRepository {
   }
 
   async logAccess(userId: number, status: AccessStatus): Promise<void> {
-    await this.prisma.accessLog.create({
+    await prisma.accessLog.create({
       data: {
         userId,
         status,

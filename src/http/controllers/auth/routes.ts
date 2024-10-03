@@ -9,12 +9,12 @@ export async function authRoutes(app: FastifyInstance) {
   app.post('/signup', registerController);
 
 
-  app.get('/admin-data', { preHandler: accessControlMiddleware(Role.ADMIN) }, async (request, reply) => {
+  app.get('/admin-data', { preHandler: accessControlMiddleware([Role.ADMIN, Role.TEACHER]) }, async (request, reply) => {
     return reply.send({ message: 'Admin data' });
   });
 
-  app.get('/user-data', { preHandler: accessControlMiddleware(Role.STUDENT) }, async (request, reply) => {
-    return reply.send({ message: 'STUDENT data' });
+  app.get('/user-data', { preHandler: accessControlMiddleware([Role.STUDENT]) }, async (request, reply) => {
+    return reply.send({ message: 'STUDENT data', user: request.user });
   });
 }
 
