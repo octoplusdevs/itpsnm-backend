@@ -3,6 +3,12 @@ import { EmployeeRepository } from '../employee-repository';
 import { prisma } from '@/lib/prisma';
 
 export class PrismaEmployeeRepository implements EmployeeRepository {
+  async update(id: number, data: Prisma.EmployeeUpdateInput): Promise<{ id: number; fullName: string; dateOfBirth: Date; identityCardNumber: string; gender: $Enums.Gender; emissionDate: Date; expirationDate: Date; maritalStatus: $Enums.MaritalStatus; residence: string; phone: string; alternativePhone: string | null; created_at: Date; update_at: Date; }> {
+    return await prisma.employee.update({
+      where: { id: Number(id) },
+      data,
+    })
+  }
   async findByIdentityCardNumber(identityCardNumber: string): Promise<{ id: number; fullName: string; dateOfBirth: Date; identityCardNumber: string; gender: $Enums.Gender; emissionDate: Date; expirationDate: Date; maritalStatus: $Enums.MaritalStatus; residence: string; phone: string; alternativePhone: string | null; created_at: Date; update_at: Date; } | null> {
     const employee = await prisma.employee.findUnique({
       where: {
@@ -22,7 +28,7 @@ export class PrismaEmployeeRepository implements EmployeeRepository {
   async findByPhone(phone: string): Promise<{ id: number; fullName: string; dateOfBirth: Date; identityCardNumber: string; gender: $Enums.Gender; emissionDate: Date; expirationDate: Date; maritalStatus: $Enums.MaritalStatus; residence: string; phone: string; alternativePhone: string | null; created_at: Date; update_at: Date; } | null> {
     const employee = await prisma.employee.findFirst({
       where: {
-         phone
+        phone
       }
     })
     return employee
@@ -69,7 +75,7 @@ export class PrismaEmployeeRepository implements EmployeeRepository {
   }
 
   async create(data: Prisma.EmployeeCreateInput): Promise<Employee> {
-    return prisma.employee.create({
+    return await prisma.employee.create({
       data: {
         fullName: data.fullName,
         dateOfBirth: data.dateOfBirth,

@@ -14,4 +14,5 @@ export interface EmployeeRepository {
     items: Employee[];
   }>
   destroy(id: number): Promise<boolean>;
+  update(id: number, data: Prisma.EmployeeUpdateInput): Promise<Employee>
 }
