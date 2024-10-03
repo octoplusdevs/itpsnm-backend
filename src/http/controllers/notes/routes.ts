@@ -3,13 +3,15 @@ import { create } from './add-note'
 // import { destroy } from './destroy'
 import { searchMany } from './search-many'
 import { getNoteWithFullGrades } from './get-note-with-full-grades'
+import { accessControlMiddleware } from '@/http/middlewares/verify-user-role'
+import { Role } from '@prisma/client'
 
 export async function notesRoutes(app: FastifyInstance) {
-  app.post('/notes', create)
+  app.post('/notes',{ preHandler: accessControlMiddleware([Role.ADMIN, Role.TEACHER]) }, create)
 
   // app.delete('/notes/:id', destroy)
 
-  app.get('/notes/search', searchMany)
+  app.get('/notes/search',{ preHandler: accessControlMiddleware([Role.ADMIN, Role.TEACHER, Role.STUDENT]) }, searchMany)
 
-  app.get('/notes/:enrollmentId/grades', getNoteWithFullGrades)
+  app.get('/notes/:enrollmentId/grades',{ preHandler: accessControlMiddleware([Role.ADMIN, Role.TEACHER, Role.STUDENT]) }, getNoteWithFullGrades)
 }
