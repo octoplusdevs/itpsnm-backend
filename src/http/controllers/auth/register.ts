@@ -62,6 +62,7 @@ export async function registerController(request: FastifyRequest, reply: Fastify
     if (err instanceof EmployeeNotFoundError) {
       return reply.status(409).send({ message: err.message })
     }
+    console.log(err)
     // Tratar exceções inesperadas
     return reply.status(500).send({
       success: false,

@@ -12,6 +12,8 @@ interface LoginResponse {
   success: boolean;
   message: string;
   userId?: number;
+  employeeNumber?: number | null;
+  enrollmentNumber?: number | null;
   role?: Role;
   token?: string;
 }
@@ -32,10 +34,10 @@ export class LoginUseCase {
       };
     }
 
-    console.log({
-      password,
-      t: user
-    })
+    // console.log({
+    //   password,
+    //   t: user
+    // })
     const passwordMatches = await bcrypt.compare(password, user.password!);
 
     if (!passwordMatches) {
@@ -80,13 +82,22 @@ export class LoginUseCase {
       this.jwtSecret,
       { expiresIn: '1h' } // Token expira em 1 hora
     );
-
-    return {
+    let userStudent = {
+      enrollmentNumber: user.enrollmentId,
       success: true,
       message: 'Login successful',
       userId: user.id,
       role: user.role,
       token,
-    };
+    }
+    let notUserStudent = {
+      success: true,
+      message: 'Login successful',
+      userId: user.id,
+      employeeNumber: user.employeeId,
+      role: user.role,
+      token,
+    }
+    return user.role === 'STUDENT' ? userStudent : notUserStudent
   }
 }

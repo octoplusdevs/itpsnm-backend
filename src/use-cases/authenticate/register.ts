@@ -21,6 +21,8 @@ interface RegisterResponse {
   message: string;
   token?: string;
   userId?: number;
+  enrollmentId?: number | null;
+  employeeId?: number | null;
 }
 
 export class RegisterUseCase {
@@ -47,14 +49,14 @@ export class RegisterUseCase {
 
 
     let existingStudent = null
-    if(enrollmentId !== null && enrollmentId != undefined){
+    if (enrollmentId !== null && enrollmentId != undefined) {
       existingStudent = await this.enrollmentRepository.checkStatus(enrollmentId)
       if (!existingStudent) {
         throw new EnrollmentNotFoundError()
       }
     }
 
-    if(employeeId !== null && employeeId != undefined){
+    if (employeeId !== null && employeeId != undefined) {
       const existingEmployeeId = await this.employeesRepository.findById(employeeId)
       if (!existingEmployeeId) {
         throw new EmployeeNotFoundError()
@@ -71,6 +73,7 @@ export class RegisterUseCase {
       role,
       employeeId,
       studentId: existingStudent?.id,
+      enrollmentId,
     });
 
     // Gerar o token JWT
@@ -78,6 +81,7 @@ export class RegisterUseCase {
       {
         userId: user.id,
         role: user.role,
+
       },
       process.env.JWT_SECRET!,
       {
@@ -90,6 +94,8 @@ export class RegisterUseCase {
       message: 'User registered successfully',
       token,
       userId: user.id,
+      enrollmentId,
+      employeeId
     };
   }
 }

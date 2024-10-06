@@ -5,6 +5,7 @@ export interface CreateUserDTO {
   password: string;
   role: Role;
   employeeId?: number | null;
+  enrollmentId?: number | null;
   studentId?: number | null;
 }
 
@@ -20,6 +21,7 @@ export type UserResponse = {
   created_at: Date;
   update_at: Date;
   employeeId: number | null;
+  enrollmentId: number | null;
   studentId: number | null;
 }
 

@@ -21,13 +21,16 @@ export async function loginController(request: FastifyRequest, reply: FastifyRep
   try {
     // Execução do UseCase
     const result = await loginUseCase.execute({ email, password });
+    console.log(result)
 
     if (result.success) {
       // Retornar sucesso
       return reply.status(200).send({
         success: result.success,
         message: result.message,
+        enrollmentNumber: result.enrollmentNumber,
         userId: result.userId,
+        employeeNumber: result.employeeNumber,
         role: result.role,
         token: result.token
       });

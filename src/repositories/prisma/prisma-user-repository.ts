@@ -23,6 +23,7 @@ export class PrismaUserRepository implements UsersRepository {
         created_at: true,
         update_at: true,
         employeeId: true,
+        enrollmentId: true,
         studentId: true
       }
     });
@@ -63,6 +64,7 @@ export class PrismaUserRepository implements UsersRepository {
         isBlocked: true,
         role: true,
         isActive: true,
+        enrollmentId: true,
         lastLogin: true,
         created_at: true,
         update_at: true,
@@ -88,6 +90,7 @@ export class PrismaUserRepository implements UsersRepository {
         isBlocked: false,
         isActive: true,
         employeeId: data.employeeId,
+        enrollmentId: data.enrollmentId,
         studentId: data.studentId,
         lastLogin: new Date(),
         created_at: new Date(),
