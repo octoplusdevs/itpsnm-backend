@@ -56,7 +56,7 @@ export class RegisterUseCase {
       if (!existingStudent) {
         throw new EnrollmentNotFoundError()
       }
-      if (!await this.usersRepository.findByEnrollment(enrollmentId)) {
+      if (await this.usersRepository.findByEnrollment(enrollmentId)) {
         throw new UserEnrollmentHasInUseError()
       }
     }
@@ -66,7 +66,7 @@ export class RegisterUseCase {
       if (!existingEmployeeId) {
         throw new EmployeeNotFoundError()
       }
-      if (!await this.employeesRepository.findById(employeeId)) {
+      if (await this.employeesRepository.findById(employeeId)) {
         throw new UserEmployeeHasInUseError()
       }
     }
