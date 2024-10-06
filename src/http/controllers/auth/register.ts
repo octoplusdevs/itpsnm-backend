@@ -13,6 +13,8 @@ import { PrismaEnrollmentsRepository } from '@/repositories/prisma/prisma-enroll
 import { EnrollmentsRepository } from '@/repositories/enrollment-repository';
 import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
 import { EmployeeOREnrollmentNotFoundError } from '@/use-cases/errors/employee-student-not-found';
+import { UserEmployeeHasInUseError } from '@/use-cases/errors/user-employee-has-exists';
+import { UserEnrollmentHasInUseError } from '@/use-cases/errors/user-enrollment-has-exists';
 
 export async function registerController(request: FastifyRequest, reply: FastifyReply) {
   // Definição do esquema de validação para o corpo da requisição
@@ -62,6 +64,13 @@ export async function registerController(request: FastifyRequest, reply: Fastify
     if (err instanceof EmployeeNotFoundError) {
       return reply.status(409).send({ message: err.message })
     }
+    if (err instanceof UserEmployeeHasInUseError) {
+      return reply.status(409).send({ message: err.message })
+    }
+    if (err instanceof UserEnrollmentHasInUseError) {
+      return reply.status(409).send({ message: err.message })
+    }
+
     console.log(err)
     // Tratar exceções inesperadas
     return reply.status(500).send({

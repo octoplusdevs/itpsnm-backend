@@ -7,6 +7,8 @@ import { EmployeeRepository } from '@/repositories/employee-repository';
 import { EnrollmentsRepository } from '@/repositories/enrollment-repository';
 import { EnrollmentNotFoundError } from '../errors/enrollment-not-found';
 import { EmployeeOREnrollmentNotFoundError } from '../errors/employee-student-not-found';
+import { UserEnrollmentHasInUseError } from '../errors/user-enrollment-has-exists';
+import { UserEmployeeHasInUseError } from '../errors/user-employee-has-exists';
 
 interface RegisterUserDTO {
   email: string;
@@ -54,12 +56,18 @@ export class RegisterUseCase {
       if (!existingStudent) {
         throw new EnrollmentNotFoundError()
       }
+      if (!await this.usersRepository.findByEnrollment(enrollmentId)) {
+        throw new UserEnrollmentHasInUseError()
+      }
     }
 
     if (employeeId !== null && employeeId != undefined) {
       const existingEmployeeId = await this.employeesRepository.findById(employeeId)
       if (!existingEmployeeId) {
         throw new EmployeeNotFoundError()
+      }
+      if (!await this.employeesRepository.findById(employeeId)) {
+        throw new UserEmployeeHasInUseError()
       }
     }
 
