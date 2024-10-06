@@ -396,10 +396,10 @@ model User {
   created_at   DateTime    @default(now())
   update_at    DateTime    @updatedAt
   accessLogs   AccessLog[]
-  employee     Employee?   @relation(fields: [employeeId], references: [id])
+  employee     Employee?   @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   employeeId   Int?        @unique
-  student      Student?    @relation(fields: [studentId], references: [id])
-  enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id])
+  student      Student?    @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   studentId    Int?        @unique
   enrollmentId Int?        @unique
 
