@@ -40,7 +40,6 @@ var LoginUseCase = class {
   constructor(usersRepository) {
     this.usersRepository = usersRepository;
     this.jwtSecret = process.env.JWT_SECRET;
-    // Use uma variável de ambiente para o segredo
     this.ATTEMPT_LIMIT = 5;
   }
   async execute({ email, password }) {
@@ -51,13 +50,17 @@ var LoginUseCase = class {
         message: "User not found"
       };
     }
+    console.log({
+      password,
+      t: user
+    });
     const passwordMatches = await import_bcryptjs.default.compare(password, user.password);
     if (!passwordMatches) {
       let newAttemptCount = user.loginAttempt + 1;
       await this.usersRepository.updateLoginAttempt(user.id, newAttemptCount);
       await this.usersRepository.logAccess(user.id, import_client.AccessStatus.FAILURE);
       if (newAttemptCount >= this.ATTEMPT_LIMIT) {
-        await this.usersRepository.blockUser(user.id);
+        await this.usersRepository.blockUser(user.id, true);
         return {
           success: false,
           message: "Account blocked due to multiple failed login attempts."
@@ -72,6 +75,12 @@ var LoginUseCase = class {
       return {
         success: false,
         message: "Account is blocked. Please contact support."
+      };
+    }
+    if (!user.isActive) {
+      return {
+        success: false,
+        message: "Account is not active. Please contact support."
       };
     }
     await this.usersRepository.updateLoginAttempt(user.id, 0);

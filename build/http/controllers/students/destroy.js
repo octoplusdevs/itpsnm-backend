@@ -38,11 +38,25 @@ var ResourceNotFoundError = class extends Error {
   }
 };
 
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-course-repository.ts
@@ -95,6 +109,13 @@ var PrismaCoursesRepository = class {
   }
 };
 
+// src/use-cases/errors/course-not-found.ts
+var CourseNotFoundError = class extends Error {
+  constructor() {
+    super("Course not found.");
+  }
+};
+
 // src/use-cases/course/destroy-course.ts
 var DestroyCourseUseCase = class {
   constructor(coursesRepository) {
@@ -103,6 +124,10 @@ var DestroyCourseUseCase = class {
   async execute({
     id
   }) {
+    const findCourse = await this.coursesRepository.findById(id);
+    if (!findCourse) {
+      throw new CourseNotFoundError();
+    }
     return await this.coursesRepository.destroy(
       id
     );
@@ -117,10 +142,10 @@ function makeDestroyCourseUseCase() {
 }
 
 // src/http/controllers/students/destroy.ts
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 async function destroy(request, reply) {
-  const registerBodySchema = import_zod.z.object({
-    id: import_zod.z.coerce.number()
+  const registerBodySchema = import_zod2.z.object({
+    id: import_zod2.z.coerce.number()
   });
   const { id } = registerBodySchema.parse(request.params);
   try {

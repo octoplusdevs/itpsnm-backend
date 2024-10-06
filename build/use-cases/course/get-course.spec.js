@@ -15019,10 +15019,10 @@ var InMemoryCoursesRepository = class {
   }
 };
 
-// src/use-cases/errors/resource-not-found.ts
-var ResourceNotFoundError = class extends Error {
+// src/use-cases/errors/course-not-found.ts
+var CourseNotFoundError = class extends Error {
   constructor() {
-    super("Resource not found.");
+    super("Course not found.");
   }
 };
 
@@ -15038,11 +15038,18 @@ var GetCourseUseCase = class {
       courseId
     );
     if (!course) {
-      throw new ResourceNotFoundError();
+      throw new CourseNotFoundError();
     }
     return {
       course
     };
+  }
+};
+
+// src/use-cases/errors/resource-not-found.ts
+var ResourceNotFoundError = class extends Error {
+  constructor() {
+    super("Resource not found.");
   }
 };
 

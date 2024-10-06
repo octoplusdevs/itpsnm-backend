@@ -25,7 +25,7 @@ __export(routes_exports, {
 module.exports = __toCommonJS(routes_exports);
 
 // src/http/controllers/enrollments/create.ts
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 
 // src/use-cases/errors/student-not-found.ts
 var StudentNotFoundError = class extends Error {
@@ -55,11 +55,25 @@ var EnrollmentAlreadyExistsError = class extends Error {
   }
 };
 
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-course-repository.ts
@@ -122,8 +136,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -136,6 +178,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -156,8 +204,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -170,6 +246,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -228,24 +310,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
+            fullName: true,
+            alternativePhone: true,
             dateOfBirth: true,
+            emissionDate: true,
             gender: true,
             height: true,
             identityCardNumber: true,
-            fullName: true,
-            countyId: true,
-            alternativePhone: true,
-            emissionDate: true,
-            expirationDate: true,
-            father: true,
-            files: true,
-            id: true,
             maritalStatus: true,
+            type: true,
             mother: true,
-            phone: true,
-            provinceId: true,
+            father: true,
             residence: true,
-            type: true
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -501,10 +595,10 @@ function makeCreateEnrollmentUseCase() {
 
 // src/http/controllers/enrollments/create.ts
 async function create(request, reply) {
-  const createEnrollmentSchema = import_zod.z.object({
-    identityCardNumber: import_zod.z.string(),
-    courseId: import_zod.z.number(),
-    levelId: import_zod.z.number()
+  const createEnrollmentSchema = import_zod2.z.object({
+    identityCardNumber: import_zod2.z.string(),
+    courseId: import_zod2.z.number(),
+    levelId: import_zod2.z.number()
   });
   const {
     identityCardNumber,
@@ -566,10 +660,10 @@ function makeDestroyEnrollmentUseCase() {
 }
 
 // src/http/controllers/enrollments/destroy.ts
-var import_zod2 = require("zod");
+var import_zod3 = require("zod");
 async function destroy(request, reply) {
-  const registerBodySchema = import_zod2.z.object({
-    id: import_zod2.z.coerce.number()
+  const registerBodySchema = import_zod3.z.object({
+    id: import_zod3.z.coerce.number()
   });
   const { id } = registerBodySchema.parse(request.params);
   try {
@@ -587,7 +681,7 @@ async function destroy(request, reply) {
 }
 
 // src/http/controllers/enrollments/get.ts
-var import_zod3 = require("zod");
+var import_zod4 = require("zod");
 
 // src/use-cases/enrollment/get-enrollment.ts
 var GetEnrollmentUseCase = class {
@@ -630,9 +724,9 @@ var ResourceNotFoundError = class extends Error {
 
 // src/http/controllers/enrollments/get.ts
 async function get(request, reply) {
-  const createEnrollmentSchema = import_zod3.z.object({
-    enrollmentNumber: import_zod3.z.coerce.number().optional(),
-    identityCardNumber: import_zod3.z.coerce.string().optional()
+  const createEnrollmentSchema = import_zod4.z.object({
+    enrollmentNumber: import_zod4.z.coerce.number().optional(),
+    identityCardNumber: import_zod4.z.coerce.string().optional()
   });
   const {
     enrollmentNumber,
@@ -657,7 +751,7 @@ async function get(request, reply) {
 }
 
 // src/http/controllers/enrollments/fetch.ts
-var import_zod4 = require("zod");
+var import_zod5 = require("zod");
 
 // src/use-cases/enrollment/fetch-enrollment.ts
 var FetchEnrollmentUseCase = class {
@@ -687,10 +781,10 @@ function makeFetchEnrollmentUseCase() {
 
 // src/http/controllers/enrollments/fetch.ts
 async function fetch(request, reply) {
-  const registerBodySchema = import_zod4.z.object({
-    docsState: import_zod4.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
-    paymentState: import_zod4.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
-    page: import_zod4.z.coerce.number().int().positive().optional()
+  const registerBodySchema = import_zod5.z.object({
+    docsState: import_zod5.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+    paymentState: import_zod5.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+    page: import_zod5.z.coerce.number().int().positive().optional()
   });
   const { paymentState, docsState, page = 1 } = registerBodySchema.parse(request.query);
   try {
@@ -709,9 +803,9 @@ async function fetch(request, reply) {
 // src/http/controllers/enrollments/routes.ts
 async function enrollmentsRoutes(app) {
   app.post("/enrollments", create);
-  app.get("/enrollments", fetch);
+  app.get("/enrollments/all", fetch);
   app.delete("/enrollments/:id", destroy);
-  app.get("/enrollment", get);
+  app.get("/enrollments", get);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

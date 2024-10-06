@@ -23,7 +23,7 @@ __export(create_exports, {
   create: () => create
 });
 module.exports = __toCommonJS(create_exports);
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 
 // src/use-cases/errors/phone-already-exists-error.ts
 var PhoneAlreadyExistsError = class extends Error {
@@ -60,11 +60,25 @@ var CountyNotFoundError = class extends Error {
   }
 };
 
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-student-repository.ts
@@ -364,23 +378,23 @@ function makeStudentUseCase() {
 
 // src/http/controllers/students/create.ts
 async function create(request, reply) {
-  const registerBodySchema = import_zod.z.object({
-    fullName: import_zod.z.string(),
-    dateOfBirth: import_zod.z.coerce.date(),
-    emissionDate: import_zod.z.coerce.date(),
-    expirationDate: import_zod.z.coerce.date(),
-    father: import_zod.z.string(),
-    gender: import_zod.z.enum(["MALE", "FEMALE"]),
-    height: import_zod.z.number(),
-    identityCardNumber: import_zod.z.string(),
-    maritalStatus: import_zod.z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]),
-    mother: import_zod.z.string(),
-    residence: import_zod.z.string(),
-    phone: import_zod.z.string(),
-    type: import_zod.z.enum(["SCHOLARSHIP", "REGULAR"]).default("REGULAR"),
-    alternativePhone: import_zod.z.string().optional(),
-    provinceId: import_zod.z.number(),
-    countyId: import_zod.z.number()
+  const registerBodySchema = import_zod2.z.object({
+    fullName: import_zod2.z.string(),
+    dateOfBirth: import_zod2.z.coerce.date(),
+    emissionDate: import_zod2.z.coerce.date(),
+    expirationDate: import_zod2.z.coerce.date(),
+    father: import_zod2.z.string(),
+    gender: import_zod2.z.enum(["MALE", "FEMALE"]),
+    height: import_zod2.z.number(),
+    identityCardNumber: import_zod2.z.string(),
+    maritalStatus: import_zod2.z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]),
+    mother: import_zod2.z.string(),
+    residence: import_zod2.z.string(),
+    phone: import_zod2.z.string(),
+    type: import_zod2.z.enum(["SCHOLARSHIP", "REGULAR"]).default("REGULAR"),
+    alternativePhone: import_zod2.z.string().optional(),
+    provinceId: import_zod2.z.number(),
+    countyId: import_zod2.z.number()
   });
   try {
     const {

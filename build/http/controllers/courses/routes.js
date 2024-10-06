@@ -39,6 +39,10 @@ var CreateCourseUseCase = class {
   async execute({
     name
   }) {
+    const findCourse = await this.coursesRepository.findByName(name);
+    if (findCourse) {
+      throw new CourseAlreadyExistsError();
+    }
     const course = await this.coursesRepository.create({
       name
     });
@@ -48,11 +52,25 @@ var CreateCourseUseCase = class {
   }
 };
 
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-course-repository.ts
@@ -113,10 +131,10 @@ function makeCourseUseCase() {
 }
 
 // src/http/controllers/courses/create.ts
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 async function create(request, reply) {
-  const registerBodySchema = import_zod.z.object({
-    name: import_zod.z.string()
+  const registerBodySchema = import_zod2.z.object({
+    name: import_zod2.z.string()
   });
   const { name } = registerBodySchema.parse(request.body);
   try {
@@ -133,6 +151,13 @@ async function create(request, reply) {
   return reply.status(201).send();
 }
 
+// src/use-cases/errors/course-not-found.ts
+var CourseNotFoundError = class extends Error {
+  constructor() {
+    super("Course not found.");
+  }
+};
+
 // src/use-cases/errors/resource-not-found.ts
 var ResourceNotFoundError = class extends Error {
   constructor() {
@@ -148,6 +173,10 @@ var DestroyCourseUseCase = class {
   async execute({
     id
   }) {
+    const findCourse = await this.coursesRepository.findById(id);
+    if (!findCourse) {
+      throw new CourseNotFoundError();
+    }
     return await this.coursesRepository.destroy(
       id
     );
@@ -162,10 +191,10 @@ function makeDestroyCourseUseCase() {
 }
 
 // src/http/controllers/courses/destroy.ts
-var import_zod2 = require("zod");
+var import_zod3 = require("zod");
 async function destroy(request, reply) {
-  const registerBodySchema = import_zod2.z.object({
-    id: import_zod2.z.coerce.number()
+  const registerBodySchema = import_zod3.z.object({
+    id: import_zod3.z.coerce.number()
   });
   const { id } = registerBodySchema.parse(request.params);
   try {
@@ -174,7 +203,7 @@ async function destroy(request, reply) {
       id
     });
   } catch (err) {
-    if (err instanceof CourseAlreadyExistsError) {
+    if (err instanceof CourseNotFoundError) {
       return reply.status(409).send({ message: err.message });
     }
     if (err instanceof ResourceNotFoundError) {
@@ -185,10 +214,111 @@ async function destroy(request, reply) {
   return reply.status(201).send();
 }
 
+// src/http/controllers/courses/fetch.ts
+var import_zod4 = require("zod");
+
+// src/use-cases/course/fetch-course.ts
+var FetchCourseUseCase = class {
+  constructor(coursesRepository) {
+    this.coursesRepository = coursesRepository;
+  }
+  async execute({
+    name,
+    page
+  }) {
+    const courses = await this.coursesRepository.searchMany(
+      name,
+      page
+    );
+    return {
+      courses
+    };
+  }
+};
+
+// src/use-cases/factories/make-fetch-course-use-case.ts
+function makeFetchCourseUseCase() {
+  const prismaCoursesRepository = new PrismaCoursesRepository();
+  const fetchCourseUseCase = new FetchCourseUseCase(prismaCoursesRepository);
+  return fetchCourseUseCase;
+}
+
+// src/http/controllers/courses/fetch.ts
+async function fetch(request, reply) {
+  const registerBodySchema = import_zod4.z.object({
+    query: import_zod4.z.string().optional(),
+    page: import_zod4.z.coerce.number().int().positive().optional()
+  });
+  const { query = "", page = 1 } = registerBodySchema.parse(request.query);
+  try {
+    const fetchCourseUseCase = makeFetchCourseUseCase();
+    let enrollments = await fetchCourseUseCase.execute({
+      name: query,
+      page
+    });
+    return reply.status(200).send(enrollments);
+  } catch (err) {
+    return reply.status(500).send(err);
+  }
+}
+
+// src/use-cases/course/get-course.ts
+var GetCourseUseCase = class {
+  constructor(coursesRepository) {
+    this.coursesRepository = coursesRepository;
+  }
+  async execute({
+    courseId
+  }) {
+    const course = await this.coursesRepository.findById(
+      courseId
+    );
+    if (!course) {
+      throw new CourseNotFoundError();
+    }
+    return {
+      course
+    };
+  }
+};
+
+// src/use-cases/factories/make-get-course-use-case.ts
+function makeGetCourseUseCase() {
+  const prismaCoursesRepository = new PrismaCoursesRepository();
+  const getCourseUseCase = new GetCourseUseCase(prismaCoursesRepository);
+  return getCourseUseCase;
+}
+
+// src/http/controllers/courses/get.ts
+var import_zod5 = require("zod");
+async function get(request, reply) {
+  const registerBodySchema = import_zod5.z.object({
+    id: import_zod5.z.coerce.number()
+  });
+  const { id } = registerBodySchema.parse(request.params);
+  try {
+    const getCourseUseCase = makeGetCourseUseCase();
+    const course = await getCourseUseCase.execute({
+      courseId: id
+    });
+    return reply.send(course);
+  } catch (err) {
+    if (err instanceof CourseNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+}
+
 // src/http/controllers/courses/routes.ts
 async function coursesRoutes(app) {
   app.post("/courses", create);
+  app.get("/courses", fetch);
   app.delete("/courses/:id", destroy);
+  app.get("/courses/:id", get);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

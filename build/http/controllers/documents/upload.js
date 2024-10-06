@@ -69,11 +69,25 @@ var CreateDocumentWithFilesUseCase = class {
   }
 };
 
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-documents-repository.ts
@@ -119,8 +133,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -133,6 +175,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -153,8 +201,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -167,6 +243,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -225,24 +307,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
+            fullName: true,
+            alternativePhone: true,
             dateOfBirth: true,
+            emissionDate: true,
             gender: true,
             height: true,
             identityCardNumber: true,
-            fullName: true,
-            countyId: true,
-            alternativePhone: true,
-            emissionDate: true,
-            expirationDate: true,
-            father: true,
-            files: true,
-            id: true,
             maritalStatus: true,
+            type: true,
             mother: true,
-            phone: true,
-            provinceId: true,
+            father: true,
             residence: true,
-            type: true
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -357,20 +451,20 @@ function makeCreateDocumentWithFilesUseCase() {
 var import_client2 = require("@prisma/client");
 var import_path = __toESM(require("path"));
 var import_fs = __toESM(require("fs"));
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 var import_util = require("util");
 var import_stream = require("stream");
 var pump = (0, import_util.promisify)(import_stream.pipeline);
 async function upload(request, reply) {
-  const fileSchema = import_zod.z.object({
-    name: import_zod.z.string(),
-    format: import_zod.z.nativeEnum(import_client2.FileFormat),
-    type: import_zod.z.nativeEnum(import_client2.FileType),
-    studentId: import_zod.z.number()
+  const fileSchema = import_zod2.z.object({
+    name: import_zod2.z.string(),
+    format: import_zod2.z.nativeEnum(import_client2.FileFormat),
+    type: import_zod2.z.nativeEnum(import_client2.FileType),
+    studentId: import_zod2.z.number()
   });
-  const createDocumentWithFilesSchema = import_zod.z.object({
-    enrollmentId: import_zod.z.number(),
-    files: import_zod.z.array(fileSchema).nonempty()
+  const createDocumentWithFilesSchema = import_zod2.z.object({
+    enrollmentId: import_zod2.z.number(),
+    files: import_zod2.z.array(fileSchema).nonempty()
   });
   const uploadDir = import_path.default.join(__dirname, "..", "..", "..", "..", "uploads/enrollments");
   if (!import_fs.default.existsSync(uploadDir)) {

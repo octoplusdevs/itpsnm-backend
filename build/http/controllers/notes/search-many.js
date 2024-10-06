@@ -56,9 +56,28 @@ var SearchManyNotesUseCase = class {
   }
 };
 
-// src/repositories/prisma/prisma-note-repository.ts
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
+// src/lib/prisma.ts
 var import_client = require("@prisma/client");
-var prisma = new import_client.PrismaClient();
+var prisma = new import_client.PrismaClient({
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
+});
+
+// src/repositories/prisma/prisma-note-repository.ts
 var PrismaNotesRepository = class {
   async addNote(data) {
     const findNote = await prisma.note.findFirst({
@@ -69,7 +88,7 @@ var PrismaNotesRepository = class {
       }
     });
     if (!findNote) {
-      return await prisma.note.create({
+      const newNote = await prisma.note.create({
         data: {
           pf1: data.pf1 ?? 0,
           pf2: data.pf2 ?? 0,
@@ -89,8 +108,9 @@ var PrismaNotesRepository = class {
           update_at: /* @__PURE__ */ new Date()
         }
       });
+      return newNote;
     }
-    return await prisma.note.update({
+    const updated = await prisma.note.update({
       where: {
         id: findNote.id
       },
@@ -99,17 +119,18 @@ var PrismaNotesRepository = class {
         pf1: data.pf1 ?? findNote.pf1,
         pf2: data.pf2 ?? findNote.pf2,
         pft: data.pft ?? findNote.pft,
-        ps1: data.pf1 ?? findNote.ps1,
-        ps2: data.pf2 ?? findNote.ps2,
-        pst: data.pft ?? findNote.pst,
-        pt1: data.pf1 ?? findNote.pt1,
-        pt2: data.pf2 ?? findNote.pt2,
-        ptt: data.pft ?? findNote.ptt,
+        ps1: data.ps1 ?? findNote.ps1,
+        ps2: data.ps2 ?? findNote.ps2,
+        pst: data.pst ?? findNote.pst,
+        pt1: data.pt1 ?? findNote.pt1,
+        pt2: data.pt2 ?? findNote.pt2,
+        ptt: data.ptt ?? findNote.ptt,
         nee: data.nee ?? findNote.nee,
         level: data.level,
         update_at: /* @__PURE__ */ new Date()
       }
     });
+    return updated;
   }
   async update(id, data) {
     const note = await prisma.note.update({
@@ -168,13 +189,13 @@ function makeSearchManyNotesUseCase() {
 }
 
 // src/http/controllers/notes/search-many.ts
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 async function searchMany(request, reply) {
-  const searchManyBodySchema = import_zod.z.object({
-    studentId: import_zod.z.number().optional(),
-    subjectId: import_zod.z.number().optional(),
-    mester: import_zod.z.enum(["FIRST", "SECOND", "THIRD"]).optional(),
-    level: import_zod.z.enum(["CLASS_10", "CLASS_11", "CLASS_12", "CLASS_13"]).optional()
+  const searchManyBodySchema = import_zod2.z.object({
+    studentId: import_zod2.z.number().optional(),
+    subjectId: import_zod2.z.number().optional(),
+    mester: import_zod2.z.enum(["FIRST", "SECOND", "THIRD"]).optional(),
+    level: import_zod2.z.enum(["CLASS_10", "CLASS_11", "CLASS_12", "CLASS_13"]).optional()
   });
   const criteria = searchManyBodySchema.parse(request.query);
   try {

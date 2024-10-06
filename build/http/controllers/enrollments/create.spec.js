@@ -13521,7 +13521,7 @@ var require_common = __commonJS({
       createDebug.enable = enable;
       createDebug.enabled = enabled;
       createDebug.humanize = require_ms();
-      createDebug.destroy = destroy3;
+      createDebug.destroy = destroy5;
       Object.keys(env2).forEach((key) => {
         createDebug[key] = env2[key];
       });
@@ -13663,7 +13663,7 @@ var require_common = __commonJS({
         }
         return val;
       }
-      function destroy3() {
+      function destroy5() {
         console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
       }
       createDebug.enable(createDebug.load());
@@ -16033,10 +16033,10 @@ var require_lru_cache = __commonJS({
         return !isStale(this, hit);
       }
       get(key) {
-        return get3(this, key, true);
+        return get7(this, key, true);
       }
       peek(key) {
-        return get3(this, key, false);
+        return get7(this, key, false);
       }
       pop() {
         const node = this[LRU_LIST].tail;
@@ -16065,10 +16065,10 @@ var require_lru_cache = __commonJS({
         }
       }
       prune() {
-        this[CACHE].forEach((value, key) => get3(this, key, false));
+        this[CACHE].forEach((value, key) => get7(this, key, false));
       }
     };
-    var get3 = (self2, key, doUse) => {
+    var get7 = (self2, key, doUse) => {
       const node = self2[CACHE].get(key);
       if (node) {
         const hit = node.value;
@@ -16330,19 +16330,19 @@ var require_range2 = __commonJS({
     var replaceCaret = (comp, options) => {
       debug("caret", comp, options);
       const r = options.loose ? re[t.CARETLOOSE] : re[t.CARET];
-      const z18 = options.includePrerelease ? "-0" : "";
+      const z35 = options.includePrerelease ? "-0" : "";
       return comp.replace(r, (_, M, m, p, pr) => {
         debug("caret", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
         } else if (isX(m)) {
-          ret = `>=${M}.0.0${z18} <${+M + 1}.0.0-0`;
+          ret = `>=${M}.0.0${z35} <${+M + 1}.0.0-0`;
         } else if (isX(p)) {
           if (M === "0") {
-            ret = `>=${M}.${m}.0${z18} <${M}.${+m + 1}.0-0`;
+            ret = `>=${M}.${m}.0${z35} <${M}.${+m + 1}.0-0`;
           } else {
-            ret = `>=${M}.${m}.0${z18} <${+M + 1}.0.0-0`;
+            ret = `>=${M}.${m}.0${z35} <${+M + 1}.0.0-0`;
           }
         } else if (pr) {
           debug("replaceCaret pr", pr);
@@ -16359,9 +16359,9 @@ var require_range2 = __commonJS({
           debug("no pr");
           if (M === "0") {
             if (m === "0") {
-              ret = `>=${M}.${m}.${p}${z18} <${M}.${m}.${+p + 1}-0`;
+              ret = `>=${M}.${m}.${p}${z35} <${M}.${m}.${+p + 1}-0`;
             } else {
-              ret = `>=${M}.${m}.${p}${z18} <${M}.${+m + 1}.0-0`;
+              ret = `>=${M}.${m}.${p}${z35} <${M}.${+m + 1}.0-0`;
             }
           } else {
             ret = `>=${M}.${m}.${p} <${+M + 1}.0.0-0`;
@@ -20354,7 +20354,7 @@ var require_react_is_production_min = __commonJS({
         }
       }
     }
-    var z18 = g2;
+    var z35 = g2;
     var A = b;
     var B = k;
     var C2 = d2;
@@ -20365,7 +20365,7 @@ var require_react_is_production_min = __commonJS({
     var H = e;
     var I = l;
     exports.ContextConsumer = h;
-    exports.ContextProvider = z18;
+    exports.ContextProvider = z35;
     exports.Element = A;
     exports.ForwardRef = B;
     exports.Fragment = C2;
@@ -21886,7 +21886,7 @@ var init_loupe = __esm({
     }
     FakeMap.prototype = {
       // eslint-disable-next-line object-shorthand
-      get: function get2(key) {
+      get: function get6(key) {
         return key[this.key];
       },
       // eslint-disable-next-line object-shorthand
@@ -22517,7 +22517,7 @@ var require_deep_eql = __commonJS({
       this._key = "chai/deep-eql__" + Math.random() + Date.now();
     }
     FakeMap2.prototype = {
-      get: function get3(key) {
+      get: function get7(key) {
         return key[this._key];
       },
       set: function set3(key, value) {
@@ -26674,7 +26674,7 @@ var import_supertest = __toESM(require_supertest());
 // src/app.ts
 var import_fastify = __toESM(require("fastify"));
 var import_cookie = __toESM(require("@fastify/cookie"));
-var import_zod18 = require("zod");
+var import_zod35 = require("zod");
 
 // src/env/index.ts
 var import_config = require("dotenv/config");
@@ -26706,6 +26706,10 @@ var CreateCourseUseCase = class {
   async execute({
     name
   }) {
+    const findCourse = await this.coursesRepository.findByName(name);
+    if (findCourse) {
+      throw new CourseAlreadyExistsError();
+    }
     const course = await this.coursesRepository.create({
       name
     });
@@ -26718,8 +26722,7 @@ var CreateCourseUseCase = class {
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-course-repository.ts
@@ -26800,6 +26803,13 @@ async function create(request2, reply) {
   return reply.status(201).send();
 }
 
+// src/use-cases/errors/course-not-found.ts
+var CourseNotFoundError = class extends Error {
+  constructor() {
+    super("Course not found.");
+  }
+};
+
 // src/use-cases/errors/resource-not-found.ts
 var ResourceNotFoundError = class extends Error {
   constructor() {
@@ -26815,6 +26825,10 @@ var DestroyCourseUseCase = class {
   async execute({
     id
   }) {
+    const findCourse = await this.coursesRepository.findById(id);
+    if (!findCourse) {
+      throw new CourseNotFoundError();
+    }
     return await this.coursesRepository.destroy(
       id
     );
@@ -26841,7 +26855,7 @@ async function destroy(request2, reply) {
       id
     });
   } catch (err) {
-    if (err instanceof CourseAlreadyExistsError) {
+    if (err instanceof CourseNotFoundError) {
       return reply.status(409).send({ message: err.message });
     }
     if (err instanceof ResourceNotFoundError) {
@@ -26852,14 +26866,115 @@ async function destroy(request2, reply) {
   return reply.status(201).send();
 }
 
+// src/http/controllers/courses/fetch.ts
+var import_zod4 = require("zod");
+
+// src/use-cases/course/fetch-course.ts
+var FetchCourseUseCase = class {
+  constructor(coursesRepository) {
+    this.coursesRepository = coursesRepository;
+  }
+  async execute({
+    name,
+    page
+  }) {
+    const courses = await this.coursesRepository.searchMany(
+      name,
+      page
+    );
+    return {
+      courses
+    };
+  }
+};
+
+// src/use-cases/factories/make-fetch-course-use-case.ts
+function makeFetchCourseUseCase() {
+  const prismaCoursesRepository = new PrismaCoursesRepository();
+  const fetchCourseUseCase = new FetchCourseUseCase(prismaCoursesRepository);
+  return fetchCourseUseCase;
+}
+
+// src/http/controllers/courses/fetch.ts
+async function fetch(request2, reply) {
+  const registerBodySchema = import_zod4.z.object({
+    query: import_zod4.z.string().optional(),
+    page: import_zod4.z.coerce.number().int().positive().optional()
+  });
+  const { query = "", page = 1 } = registerBodySchema.parse(request2.query);
+  try {
+    const fetchCourseUseCase = makeFetchCourseUseCase();
+    let enrollments = await fetchCourseUseCase.execute({
+      name: query,
+      page
+    });
+    return reply.status(200).send(enrollments);
+  } catch (err) {
+    return reply.status(500).send(err);
+  }
+}
+
+// src/use-cases/course/get-course.ts
+var GetCourseUseCase = class {
+  constructor(coursesRepository) {
+    this.coursesRepository = coursesRepository;
+  }
+  async execute({
+    courseId
+  }) {
+    const course = await this.coursesRepository.findById(
+      courseId
+    );
+    if (!course) {
+      throw new CourseNotFoundError();
+    }
+    return {
+      course
+    };
+  }
+};
+
+// src/use-cases/factories/make-get-course-use-case.ts
+function makeGetCourseUseCase() {
+  const prismaCoursesRepository = new PrismaCoursesRepository();
+  const getCourseUseCase = new GetCourseUseCase(prismaCoursesRepository);
+  return getCourseUseCase;
+}
+
+// src/http/controllers/courses/get.ts
+var import_zod5 = require("zod");
+async function get(request2, reply) {
+  const registerBodySchema = import_zod5.z.object({
+    id: import_zod5.z.coerce.number()
+  });
+  const { id } = registerBodySchema.parse(request2.params);
+  try {
+    const getCourseUseCase = makeGetCourseUseCase();
+    const course = await getCourseUseCase.execute({
+      courseId: id
+    });
+    return reply.send(course);
+  } catch (err) {
+    if (err instanceof CourseNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+}
+
 // src/http/controllers/courses/routes.ts
 async function coursesRoutes(app2) {
   app2.post("/courses", create);
+  app2.get("/courses", fetch);
   app2.delete("/courses/:id", destroy);
+  app2.get("/courses/:id", get);
 }
 
 // src/http/controllers/students/create.ts
-var import_zod4 = require("zod");
+var import_zod6 = require("zod");
 
 // src/use-cases/errors/phone-already-exists-error.ts
 var PhoneAlreadyExistsError = class extends Error {
@@ -27193,23 +27308,23 @@ function makeStudentUseCase() {
 
 // src/http/controllers/students/create.ts
 async function create2(request2, reply) {
-  const registerBodySchema = import_zod4.z.object({
-    fullName: import_zod4.z.string(),
-    dateOfBirth: import_zod4.z.coerce.date(),
-    emissionDate: import_zod4.z.coerce.date(),
-    expirationDate: import_zod4.z.coerce.date(),
-    father: import_zod4.z.string(),
-    gender: import_zod4.z.enum(["MALE", "FEMALE"]),
-    height: import_zod4.z.number(),
-    identityCardNumber: import_zod4.z.string(),
-    maritalStatus: import_zod4.z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]),
-    mother: import_zod4.z.string(),
-    residence: import_zod4.z.string(),
-    phone: import_zod4.z.string(),
-    type: import_zod4.z.enum(["SCHOLARSHIP", "REGULAR"]).default("REGULAR"),
-    alternativePhone: import_zod4.z.string().optional(),
-    provinceId: import_zod4.z.number(),
-    countyId: import_zod4.z.number()
+  const registerBodySchema = import_zod6.z.object({
+    fullName: import_zod6.z.string(),
+    dateOfBirth: import_zod6.z.coerce.date(),
+    emissionDate: import_zod6.z.coerce.date(),
+    expirationDate: import_zod6.z.coerce.date(),
+    father: import_zod6.z.string(),
+    gender: import_zod6.z.enum(["MALE", "FEMALE"]),
+    height: import_zod6.z.number(),
+    identityCardNumber: import_zod6.z.string(),
+    maritalStatus: import_zod6.z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]),
+    mother: import_zod6.z.string(),
+    residence: import_zod6.z.string(),
+    phone: import_zod6.z.string(),
+    type: import_zod6.z.enum(["SCHOLARSHIP", "REGULAR"]).default("REGULAR"),
+    alternativePhone: import_zod6.z.string().optional(),
+    provinceId: import_zod6.z.number(),
+    countyId: import_zod6.z.number()
   });
   try {
     const {
@@ -27259,7 +27374,7 @@ async function create2(request2, reply) {
 }
 
 // src/http/controllers/students/fetch.ts
-var import_zod5 = require("zod");
+var import_zod7 = require("zod");
 
 // src/use-cases/student/fetch-student.ts
 var FetchStudentUseCase = class {
@@ -27288,10 +27403,10 @@ function makeFetchStudentUseCase() {
 }
 
 // src/http/controllers/students/fetch.ts
-async function fetch(request2, reply) {
-  const registerBodySchema = import_zod5.z.object({
-    query: import_zod5.z.string().optional(),
-    page: import_zod5.z.coerce.number().int().positive().optional()
+async function fetch2(request2, reply) {
+  const registerBodySchema = import_zod7.z.object({
+    query: import_zod7.z.string().optional(),
+    page: import_zod7.z.coerce.number().int().positive().optional()
   });
   const { query = "", page = 1 } = registerBodySchema.parse(request2.query);
   try {
@@ -27309,23 +27424,16 @@ async function fetch(request2, reply) {
 // src/http/controllers/students/routes.ts
 async function studentsRoutes(app2) {
   app2.post("/students", create2);
-  app2.get("/students", fetch);
+  app2.get("/students", fetch2);
 }
 
 // src/http/controllers/enrollments/create.ts
-var import_zod6 = require("zod");
+var import_zod8 = require("zod");
 
 // src/use-cases/errors/student-not-found.ts
 var StudentNotFoundError = class extends Error {
   constructor() {
     super("Student not found.");
-  }
-};
-
-// src/use-cases/errors/course-not-found.ts
-var CourseNotFoundError = class extends Error {
-  constructor() {
-    super("Course not found.");
   }
 };
 
@@ -27353,8 +27461,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -27367,6 +27503,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -27387,8 +27529,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -27401,6 +27571,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -27459,24 +27635,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
+            fullName: true,
+            alternativePhone: true,
             dateOfBirth: true,
+            emissionDate: true,
             gender: true,
             height: true,
             identityCardNumber: true,
-            fullName: true,
-            countyId: true,
-            alternativePhone: true,
-            emissionDate: true,
-            expirationDate: true,
-            father: true,
-            files: true,
-            id: true,
             maritalStatus: true,
+            type: true,
             mother: true,
-            phone: true,
-            provinceId: true,
+            father: true,
             residence: true,
-            type: true
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -27613,10 +27801,10 @@ function makeCreateEnrollmentUseCase() {
 
 // src/http/controllers/enrollments/create.ts
 async function create3(request2, reply) {
-  const createEnrollmentSchema = import_zod6.z.object({
-    identityCardNumber: import_zod6.z.string(),
-    courseId: import_zod6.z.number(),
-    levelId: import_zod6.z.number()
+  const createEnrollmentSchema = import_zod8.z.object({
+    identityCardNumber: import_zod8.z.string(),
+    courseId: import_zod8.z.number(),
+    levelId: import_zod8.z.number()
   });
   const {
     identityCardNumber,
@@ -27678,10 +27866,10 @@ function makeDestroyEnrollmentUseCase() {
 }
 
 // src/http/controllers/enrollments/destroy.ts
-var import_zod7 = require("zod");
+var import_zod9 = require("zod");
 async function destroy2(request2, reply) {
-  const registerBodySchema = import_zod7.z.object({
-    id: import_zod7.z.coerce.number()
+  const registerBodySchema = import_zod9.z.object({
+    id: import_zod9.z.coerce.number()
   });
   const { id } = registerBodySchema.parse(request2.params);
   try {
@@ -27699,7 +27887,7 @@ async function destroy2(request2, reply) {
 }
 
 // src/http/controllers/enrollments/get.ts
-var import_zod8 = require("zod");
+var import_zod10 = require("zod");
 
 // src/use-cases/enrollment/get-enrollment.ts
 var GetEnrollmentUseCase = class {
@@ -27734,10 +27922,10 @@ function makeGetEnrollmentUseCase() {
 }
 
 // src/http/controllers/enrollments/get.ts
-async function get(request2, reply) {
-  const createEnrollmentSchema = import_zod8.z.object({
-    enrollmentNumber: import_zod8.z.coerce.number().optional(),
-    identityCardNumber: import_zod8.z.coerce.string().optional()
+async function get2(request2, reply) {
+  const createEnrollmentSchema = import_zod10.z.object({
+    enrollmentNumber: import_zod10.z.coerce.number().optional(),
+    identityCardNumber: import_zod10.z.coerce.string().optional()
   });
   const {
     enrollmentNumber,
@@ -27762,7 +27950,7 @@ async function get(request2, reply) {
 }
 
 // src/http/controllers/enrollments/fetch.ts
-var import_zod9 = require("zod");
+var import_zod11 = require("zod");
 
 // src/use-cases/enrollment/fetch-enrollment.ts
 var FetchEnrollmentUseCase = class {
@@ -27791,11 +27979,11 @@ function makeFetchEnrollmentUseCase() {
 }
 
 // src/http/controllers/enrollments/fetch.ts
-async function fetch2(request2, reply) {
-  const registerBodySchema = import_zod9.z.object({
-    docsState: import_zod9.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
-    paymentState: import_zod9.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
-    page: import_zod9.z.coerce.number().int().positive().optional()
+async function fetch3(request2, reply) {
+  const registerBodySchema = import_zod11.z.object({
+    docsState: import_zod11.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+    paymentState: import_zod11.z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+    page: import_zod11.z.coerce.number().int().positive().optional()
   });
   const { paymentState, docsState, page = 1 } = registerBodySchema.parse(request2.query);
   try {
@@ -27814,9 +28002,9 @@ async function fetch2(request2, reply) {
 // src/http/controllers/enrollments/routes.ts
 async function enrollmentsRoutes(app2) {
   app2.post("/enrollments", create3);
-  app2.get("/enrollments", fetch2);
+  app2.get("/enrollments/all", fetch3);
   app2.delete("/enrollments/:id", destroy2);
-  app2.get("/enrollment", get);
+  app2.get("/enrollments", get2);
 }
 
 // src/use-cases/document/create-document-with-files.ts
@@ -27957,20 +28145,20 @@ function makeCreateDocumentWithFilesUseCase() {
 var import_client2 = require("@prisma/client");
 var import_path = __toESM(require("path"));
 var import_fs = __toESM(require("fs"));
-var import_zod10 = require("zod");
+var import_zod12 = require("zod");
 var import_util = require("util");
 var import_stream = require("stream");
 var pump = (0, import_util.promisify)(import_stream.pipeline);
 async function upload(request2, reply) {
-  const fileSchema = import_zod10.z.object({
-    name: import_zod10.z.string(),
-    format: import_zod10.z.nativeEnum(import_client2.FileFormat),
-    type: import_zod10.z.nativeEnum(import_client2.FileType),
-    studentId: import_zod10.z.number()
+  const fileSchema = import_zod12.z.object({
+    name: import_zod12.z.string(),
+    format: import_zod12.z.nativeEnum(import_client2.FileFormat),
+    type: import_zod12.z.nativeEnum(import_client2.FileType),
+    studentId: import_zod12.z.number()
   });
-  const createDocumentWithFilesSchema = import_zod10.z.object({
-    enrollmentId: import_zod10.z.number(),
-    files: import_zod10.z.array(fileSchema).nonempty()
+  const createDocumentWithFilesSchema = import_zod12.z.object({
+    enrollmentId: import_zod12.z.number(),
+    files: import_zod12.z.array(fileSchema).nonempty()
   });
   const uploadDir = import_path.default.join(__dirname, "..", "..", "..", "..", "uploads/enrollments");
   if (!import_fs.default.existsSync(uploadDir)) {
@@ -28053,7 +28241,7 @@ async function documentsRoutes(app2) {
 var import_client3 = require("@prisma/client");
 var import_path2 = __toESM(require("path"));
 var import_fs2 = __toESM(require("fs"));
-var import_zod11 = require("zod");
+var import_zod13 = require("zod");
 var import_util2 = require("util");
 var import_stream2 = require("stream");
 
@@ -28085,10 +28273,10 @@ function makeCreateFileUseCase() {
 // src/http/controllers/photos/upload.ts
 var pump2 = (0, import_util2.promisify)(import_stream2.pipeline);
 async function upload2(request2, reply) {
-  const fileSchema = import_zod11.z.object({
-    name: import_zod11.z.string(),
-    format: import_zod11.z.nativeEnum(import_client3.FileFormat),
-    identityCardNumber: import_zod11.z.string()
+  const fileSchema = import_zod13.z.object({
+    name: import_zod13.z.string(),
+    format: import_zod13.z.nativeEnum(import_client3.FileFormat),
+    identityCardNumber: import_zod13.z.string()
   });
   const uploadDir = import_path2.default.join(__dirname, "..", "..", "..", "..", "uploads/photos");
   if (!import_fs2.default.existsSync(uploadDir)) {
@@ -28157,20 +28345,20 @@ async function photosRoutes(app2) {
 var import_client4 = require("@prisma/client");
 var import_path3 = __toESM(require("path"));
 var import_fs3 = __toESM(require("fs"));
-var import_zod12 = require("zod");
+var import_zod14 = require("zod");
 var import_util3 = require("util");
 var import_stream3 = require("stream");
 var pump3 = (0, import_util3.promisify)(import_stream3.pipeline);
 async function payment(request2, reply) {
-  const fileSchema = import_zod12.z.object({
-    name: import_zod12.z.string(),
-    format: import_zod12.z.nativeEnum(import_client4.FileFormat),
-    type: import_zod12.z.nativeEnum(import_client4.FileType),
-    studentId: import_zod12.z.number()
+  const fileSchema = import_zod14.z.object({
+    name: import_zod14.z.string(),
+    format: import_zod14.z.nativeEnum(import_client4.FileFormat),
+    type: import_zod14.z.nativeEnum(import_client4.FileType),
+    studentId: import_zod14.z.number()
   });
-  const createDocumentWithFilesSchema = import_zod12.z.object({
-    enrollmentId: import_zod12.z.number(),
-    files: import_zod12.z.array(fileSchema).nonempty()
+  const createDocumentWithFilesSchema = import_zod14.z.object({
+    enrollmentId: import_zod14.z.number(),
+    files: import_zod14.z.array(fileSchema).nonempty()
   });
   const uploadDir = import_path3.default.join(__dirname, "..", "..", "..", "..", "uploads/enrollments");
   if (!import_fs3.default.existsSync(uploadDir)) {
@@ -28250,7 +28438,7 @@ async function paymentsRoutes(app2) {
 }
 
 // src/http/controllers/notes/add-note.ts
-var import_zod13 = require("zod");
+var import_zod15 = require("zod");
 
 // src/use-cases/note/add-note.ts
 var import_crypto2 = require("crypto");
@@ -28270,17 +28458,17 @@ var CreateNoteUseCase = class {
     this.subjectsRepository = subjectsRepository;
   }
   async execute({
-    pf1 = 0,
-    pf2 = 0,
-    pft = 0,
-    ps1 = 0,
-    ps2 = 0,
-    pst = 0,
-    pt1 = 0,
-    pt2 = 0,
-    ptt = 0,
-    nee = 0,
-    resource = 0,
+    pf1,
+    pf2,
+    pft,
+    ps1,
+    ps2,
+    pst,
+    pt1,
+    pt2,
+    ptt,
+    nee,
+    resource,
     level,
     enrollmentId,
     subjectId
@@ -28319,11 +28507,9 @@ var CreateNoteUseCase = class {
 };
 
 // src/repositories/prisma/prisma-note-repository.ts
-var import_client5 = require("@prisma/client");
-var prisma2 = new import_client5.PrismaClient();
 var PrismaNotesRepository = class {
   async addNote(data) {
-    const findNote = await prisma2.note.findFirst({
+    const findNote = await prisma.note.findFirst({
       where: {
         level: data.level,
         enrollmentId: data.enrollmentId,
@@ -28331,7 +28517,7 @@ var PrismaNotesRepository = class {
       }
     });
     if (!findNote) {
-      return await prisma2.note.create({
+      const newNote = await prisma.note.create({
         data: {
           pf1: data.pf1 ?? 0,
           pf2: data.pf2 ?? 0,
@@ -28351,8 +28537,9 @@ var PrismaNotesRepository = class {
           update_at: /* @__PURE__ */ new Date()
         }
       });
+      return newNote;
     }
-    return await prisma2.note.update({
+    const updated = await prisma.note.update({
       where: {
         id: findNote.id
       },
@@ -28361,20 +28548,21 @@ var PrismaNotesRepository = class {
         pf1: data.pf1 ?? findNote.pf1,
         pf2: data.pf2 ?? findNote.pf2,
         pft: data.pft ?? findNote.pft,
-        ps1: data.pf1 ?? findNote.ps1,
-        ps2: data.pf2 ?? findNote.ps2,
-        pst: data.pft ?? findNote.pst,
-        pt1: data.pf1 ?? findNote.pt1,
-        pt2: data.pf2 ?? findNote.pt2,
-        ptt: data.pft ?? findNote.ptt,
+        ps1: data.ps1 ?? findNote.ps1,
+        ps2: data.ps2 ?? findNote.ps2,
+        pst: data.pst ?? findNote.pst,
+        pt1: data.pt1 ?? findNote.pt1,
+        pt2: data.pt2 ?? findNote.pt2,
+        ptt: data.ptt ?? findNote.ptt,
         nee: data.nee ?? findNote.nee,
         level: data.level,
         update_at: /* @__PURE__ */ new Date()
       }
     });
+    return updated;
   }
   async update(id, data) {
-    const note = await prisma2.note.update({
+    const note = await prisma.note.update({
       where: { id },
       data: {
         ...data,
@@ -28385,7 +28573,7 @@ var PrismaNotesRepository = class {
   }
   async destroy(id) {
     try {
-      await prisma2.note.delete({
+      await prisma.note.delete({
         where: { id }
       });
       return true;
@@ -28394,13 +28582,13 @@ var PrismaNotesRepository = class {
     }
   }
   async searchMany(criteria) {
-    const notes = await prisma2.note.findMany({
+    const notes = await prisma.note.findMany({
       where: criteria
     });
     return notes;
   }
   async getNoteWithFullGrades(criteria) {
-    const notes = await prisma2.note.findMany({
+    const notes = await prisma.note.findMany({
       where: {
         enrollmentId: criteria.enrollmentId,
         OR: [
@@ -28490,21 +28678,21 @@ var NoteAlreadyExistsError = class extends Error {
 
 // src/http/controllers/notes/add-note.ts
 async function create4(request2, reply) {
-  const createNoteBodySchema = import_zod13.z.object({
-    pf1: import_zod13.z.number().default(0),
-    pf2: import_zod13.z.number().default(0),
-    pft: import_zod13.z.number().default(0),
-    ps1: import_zod13.z.number().default(0),
-    ps2: import_zod13.z.number().default(0),
-    pst: import_zod13.z.number().default(0),
-    pt1: import_zod13.z.number().default(0),
-    pt2: import_zod13.z.number().default(0),
-    ptt: import_zod13.z.number().default(0),
-    nee: import_zod13.z.number().default(0),
-    resource: import_zod13.z.number().optional(),
-    level: import_zod13.z.enum(["CLASS_10", "CLASS_11", "CLASS_12", "CLASS_13"]),
-    enrollmentId: import_zod13.z.number(),
-    subjectId: import_zod13.z.number()
+  const createNoteBodySchema = import_zod15.z.object({
+    pf1: import_zod15.z.number().optional(),
+    pf2: import_zod15.z.number().optional(),
+    pft: import_zod15.z.number().optional(),
+    ps1: import_zod15.z.number().optional(),
+    ps2: import_zod15.z.number().optional(),
+    pst: import_zod15.z.number().optional(),
+    pt1: import_zod15.z.number().optional(),
+    pt2: import_zod15.z.number().optional(),
+    ptt: import_zod15.z.number().optional(),
+    nee: import_zod15.z.number().optional(),
+    resource: import_zod15.z.number().optional(),
+    level: import_zod15.z.enum(["CLASS_10", "CLASS_11", "CLASS_12", "CLASS_13"]),
+    enrollmentId: import_zod15.z.number(),
+    subjectId: import_zod15.z.number()
   });
   const { pf1, nee, pf2, pft, ps1, ps2, pst, pt1, pt2, ptt, resource, level, enrollmentId, subjectId } = createNoteBodySchema.parse(request2.body);
   try {
@@ -28581,13 +28769,13 @@ function makeSearchManyNotesUseCase() {
 }
 
 // src/http/controllers/notes/search-many.ts
-var import_zod14 = require("zod");
+var import_zod16 = require("zod");
 async function searchMany(request2, reply) {
-  const searchManyBodySchema = import_zod14.z.object({
-    studentId: import_zod14.z.number().optional(),
-    subjectId: import_zod14.z.number().optional(),
-    mester: import_zod14.z.enum(["FIRST", "SECOND", "THIRD"]).optional(),
-    level: import_zod14.z.enum(["CLASS_10", "CLASS_11", "CLASS_12", "CLASS_13"]).optional()
+  const searchManyBodySchema = import_zod16.z.object({
+    studentId: import_zod16.z.number().optional(),
+    subjectId: import_zod16.z.number().optional(),
+    mester: import_zod16.z.enum(["FIRST", "SECOND", "THIRD"]).optional(),
+    level: import_zod16.z.enum(["CLASS_10", "CLASS_11", "CLASS_12", "CLASS_13"]).optional()
   });
   const criteria = searchManyBodySchema.parse(request2.query);
   try {
@@ -28619,18 +28807,18 @@ function makeGetNoteWithFullGradesUseCase() {
 }
 
 // src/http/controllers/notes/get-note-with-full-grades.ts
-var import_client6 = require("@prisma/client");
-var import_zod15 = require("zod");
+var import_client5 = require("@prisma/client");
+var import_zod17 = require("zod");
 async function getNoteWithFullGrades(request2, reply) {
-  const getNoteWithFullGradesParamsSchema = import_zod15.z.object({
-    enrollmentId: import_zod15.z.coerce.number()
+  const getNoteWithFullGradesParamsSchema = import_zod17.z.object({
+    enrollmentId: import_zod17.z.coerce.number()
   });
-  const getNoteWithFullGradesQueriesSchema = import_zod15.z.object({
-    level: import_zod15.z.nativeEnum(import_client6.LevelName).optional(),
+  const getNoteWithFullGradesQueriesSchema = import_zod17.z.object({
+    level: import_zod17.z.nativeEnum(import_client5.LevelName).optional(),
     // Use z.nativeEnum para enums
-    resource: import_zod15.z.coerce.number().optional(),
+    resource: import_zod17.z.coerce.number().optional(),
     // Use z.nativeEnum para enums
-    subjectId: import_zod15.z.coerce.number().optional()
+    subjectId: import_zod17.z.coerce.number().optional()
     // Use z.nativeEnum para enums
   });
   const { level, subjectId } = getNoteWithFullGradesQueriesSchema.parse(request2.query);
@@ -28653,25 +28841,172 @@ async function getNoteWithFullGrades(request2, reply) {
   }
 }
 
+// src/http/middlewares/verify-user-role.ts
+var import_jsonwebtoken = require("jsonwebtoken");
+
+// src/repositories/prisma/prisma-user-repository.ts
+var PrismaUserRepository = class {
+  async findById(id) {
+    return prisma.user.findUnique({ where: { id } });
+  }
+  async findByEmail(email) {
+    return prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        loginAttempt: true,
+        isBlocked: true,
+        role: true,
+        isActive: true,
+        password: true,
+        lastLogin: true,
+        created_at: true,
+        update_at: true,
+        employeeId: true,
+        studentId: true
+      }
+    });
+  }
+  async searchMany(role, page) {
+    let pageSize = 20;
+    const totalItems = await prisma.user.count();
+    const totalPages = Math.ceil(totalItems / pageSize);
+    let users = await prisma.user.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      where: {
+        role
+      },
+      select: {
+        id: true,
+        email: true,
+        loginAttempt: true,
+        isBlocked: true,
+        role: true,
+        isActive: true,
+        lastLogin: true,
+        created_at: true,
+        update_at: true,
+        employeeId: true,
+        studentId: true
+      }
+    });
+    return {
+      totalItems,
+      currentPage: page,
+      totalPages,
+      items: users
+    };
+  }
+  async create(data) {
+    return prisma.user.create({
+      data: {
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        loginAttempt: 0,
+        isBlocked: false,
+        isActive: true,
+        employeeId: data.employeeId,
+        studentId: data.studentId,
+        lastLogin: /* @__PURE__ */ new Date(),
+        created_at: /* @__PURE__ */ new Date(),
+        update_at: /* @__PURE__ */ new Date()
+      }
+    });
+  }
+  async updateLoginAttempt(id, attempts) {
+    await prisma.user.update({
+      where: { id },
+      data: {
+        loginAttempt: attempts,
+        update_at: /* @__PURE__ */ new Date()
+      }
+    });
+  }
+  async resetUserPassword(id, password) {
+    await prisma.user.update({
+      where: { id },
+      data: {
+        password,
+        loginAttempt: 0,
+        isBlocked: false,
+        update_at: /* @__PURE__ */ new Date()
+      }
+    });
+  }
+  async blockUser(id, status) {
+    await prisma.user.update({
+      where: { id },
+      data: {
+        isBlocked: Boolean(status),
+        update_at: /* @__PURE__ */ new Date()
+      }
+    });
+  }
+  async logAccess(userId, status) {
+    await prisma.accessLog.create({
+      data: {
+        userId,
+        status,
+        timestamp: /* @__PURE__ */ new Date()
+      }
+    });
+  }
+};
+
+// src/http/middlewares/verify-user-role.ts
+function accessControlMiddleware(requiredRole) {
+  return async (request2, reply) => {
+    try {
+      const authHeader = request2.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return reply.status(401).send({ message: "Unauthorized: No token provided" });
+      }
+      const token = authHeader.replace("Bearer ", "");
+      const secretKey = process.env.JWT_SECRET;
+      let decodedToken;
+      try {
+        decodedToken = (0, import_jsonwebtoken.verify)(token, secretKey);
+      } catch (error) {
+        return reply.status(401).send({ message: "Unauthorized: Invalid token" });
+      }
+      const { userId } = decodedToken;
+      const usersRepository = new PrismaUserRepository();
+      const user = await usersRepository.findById(userId);
+      if (!user || user.isBlocked || !user.isActive) {
+        return reply.status(401).send({ message: "Unauthorized: User is blocked or inactive" });
+      }
+      if (!requiredRole.includes(user.role)) {
+        return reply.status(403).send({ message: "Forbidden: Access denied" });
+      }
+      request2.user = user;
+    } catch (error) {
+      return reply.status(500).send({ message: "Internal Server Error" });
+    }
+  };
+}
+
 // src/http/controllers/notes/routes.ts
+var import_client6 = require("@prisma/client");
 async function notesRoutes(app2) {
-  app2.post("/notes", create4);
-  app2.get("/notes/search", searchMany);
-  app2.get("/notes/:enrollmentId/grades", getNoteWithFullGrades);
+  app2.post("/notes", { preHandler: accessControlMiddleware([import_client6.Role.ADMIN, import_client6.Role.TEACHER]) }, create4);
+  app2.get("/notes/search", { preHandler: accessControlMiddleware([import_client6.Role.ADMIN, import_client6.Role.TEACHER, import_client6.Role.STUDENT]) }, searchMany);
+  app2.get("/notes/:enrollmentId/grades", { preHandler: accessControlMiddleware([import_client6.Role.ADMIN, import_client6.Role.TEACHER, import_client6.Role.STUDENT]) }, getNoteWithFullGrades);
 }
 
 // src/http/controllers/auth/login.ts
-var import_zod16 = require("zod");
+var import_zod18 = require("zod");
 
 // src/use-cases/authenticate/authenticate.ts
 var import_client7 = require("@prisma/client");
 var import_bcryptjs = __toESM(require("bcryptjs"));
-var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
+var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
 var LoginUseCase = class {
   constructor(usersRepository) {
     this.usersRepository = usersRepository;
     this.jwtSecret = process.env.JWT_SECRET;
-    // Use uma variável de ambiente para o segredo
     this.ATTEMPT_LIMIT = 5;
   }
   async execute({ email, password }) {
@@ -28682,13 +29017,17 @@ var LoginUseCase = class {
         message: "User not found"
       };
     }
+    console.log({
+      password,
+      t: user
+    });
     const passwordMatches = await import_bcryptjs.default.compare(password, user.password);
     if (!passwordMatches) {
       let newAttemptCount = user.loginAttempt + 1;
       await this.usersRepository.updateLoginAttempt(user.id, newAttemptCount);
       await this.usersRepository.logAccess(user.id, import_client7.AccessStatus.FAILURE);
       if (newAttemptCount >= this.ATTEMPT_LIMIT) {
-        await this.usersRepository.blockUser(user.id);
+        await this.usersRepository.blockUser(user.id, true);
         return {
           success: false,
           message: "Account blocked due to multiple failed login attempts."
@@ -28705,9 +29044,15 @@ var LoginUseCase = class {
         message: "Account is blocked. Please contact support."
       };
     }
+    if (!user.isActive) {
+      return {
+        success: false,
+        message: "Account is not active. Please contact support."
+      };
+    }
     await this.usersRepository.updateLoginAttempt(user.id, 0);
     await this.usersRepository.logAccess(user.id, import_client7.AccessStatus.SUCCESS);
-    const token = import_jsonwebtoken.default.sign(
+    const token = import_jsonwebtoken2.default.sign(
       { userId: user.id, role: user.role },
       this.jwtSecret,
       { expiresIn: "1h" }
@@ -28723,68 +29068,11 @@ var LoginUseCase = class {
   }
 };
 
-// src/repositories/prisma/prisma-user-repository.ts
-var import_client8 = require("@prisma/client");
-var PrismaUserRepository = class {
-  constructor() {
-    this.prisma = new import_client8.PrismaClient();
-  }
-  async findById(id) {
-    return this.prisma.user.findUnique({ where: { id } });
-  }
-  async findByEmail(email) {
-    return this.prisma.user.findUnique({ where: { email } });
-  }
-  async create(data) {
-    return this.prisma.user.create({
-      data: {
-        email: data.email,
-        password: data.password,
-        role: data.role,
-        loginAttempt: 0,
-        isBlocked: false,
-        isActive: true,
-        lastLogin: /* @__PURE__ */ new Date(),
-        created_at: /* @__PURE__ */ new Date(),
-        update_at: /* @__PURE__ */ new Date()
-        // EmployeeId and StudentId should be handled if needed
-      }
-    });
-  }
-  async updateLoginAttempt(id, attempts) {
-    await this.prisma.user.update({
-      where: { id },
-      data: {
-        loginAttempt: attempts,
-        update_at: /* @__PURE__ */ new Date()
-      }
-    });
-  }
-  async blockUser(id) {
-    await this.prisma.user.update({
-      where: { id },
-      data: {
-        isBlocked: true,
-        update_at: /* @__PURE__ */ new Date()
-      }
-    });
-  }
-  async logAccess(userId, status) {
-    await this.prisma.accessLog.create({
-      data: {
-        userId,
-        status,
-        timestamp: /* @__PURE__ */ new Date()
-      }
-    });
-  }
-};
-
 // src/http/controllers/auth/login.ts
 async function loginController(request2, reply) {
-  const loginSchema = import_zod16.z.object({
-    email: import_zod16.z.string().email(),
-    password: import_zod16.z.string().min(6)
+  const loginSchema = import_zod18.z.object({
+    email: import_zod18.z.string().email(),
+    password: import_zod18.z.string().min(6)
     // Definindo uma mínima de 6 caracteres para a senha
   });
   const { email, password } = loginSchema.parse(request2.body);
@@ -28815,54 +29103,41 @@ async function loginController(request2, reply) {
   }
 }
 
-// src/http/middlewares/verify-user-role.ts
-var import_jsonwebtoken2 = require("jsonwebtoken");
-function accessControlMiddleware(requiredRole) {
-  return async (request2, reply) => {
-    try {
-      const authHeader = request2.headers.authorization;
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return reply.status(401).send({ message: "Unauthorized: No token provided" });
-      }
-      const token = authHeader.replace("Bearer ", "");
-      const secretKey = process.env.JWT_SECRET;
-      let decodedToken;
-      try {
-        decodedToken = (0, import_jsonwebtoken2.verify)(token, secretKey);
-      } catch (error) {
-        return reply.status(401).send({ message: "Unauthorized: Invalid token" });
-      }
-      const { userId, role } = decodedToken;
-      const usersRepository = new PrismaUserRepository();
-      const user = await usersRepository.findById(userId);
-      if (!user || user.isBlocked || !user.isActive) {
-        return reply.status(401).send({ message: "Unauthorized: User is blocked or inactive" });
-      }
-      if (user.role !== requiredRole) {
-        return reply.status(403).send({ message: "Forbidden: Access denied" });
-      }
-      request2.user = user;
-    } catch (error) {
-      console.error(error);
-      return reply.status(500).send({ message: "Internal Server Error" });
-    }
-  };
-}
-
 // src/http/controllers/auth/routes.ts
-var import_client9 = require("@prisma/client");
+var import_client8 = require("@prisma/client");
 
 // src/http/controllers/auth/register.ts
-var import_zod17 = require("zod");
+var import_zod19 = require("zod");
 
 // src/use-cases/authenticate/register.ts
 var import_bcryptjs2 = __toESM(require("bcryptjs"));
 var import_jsonwebtoken3 = require("jsonwebtoken");
-var RegisterUseCase = class {
-  constructor(usersRepository) {
-    this.usersRepository = usersRepository;
+
+// src/use-cases/errors/employee-not-found.ts
+var EmployeeNotFoundError = class extends Error {
+  constructor() {
+    super("Employee not found.");
   }
-  async execute({ email, password, role, employeeId, studentId }) {
+};
+
+// src/use-cases/errors/employee-student-not-found.ts
+var EmployeeOREnrollmentNotFoundError = class extends Error {
+  constructor() {
+    super("Employee or Enrollment not found.");
+  }
+};
+
+// src/use-cases/authenticate/register.ts
+var RegisterUseCase = class {
+  constructor(usersRepository, enrollmentRepository, employeesRepository) {
+    this.usersRepository = usersRepository;
+    this.enrollmentRepository = enrollmentRepository;
+    this.employeesRepository = employeesRepository;
+  }
+  async execute({ email, password, role, employeeId, enrollmentId }) {
+    if (!employeeId && !enrollmentId) {
+      throw new EmployeeOREnrollmentNotFoundError();
+    }
     const existingUser = await this.usersRepository.findByEmail(email);
     if (existingUser) {
       return {
@@ -28870,13 +29145,26 @@ var RegisterUseCase = class {
         message: "Email already in use"
       };
     }
+    let existingStudent = null;
+    if (enrollmentId !== null && enrollmentId != void 0) {
+      existingStudent = await this.enrollmentRepository.checkStatus(enrollmentId);
+      if (!existingStudent) {
+        throw new EnrollmentNotFoundError();
+      }
+    }
+    if (employeeId !== null && employeeId != void 0) {
+      const existingEmployeeId = await this.employeesRepository.findById(employeeId);
+      if (!existingEmployeeId) {
+        throw new EmployeeNotFoundError();
+      }
+    }
     const hashedPassword = await import_bcryptjs2.default.hash(password, 10);
     const user = await this.usersRepository.create({
       email,
       password: hashedPassword,
       role,
       employeeId,
-      studentId
+      studentId: existingStudent?.id
     });
     const token = (0, import_jsonwebtoken3.sign)(
       {
@@ -28898,20 +29186,113 @@ var RegisterUseCase = class {
   }
 };
 
+// src/repositories/prisma/prisma-employee-repository.ts
+var PrismaEmployeeRepository = class {
+  async update(id, data) {
+    return await prisma.employee.update({
+      where: { id: Number(id) },
+      data
+    });
+  }
+  async findByIdentityCardNumber(identityCardNumber) {
+    const employee = await prisma.employee.findUnique({
+      where: {
+        identityCardNumber
+      }
+    });
+    return employee;
+  }
+  async findByAlternativePhone(phone) {
+    const employee = await prisma.employee.findFirst({
+      where: {
+        alternativePhone: phone
+      }
+    });
+    return employee;
+  }
+  async findByPhone(phone) {
+    const employee = await prisma.employee.findFirst({
+      where: {
+        phone
+      }
+    });
+    return employee;
+  }
+  async findByName(name) {
+    const employee = await prisma.employee.findFirst({
+      where: {
+        fullName: {
+          contains: name,
+          mode: "insensitive"
+        }
+      }
+    });
+    return employee;
+  }
+  async searchMany(page) {
+    let pageSize = 20;
+    const totalItems = await prisma.employee.count();
+    const totalPages = Math.ceil(totalItems / pageSize);
+    let students = await prisma.employee.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize
+    });
+    return {
+      totalItems,
+      currentPage: page,
+      totalPages,
+      items: students
+    };
+  }
+  async destroy(id) {
+    let find = await prisma.employee.delete({
+      where: {
+        id
+      }
+    });
+    return find ? true : false;
+  }
+  async findById(id) {
+    return prisma.employee.findUnique({ where: { id } });
+  }
+  async create(data) {
+    return await prisma.employee.create({
+      data: {
+        fullName: data.fullName,
+        dateOfBirth: data.dateOfBirth,
+        alternativePhone: data.alternativePhone,
+        gender: data.gender,
+        identityCardNumber: data.identityCardNumber,
+        emissionDate: data.emissionDate,
+        expirationDate: data.expirationDate,
+        maritalStatus: data.maritalStatus,
+        phone: data.phone,
+        residence: data.residence,
+        created_at: /* @__PURE__ */ new Date(),
+        update_at: /* @__PURE__ */ new Date()
+      }
+    });
+  }
+};
+
 // src/http/controllers/auth/register.ts
 async function registerController(request2, reply) {
-  const registerSchema = import_zod17.z.object({
-    email: import_zod17.z.string().email(),
-    password: import_zod17.z.string().min(6),
+  const registerSchema = import_zod19.z.object({
+    email: import_zod19.z.string().email(),
+    employeeId: import_zod19.z.number().optional(),
+    enrollmentId: import_zod19.z.number().optional(),
+    password: import_zod19.z.string().min(6),
     // Definindo uma senha com no mínimo 6 caracteres
-    role: import_zod17.z.enum(["STUDENT", "ADMIN", "TEACHER"])
+    role: import_zod19.z.enum(["STUDENT", "ADMIN", "TEACHER"])
     // Adicionando um enum para o papel do usuário
   });
-  const { email, password, role } = registerSchema.parse(request2.body);
+  const { email, password, role, employeeId, enrollmentId } = registerSchema.parse(request2.body);
   const usersRepository = new PrismaUserRepository();
-  const registerUseCase = new RegisterUseCase(usersRepository);
+  const employeeRepository = new PrismaEmployeeRepository();
+  const enrollmentsRepository = new PrismaEnrollmentsRepository();
+  const registerUseCase = new RegisterUseCase(usersRepository, enrollmentsRepository, employeeRepository);
   try {
-    const result = await registerUseCase.execute({ email, password, role });
+    const result = await registerUseCase.execute({ email, password, role, employeeId, enrollmentId });
     if (result.success) {
       return reply.status(201).send({
         success: result.success,
@@ -28925,8 +29306,16 @@ async function registerController(request2, reply) {
         message: result.message
       });
     }
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    if (err instanceof EmployeeOREnrollmentNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof EnrollmentNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof EmployeeNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
     return reply.status(500).send({
       success: false,
       message: "Internal Server Error"
@@ -28938,12 +29327,955 @@ async function registerController(request2, reply) {
 async function authRoutes(app2) {
   app2.post("/auth", loginController);
   app2.post("/signup", registerController);
-  app2.get("/admin-data", { preHandler: accessControlMiddleware(import_client9.Role.ADMIN) }, async (request2, reply) => {
+  app2.get("/admin-data", { preHandler: accessControlMiddleware([import_client8.Role.ADMIN, import_client8.Role.TEACHER]) }, async (request2, reply) => {
     return reply.send({ message: "Admin data" });
   });
-  app2.get("/user-data", { preHandler: accessControlMiddleware(import_client9.Role.STUDENT) }, async (request2, reply) => {
-    return reply.send({ message: "STUDENT data" });
+  app2.get("/user-data", { preHandler: accessControlMiddleware([import_client8.Role.STUDENT]) }, async (request2, reply) => {
+    return reply.send({ message: "STUDENT data", user: request2.user });
   });
+}
+
+// src/use-cases/errors/province-already-exists-error.ts
+var ProvinceAlreadyExistsError = class extends Error {
+  constructor() {
+    super("Province already exists.");
+  }
+};
+
+// src/use-cases/province/create-province.ts
+var CreateProvinceUseCase = class {
+  constructor(provincesRepository) {
+    this.provincesRepository = provincesRepository;
+  }
+  async execute({
+    name
+  }) {
+    const findProvince = await this.provincesRepository.findByName(name);
+    if (findProvince) {
+      throw new ProvinceAlreadyExistsError();
+    }
+    const province = await this.provincesRepository.create({
+      name
+    });
+    return {
+      province
+    };
+  }
+};
+
+// src/use-cases/factories/make-province-use-case.ts
+function makeProvinceUseCase() {
+  const prismaProvincesRepository = new PrismaProvincesRepository();
+  const createProvinceUseCase = new CreateProvinceUseCase(prismaProvincesRepository);
+  return createProvinceUseCase;
+}
+
+// src/http/controllers/provinces/create.ts
+var import_zod20 = require("zod");
+async function create5(request2, reply) {
+  const registerBodySchema = import_zod20.z.object({
+    name: import_zod20.z.string()
+  });
+  const { name } = registerBodySchema.parse(request2.body);
+  try {
+    const provinceUseCase = makeProvinceUseCase();
+    await provinceUseCase.execute({
+      name
+    });
+  } catch (err) {
+    if (err instanceof ProvinceAlreadyExistsError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+  return reply.status(201).send();
+}
+
+// src/use-cases/province/destroy-province.ts
+var DestroyProvinceUseCase = class {
+  constructor(provincesRepository) {
+    this.provincesRepository = provincesRepository;
+  }
+  async execute({
+    id
+  }) {
+    let findProvince = await this.provincesRepository.findById(id);
+    if (!findProvince) {
+      throw new ProvinceNotFoundError();
+    }
+    return await this.provincesRepository.destroy(
+      id
+    );
+  }
+};
+
+// src/use-cases/factories/make-destroy-province-use-case.ts
+function makeDestroyProvinceUseCase() {
+  const prismaProvincesRepository = new PrismaProvincesRepository();
+  const destroyProvinceUseCase = new DestroyProvinceUseCase(prismaProvincesRepository);
+  return destroyProvinceUseCase;
+}
+
+// src/http/controllers/provinces/destroy.ts
+var import_zod21 = require("zod");
+async function destroy3(request2, reply) {
+  const registerBodySchema = import_zod21.z.object({
+    id: import_zod21.z.coerce.number()
+  });
+  const { id } = registerBodySchema.parse(request2.params);
+  try {
+    const provinceUseCase = makeDestroyProvinceUseCase();
+    await provinceUseCase.execute({
+      id
+    });
+  } catch (err) {
+    if (err instanceof ProvinceNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+  return reply.status(201).send();
+}
+
+// src/http/controllers/provinces/fetch.ts
+var import_zod22 = require("zod");
+
+// src/use-cases/province/fetch-province.ts
+var FetchProvinceUseCase = class {
+  constructor(provincesRepository) {
+    this.provincesRepository = provincesRepository;
+  }
+  async execute({
+    name,
+    page
+  }) {
+    const provinces = await this.provincesRepository.searchMany(
+      name,
+      page
+    );
+    return {
+      provinces
+    };
+  }
+};
+
+// src/use-cases/factories/make-fetch-province-use-case.ts
+function makeFetchProvinceUseCase() {
+  const prismaProvincesRepository = new PrismaProvincesRepository();
+  const fetchProvinceUseCase = new FetchProvinceUseCase(prismaProvincesRepository);
+  return fetchProvinceUseCase;
+}
+
+// src/http/controllers/provinces/fetch.ts
+async function fetch4(request2, reply) {
+  const registerBodySchema = import_zod22.z.object({
+    query: import_zod22.z.string().optional(),
+    page: import_zod22.z.coerce.number().int().positive().optional()
+  });
+  const { query = "", page = 1 } = registerBodySchema.parse(request2.query);
+  try {
+    const fetchProvinceUseCase = makeFetchProvinceUseCase();
+    let provinces = await fetchProvinceUseCase.execute({
+      name: query,
+      page
+    });
+    return reply.status(200).send(provinces);
+  } catch (err) {
+    return reply.status(500).send(err);
+  }
+}
+
+// src/use-cases/province/get-province.ts
+var GetProvinceUseCase = class {
+  constructor(provincesRepository) {
+    this.provincesRepository = provincesRepository;
+  }
+  async execute({
+    provinceId
+  }) {
+    const province = await this.provincesRepository.findById(
+      provinceId
+    );
+    if (!province) {
+      throw new ProvinceNotFoundError();
+    }
+    return {
+      province
+    };
+  }
+};
+
+// src/use-cases/factories/make-get-province-use-case.ts
+function makeGetProvinceUseCase() {
+  const prismaProvinceRepository = new PrismaProvincesRepository();
+  const getProvinceUseCase = new GetProvinceUseCase(prismaProvinceRepository);
+  return getProvinceUseCase;
+}
+
+// src/http/controllers/provinces/get.ts
+var import_zod23 = require("zod");
+async function get3(request2, reply) {
+  const registerBodySchema = import_zod23.z.object({
+    id: import_zod23.z.coerce.number()
+  });
+  const { id } = registerBodySchema.parse(request2.params);
+  try {
+    const getProvinceUseCase = makeGetProvinceUseCase();
+    const province = await getProvinceUseCase.execute({
+      provinceId: id
+    });
+    return reply.send(province);
+  } catch (err) {
+    if (err instanceof ProvinceNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+}
+
+// src/http/controllers/provinces/routes.ts
+async function provincesRoutes(app2) {
+  app2.post("/provinces", create5);
+  app2.get("/provinces", fetch4);
+  app2.delete("/provinces/:id", destroy3);
+  app2.get("/provinces/:id", get3);
+}
+
+// src/use-cases/errors/county-already-exists-error.ts
+var CountyAlreadyExistsError = class extends Error {
+  constructor() {
+    super("County already exists.");
+  }
+};
+
+// src/use-cases/county/create-county.ts
+var CreateCountyUseCase = class {
+  constructor(countyRepository) {
+    this.countyRepository = countyRepository;
+  }
+  async execute({
+    name
+  }) {
+    const findCounty = await this.countyRepository.findByName(name);
+    if (findCounty) {
+      throw new CountyAlreadyExistsError();
+    }
+    const province = await this.countyRepository.create({
+      name
+    });
+    return {
+      province
+    };
+  }
+};
+
+// src/use-cases/factories/make-county-use-case.ts
+function makeCountyUseCase() {
+  const prismaCountyRepository = new PrismaCountyRepository();
+  const createCountyUseCase = new CreateCountyUseCase(prismaCountyRepository);
+  return createCountyUseCase;
+}
+
+// src/http/controllers/counties/create.ts
+var import_zod24 = require("zod");
+async function create6(request2, reply) {
+  const registerBodySchema = import_zod24.z.object({
+    name: import_zod24.z.string()
+  });
+  const { name } = registerBodySchema.parse(request2.body);
+  try {
+    const countyUseCase = makeCountyUseCase();
+    await countyUseCase.execute({
+      name
+    });
+  } catch (err) {
+    if (err instanceof CountyAlreadyExistsError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+  return reply.status(201).send();
+}
+
+// src/use-cases/county/destroy-county.ts
+var DestroyCountyUseCase = class {
+  constructor(countiesRepository) {
+    this.countiesRepository = countiesRepository;
+  }
+  async execute({
+    id
+  }) {
+    let findCounty = await this.countiesRepository.findById(id);
+    if (!findCounty) {
+      throw new CountyNotFoundError();
+    }
+    return await this.countiesRepository.destroy(
+      id
+    );
+  }
+};
+
+// src/use-cases/factories/make-destroy-county-use-case.ts
+function makeDestroyCountyUseCase() {
+  const prismaCountyRepository = new PrismaCountyRepository();
+  const destroyCountyUseCase = new DestroyCountyUseCase(prismaCountyRepository);
+  return destroyCountyUseCase;
+}
+
+// src/http/controllers/counties/destroy.ts
+var import_zod25 = require("zod");
+async function destroy4(request2, reply) {
+  const registerBodySchema = import_zod25.z.object({
+    id: import_zod25.z.coerce.number()
+  });
+  const { id } = registerBodySchema.parse(request2.params);
+  try {
+    const countyDestroyUseCase = makeDestroyCountyUseCase();
+    await countyDestroyUseCase.execute({
+      id
+    });
+  } catch (err) {
+    if (err instanceof CountyNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+  return reply.status(201).send();
+}
+
+// src/http/controllers/counties/fetch.ts
+var import_zod26 = require("zod");
+
+// src/use-cases/county/fetch-county.ts
+var FetchCountyUseCase = class {
+  constructor(countiesRepository) {
+    this.countiesRepository = countiesRepository;
+  }
+  async execute({
+    name,
+    page
+  }) {
+    const counties = await this.countiesRepository.searchMany(
+      name,
+      page
+    );
+    return {
+      counties
+    };
+  }
+};
+
+// src/use-cases/factories/make-fetch-county-use-case.ts
+function makeFetchCountyUseCase() {
+  const prismaCountyRepository = new PrismaCountyRepository();
+  const fetchCountyUseCase = new FetchCountyUseCase(prismaCountyRepository);
+  return fetchCountyUseCase;
+}
+
+// src/http/controllers/counties/fetch.ts
+async function fetch5(request2, reply) {
+  const registerBodySchema = import_zod26.z.object({
+    query: import_zod26.z.string().optional(),
+    page: import_zod26.z.coerce.number().int().positive().optional()
+  });
+  const { query = "", page = 1 } = registerBodySchema.parse(request2.query);
+  try {
+    const fetchCountyUseCase = makeFetchCountyUseCase();
+    let counties = await fetchCountyUseCase.execute({
+      name: query,
+      page
+    });
+    return reply.status(200).send(counties);
+  } catch (err) {
+    return reply.status(500).send(err);
+  }
+}
+
+// src/use-cases/county/get-county.ts
+var GetCountyUseCase = class {
+  constructor(countyRepository) {
+    this.countyRepository = countyRepository;
+  }
+  async execute({
+    countyId
+  }) {
+    const county = await this.countyRepository.findById(
+      countyId
+    );
+    if (!county) {
+      throw new CountyNotFoundError();
+    }
+    return {
+      county
+    };
+  }
+};
+
+// src/use-cases/factories/make-get-county-use-case.ts
+function makeGetCountyUseCase() {
+  const prismaCountyRepository = new PrismaCountyRepository();
+  const getCountyUseCase = new GetCountyUseCase(prismaCountyRepository);
+  return getCountyUseCase;
+}
+
+// src/http/controllers/counties/get.ts
+var import_zod27 = require("zod");
+async function get4(request2, reply) {
+  const registerBodySchema = import_zod27.z.object({
+    id: import_zod27.z.coerce.number()
+  });
+  const { id } = registerBodySchema.parse(request2.params);
+  try {
+    const getCountyUseCase = makeGetCountyUseCase();
+    const county = await getCountyUseCase.execute({
+      countyId: id
+    });
+    return reply.send(county);
+  } catch (err) {
+    if (err instanceof CountyNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+}
+
+// src/http/controllers/counties/routes.ts
+async function countiesRoutes(app2) {
+  app2.post("/counties", create6);
+  app2.get("/counties", fetch5);
+  app2.delete("/counties/:id", destroy4);
+  app2.get("/counties/:id", get4);
+}
+
+// src/http/controllers/users/fetch.ts
+var import_zod28 = require("zod");
+
+// src/use-cases/user/fetch-user.ts
+var FetchUserUseCase = class {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
+  async execute({
+    role,
+    page
+  }) {
+    const users = await this.usersRepository.searchMany(
+      role,
+      page
+    );
+    return {
+      users
+    };
+  }
+};
+
+// src/use-cases/factories/make-fetch-users-use-case.ts
+function makeFetchUsersUseCase() {
+  const prismaUserRepository = new PrismaUserRepository();
+  const fetchUserUseCase = new FetchUserUseCase(prismaUserRepository);
+  return fetchUserUseCase;
+}
+
+// src/http/controllers/users/fetch.ts
+var import_client9 = require("@prisma/client");
+async function fetch6(request2, reply) {
+  const registerBodySchema = import_zod28.z.object({
+    role: import_zod28.z.nativeEnum(import_client9.Role).default("STUDENT"),
+    page: import_zod28.z.coerce.number().int().positive().optional()
+  });
+  const { role, page = 1 } = registerBodySchema.parse(request2.query);
+  try {
+    const fetchUserUseCase = makeFetchUsersUseCase();
+    let users = await fetchUserUseCase.execute({
+      role,
+      page
+    });
+    return reply.status(200).send(users);
+  } catch (err) {
+    return reply.status(500).send(err);
+  }
+}
+
+// src/use-cases/errors/user-is-invalid-error.ts
+var UserInvalidError = class extends Error {
+  constructor() {
+    super("User is invalid.");
+  }
+};
+
+// src/use-cases/user/block-user.ts
+var BlockUserUseCase = class {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
+  async execute({
+    email,
+    status
+  }) {
+    let findUser = await this.usersRepository.findByEmail(email);
+    if (!findUser) {
+      throw new UserInvalidError();
+    }
+    await this.usersRepository.blockUser(findUser.id, status);
+  }
+};
+
+// src/use-cases/factories/make-block-user-use-case.ts
+function makeBlockUserUseCase() {
+  const prismaUserRepository = new PrismaUserRepository();
+  const blockUserUseCase = new BlockUserUseCase(prismaUserRepository);
+  return blockUserUseCase;
+}
+
+// src/http/controllers/users/block.ts
+var import_zod29 = require("zod");
+async function blockUser(request2, reply) {
+  const registerBodySchema = import_zod29.z.object({
+    status: import_zod29.z.boolean(),
+    email: import_zod29.z.string()
+  });
+  const { email, status } = registerBodySchema.parse(request2.body);
+  try {
+    const blockUserUseCase = makeBlockUserUseCase();
+    await blockUserUseCase.execute({
+      email,
+      status
+    });
+  } catch (err) {
+    if (err instanceof UserInvalidError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+  return reply.status(201).send();
+}
+
+// src/use-cases/user/reset-user-password.ts
+var import_bcryptjs3 = __toESM(require("bcryptjs"));
+var ResetUserPasswordUseCase = class {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
+  async execute({
+    email,
+    password
+  }) {
+    let findUser = await this.usersRepository.findByEmail(email);
+    if (!findUser) {
+      throw new UserInvalidError();
+    }
+    let newHashedPassword = await import_bcryptjs3.default.hash(password, 10);
+    await this.usersRepository.resetUserPassword(findUser.id, newHashedPassword);
+  }
+};
+
+// src/use-cases/factories/make-reset-user-password-use-case.ts
+function makeResetUserPasswordUseCase() {
+  const prismaUserRepository = new PrismaUserRepository();
+  const resetUserPasswordUseCase = new ResetUserPasswordUseCase(prismaUserRepository);
+  return resetUserPasswordUseCase;
+}
+
+// src/http/controllers/users/reset-password.ts
+var import_zod30 = require("zod");
+async function resetPassword(request2, reply) {
+  const registerBodySchema = import_zod30.z.object({
+    email: import_zod30.z.string(),
+    password: import_zod30.z.string().default("123456")
+  });
+  const { email, password } = registerBodySchema.parse(request2.body);
+  try {
+    const resetUserPasswordUseCase = makeResetUserPasswordUseCase();
+    await resetUserPasswordUseCase.execute({
+      email,
+      password
+    });
+  } catch (err) {
+    if (err instanceof UserInvalidError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+  return reply.status(201).send();
+}
+
+// src/use-cases/errors/user-not-found.ts
+var UserNotFoundError = class extends Error {
+  constructor() {
+    super("User not found.");
+  }
+};
+
+// src/use-cases/user/get-user.ts
+var GetUserUseCase = class {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
+  async execute({
+    email
+  }) {
+    const user = await this.usersRepository.findByEmail(
+      email
+    );
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+    delete user.password;
+    return {
+      user
+    };
+  }
+};
+
+// src/use-cases/factories/make-get-user-use-case.ts
+function makeGetUserUseCase() {
+  const prismaUserRepository = new PrismaUserRepository();
+  const getUserUseCase = new GetUserUseCase(prismaUserRepository);
+  return getUserUseCase;
+}
+
+// src/http/controllers/users/get.ts
+var import_zod31 = require("zod");
+async function get5(request2, reply) {
+  const registerBodySchema = import_zod31.z.object({
+    email: import_zod31.z.string()
+  });
+  const { email } = registerBodySchema.parse(request2.query);
+  try {
+    const getUserUseCase = makeGetUserUseCase();
+    const user = await getUserUseCase.execute({
+      email
+    });
+    return reply.send(user);
+  } catch (err) {
+    if (err instanceof UserNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    return reply.status(500).send(err);
+  }
+}
+
+// src/http/controllers/users/routes.ts
+async function usersRoutes(app2) {
+  app2.get("/users", fetch6);
+  app2.get("/user", get5);
+  app2.post("/users/block", blockUser);
+  app2.post("/users/reset-password", resetPassword);
+}
+
+// src/http/controllers/employees/create.ts
+var import_zod32 = require("zod");
+
+// src/use-cases/employees/create-employee.ts
+var CreateEmployeeUseCase = class {
+  constructor(employeeRepository) {
+    this.employeeRepository = employeeRepository;
+  }
+  async execute({
+    fullName,
+    dateOfBirth,
+    emissionDate,
+    expirationDate,
+    gender,
+    identityCardNumber,
+    maritalStatus,
+    phone,
+    residence,
+    alternativePhone
+  }) {
+    const userWithSamePhone = await this.employeeRepository.findByPhone(phone);
+    if (userWithSamePhone) {
+      throw new PhoneAlreadyExistsError();
+    }
+    const userWithSameBI = await this.employeeRepository.findByIdentityCardNumber(identityCardNumber);
+    if (userWithSameBI) {
+      throw new IdentityCardNumberAlreadyExistsError();
+    }
+    const employee = await this.employeeRepository.create({
+      dateOfBirth,
+      emissionDate,
+      expirationDate,
+      fullName,
+      gender,
+      identityCardNumber,
+      maritalStatus,
+      phone,
+      residence,
+      alternativePhone
+    });
+    return {
+      employee
+    };
+  }
+};
+
+// src/use-cases/factories/make-create-employee-use-case.ts
+function makeCreateEmployeeUseCase() {
+  const prismaEmployeeRepository = new PrismaEmployeeRepository();
+  return new CreateEmployeeUseCase(prismaEmployeeRepository);
+}
+
+// src/http/controllers/employees/create.ts
+async function create7(request2, reply) {
+  const createBodySchema = import_zod32.z.object({
+    fullName: import_zod32.z.string(),
+    dateOfBirth: import_zod32.z.coerce.date(),
+    emissionDate: import_zod32.z.coerce.date(),
+    expirationDate: import_zod32.z.coerce.date(),
+    gender: import_zod32.z.enum(["MALE", "FEMALE"]),
+    identityCardNumber: import_zod32.z.string(),
+    maritalStatus: import_zod32.z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]),
+    phone: import_zod32.z.string(),
+    residence: import_zod32.z.string(),
+    alternativePhone: import_zod32.z.string().optional()
+  });
+  try {
+    const {
+      fullName,
+      dateOfBirth,
+      emissionDate,
+      expirationDate,
+      gender,
+      identityCardNumber,
+      maritalStatus,
+      phone,
+      residence,
+      alternativePhone
+    } = createBodySchema.parse(request2.body);
+    const createEmployeeUseCase = makeCreateEmployeeUseCase();
+    const employee = await createEmployeeUseCase.execute({
+      fullName,
+      dateOfBirth,
+      emissionDate,
+      expirationDate,
+      gender,
+      identityCardNumber,
+      maritalStatus,
+      phone,
+      residence,
+      alternativePhone
+    });
+    return reply.status(201).send(employee);
+  } catch (err) {
+    if (err instanceof PhoneAlreadyExistsError || err instanceof IdentityCardNumberAlreadyExistsError) {
+      return reply.status(409).send({ message: err?.message });
+    }
+    return reply.status(500).send({ error: err });
+  }
+}
+
+// src/http/controllers/employees/fetch.ts
+var import_zod33 = require("zod");
+
+// src/use-cases/employees/fetch-employee.ts
+var FetchEmployeeUseCase = class {
+  constructor(employeeRepository) {
+    this.employeeRepository = employeeRepository;
+  }
+  async execute({
+    page
+  }) {
+    const employees = await this.employeeRepository.searchMany(
+      page
+    );
+    return {
+      employees
+    };
+  }
+};
+
+// src/use-cases/factories/make-fetch-employees-use-case.ts
+function makeFetchEmployeesUseCase() {
+  const prismaEmployeeRepository = new PrismaEmployeeRepository();
+  const fetchEmployeeUseCase = new FetchEmployeeUseCase(prismaEmployeeRepository);
+  return fetchEmployeeUseCase;
+}
+
+// src/http/controllers/employees/fetch.ts
+async function fetch7(request2, reply) {
+  const registerBodySchema = import_zod33.z.object({
+    query: import_zod33.z.string().optional(),
+    page: import_zod33.z.coerce.number().int().positive().optional()
+  });
+  const { page = 1 } = registerBodySchema.parse(request2.query);
+  try {
+    const fetchEmployeesUseCase = makeFetchEmployeesUseCase();
+    let employees = await fetchEmployeesUseCase.execute({
+      page
+    });
+    return reply.status(200).send(employees);
+  } catch (err) {
+    return reply.status(500).send(err);
+  }
+}
+
+// src/http/controllers/employees/update.ts
+var import_zod34 = require("zod");
+
+// src/use-cases/employees/update-employee.ts
+var UpdateEmployeeUseCase = class {
+  constructor(employeeRepository) {
+    this.employeeRepository = employeeRepository;
+  }
+  async execute({
+    id,
+    fullName,
+    dateOfBirth,
+    emissionDate,
+    expirationDate,
+    gender,
+    identityCardNumber,
+    maritalStatus,
+    phone,
+    residence,
+    alternativePhone
+  }) {
+    const existingEmployee = await this.employeeRepository.findById(id);
+    if (!existingEmployee) {
+      throw new EmployeeNotFoundError();
+    }
+    if (phone) {
+      const userWithSamePhone = await this.employeeRepository.findByPhone(phone);
+      if (userWithSamePhone && userWithSamePhone.id !== id) {
+        throw new PhoneAlreadyExistsError();
+      }
+    }
+    if (identityCardNumber) {
+      const userWithSameBI = await this.employeeRepository.findByIdentityCardNumber(identityCardNumber);
+      if (userWithSameBI && userWithSameBI.id !== id) {
+        throw new IdentityCardNumberAlreadyExistsError();
+      }
+    }
+    const updatedEmployee = await this.employeeRepository.update(id, {
+      fullName,
+      dateOfBirth,
+      emissionDate,
+      expirationDate,
+      gender,
+      identityCardNumber,
+      maritalStatus,
+      phone,
+      residence,
+      alternativePhone
+    });
+    return {
+      employee: updatedEmployee
+    };
+  }
+};
+
+// src/use-cases/factories/make-update-employee-use-case.ts
+function makeUpdateEmployeeUseCase() {
+  const prismaEmployeeRepository = new PrismaEmployeeRepository();
+  const updateUseCase = new UpdateEmployeeUseCase(prismaEmployeeRepository);
+  return updateUseCase;
+}
+
+// src/http/controllers/employees/update.ts
+async function update(request2, reply) {
+  const updateBodySchema = import_zod34.z.object({
+    fullName: import_zod34.z.string().optional(),
+    dateOfBirth: import_zod34.z.coerce.date().optional(),
+    emissionDate: import_zod34.z.coerce.date().optional(),
+    expirationDate: import_zod34.z.coerce.date().optional(),
+    gender: import_zod34.z.enum(["MALE", "FEMALE"]).optional(),
+    identityCardNumber: import_zod34.z.string().optional(),
+    maritalStatus: import_zod34.z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"]).optional(),
+    phone: import_zod34.z.string().optional(),
+    residence: import_zod34.z.string().optional(),
+    alternativePhone: import_zod34.z.string().optional()
+  });
+  try {
+    const { id } = request2.params;
+    const {
+      fullName,
+      dateOfBirth,
+      emissionDate,
+      expirationDate,
+      gender,
+      identityCardNumber,
+      maritalStatus,
+      phone,
+      residence,
+      alternativePhone
+    } = updateBodySchema.parse(request2.body);
+    const updateEmployeeUseCase = makeUpdateEmployeeUseCase();
+    const employee = await updateEmployeeUseCase.execute({
+      id: Number(id),
+      // Converte o ID para número
+      fullName,
+      dateOfBirth,
+      emissionDate,
+      expirationDate,
+      gender,
+      identityCardNumber,
+      maritalStatus,
+      phone,
+      residence,
+      alternativePhone
+    });
+    return reply.status(200).send(employee);
+  } catch (err) {
+    if (err instanceof PhoneAlreadyExistsError || err instanceof IdentityCardNumberAlreadyExistsError) {
+      return reply.status(409).send({ message: err?.message });
+    }
+    return reply.status(500).send({ error: err });
+  }
+}
+
+// src/use-cases/employees/fetch-by-id-employee.ts
+var FetchEmployeeByIdUseCase = class {
+  constructor(employeeRepository) {
+    this.employeeRepository = employeeRepository;
+  }
+  async execute(id) {
+    const employee = await this.employeeRepository.findById(Number(id));
+    return {
+      employee
+    };
+  }
+};
+
+// src/use-cases/factories/make-fetch-employee-by-id-use-case.ts
+function makeFetchEmployeeByIdUseCase() {
+  const prismaEmployeeRepository = new PrismaEmployeeRepository();
+  const fetchEmployeeUseCase = new FetchEmployeeByIdUseCase(prismaEmployeeRepository);
+  return fetchEmployeeUseCase;
+}
+
+// src/http/controllers/employees/fetch-by-id.ts
+async function fetchById(request2, reply) {
+  const { id } = request2.params;
+  try {
+    const fetchEmployeeByIdUseCase = makeFetchEmployeeByIdUseCase();
+    const employee = await fetchEmployeeByIdUseCase.execute(id);
+    if (!employee) {
+      return reply.status(404).send({ message: "Employee not found" });
+    }
+    return reply.status(200).send(employee);
+  } catch (err) {
+    return reply.status(500).send({ error: err });
+  }
+}
+
+// src/http/controllers/employees/routes.ts
+async function employeesRoutes(app2) {
+  app2.put("/employees/:id", update);
+  app2.get("/employees/:id", fetchById);
+  app2.post("/employees", create7);
+  app2.get("/employees", fetch7);
 }
 
 // src/app.ts
@@ -28968,6 +30300,8 @@ app.register(import_multipart.default, {
   }
 });
 app.register(import_cookie.default);
+app.register(provincesRoutes, { prefix: "/api/v1" });
+app.register(countiesRoutes, { prefix: "/api/v1" });
 app.register(coursesRoutes, { prefix: "/api/v1" });
 app.register(studentsRoutes, { prefix: "/api/v1" });
 app.register(enrollmentsRoutes, { prefix: "/api/v1" });
@@ -28976,8 +30310,10 @@ app.register(photosRoutes, { prefix: "/api/v1" });
 app.register(paymentsRoutes, { prefix: "/api/v1" });
 app.register(notesRoutes, { prefix: "/api/v1" });
 app.register(authRoutes, { prefix: "/api/v1" });
+app.register(usersRoutes, { prefix: "/api/v1" });
+app.register(employeesRoutes, { prefix: "/api/v1" });
 app.setErrorHandler((error, _, reply) => {
-  if (error instanceof import_zod18.ZodError) {
+  if (error instanceof import_zod35.ZodError) {
     return reply.status(400).send({ message: "Validation error.", issues: error.format() });
   }
   if (env.NODE_ENV !== "production") {
@@ -29202,7 +30538,7 @@ function createSimpleStackTrace(options) {
 
 // node_modules/@vitest/runner/dist/chunk-tasks.js
 function createChainable(keys2, fn2) {
-  function create5(context) {
+  function create8(context) {
     const chain2 = function(...args) {
       return fn2.apply(context, args);
     };
@@ -29211,13 +30547,13 @@ function createChainable(keys2, fn2) {
     for (const key of keys2) {
       Object.defineProperty(chain2, key, {
         get() {
-          return create5({ ...context, [key]: true });
+          return create8({ ...context, [key]: true });
         }
       });
     }
     return chain2;
   }
-  const chain = create5({});
+  const chain = create8({});
   chain.fn = fn2;
   return chain;
 }
@@ -33328,9 +34664,9 @@ function requireReactIs_production_min() {
       }
     }
   }
-  var z18 = g2, A = b, B = k, C2 = d2, D = p, E = n2, F = c, G = f2, H = e, I = l;
+  var z35 = g2, A = b, B = k, C2 = d2, D = p, E = n2, F = c, G = f2, H = e, I = l;
   reactIs_production_min.ContextConsumer = h;
-  reactIs_production_min.ContextProvider = z18;
+  reactIs_production_min.ContextProvider = z35;
   reactIs_production_min.Element = A;
   reactIs_production_min.ForwardRef = B;
   reactIs_production_min.Fragment = C2;
@@ -34170,7 +35506,7 @@ var keyToTestName = (key) => {
   return key.replace(/ \d+$/, "");
 };
 var getSnapshotData = (content, options) => {
-  const update = options.updateSnapshot;
+  const update2 = options.updateSnapshot;
   const data = /* @__PURE__ */ Object.create(null);
   let snapshotContents = "";
   let dirty = false;
@@ -34183,7 +35519,7 @@ var getSnapshotData = (content, options) => {
     }
   }
   const isInvalid = snapshotContents;
-  if ((update === "all" || update === "new") && isInvalid)
+  if ((update2 === "all" || update2 === "new") && isInvalid)
     dirty = true;
   return { data, dirty };
 };
@@ -36734,41 +38070,6 @@ var index = /* @__PURE__ */ Object.freeze({
 
 // node_modules/vitest/dist/index.js
 var expectTypeOf = dist.expectTypeOf;
-
-// src/use-cases/errors/province-already-exists-error.ts
-var ProvinceAlreadyExistsError = class extends Error {
-  constructor() {
-    super("Province already exists.");
-  }
-};
-
-// src/use-cases/province/create-province.ts
-var CreateProvinceUseCase = class {
-  constructor(provincesRepository) {
-    this.provincesRepository = provincesRepository;
-  }
-  async execute({
-    name
-  }) {
-    const findProvince = await this.provincesRepository.findByName(name);
-    if (findProvince) {
-      throw new ProvinceAlreadyExistsError();
-    }
-    const province = await this.provincesRepository.create({
-      name
-    });
-    return {
-      province
-    };
-  }
-};
-
-// src/use-cases/factories/make-province-use-case.ts
-function makeProvinceUseCase() {
-  const prismaProvincesRepository = new PrismaProvincesRepository();
-  const createProvinceUseCase = new CreateProvinceUseCase(prismaProvincesRepository);
-  return createProvinceUseCase;
-}
 
 // src/http/controllers/enrollments/create.spec.ts
 describe("Enrollment (e2e)", () => {

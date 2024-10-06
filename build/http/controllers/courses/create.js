@@ -39,6 +39,10 @@ var CreateCourseUseCase = class {
   async execute({
     name
   }) {
+    const findCourse = await this.coursesRepository.findByName(name);
+    if (findCourse) {
+      throw new CourseAlreadyExistsError();
+    }
     const course = await this.coursesRepository.create({
       name
     });
@@ -48,11 +52,25 @@ var CreateCourseUseCase = class {
   }
 };
 
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-course-repository.ts
@@ -113,10 +131,10 @@ function makeCourseUseCase() {
 }
 
 // src/http/controllers/courses/create.ts
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 async function create(request, reply) {
-  const registerBodySchema = import_zod.z.object({
-    name: import_zod.z.string()
+  const registerBodySchema = import_zod2.z.object({
+    name: import_zod2.z.string()
   });
   const { name } = registerBodySchema.parse(request.body);
   try {

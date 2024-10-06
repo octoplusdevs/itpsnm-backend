@@ -23,6 +23,15 @@ __export(destroy_province_exports, {
   DestroyProvinceUseCase: () => DestroyProvinceUseCase
 });
 module.exports = __toCommonJS(destroy_province_exports);
+
+// src/use-cases/errors/province-not-found.ts
+var ProvinceNotFoundError = class extends Error {
+  constructor() {
+    super("Province not found.");
+  }
+};
+
+// src/use-cases/province/destroy-province.ts
 var DestroyProvinceUseCase = class {
   constructor(provincesRepository) {
     this.provincesRepository = provincesRepository;
@@ -30,6 +39,10 @@ var DestroyProvinceUseCase = class {
   async execute({
     id
   }) {
+    let findProvince = await this.provincesRepository.findById(id);
+    if (!findProvince) {
+      throw new ProvinceNotFoundError();
+    }
     return await this.provincesRepository.destroy(
       id
     );

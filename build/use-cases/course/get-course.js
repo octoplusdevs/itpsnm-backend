@@ -24,10 +24,10 @@ __export(get_course_exports, {
 });
 module.exports = __toCommonJS(get_course_exports);
 
-// src/use-cases/errors/resource-not-found.ts
-var ResourceNotFoundError = class extends Error {
+// src/use-cases/errors/course-not-found.ts
+var CourseNotFoundError = class extends Error {
   constructor() {
-    super("Resource not found.");
+    super("Course not found.");
   }
 };
 
@@ -43,7 +43,7 @@ var GetCourseUseCase = class {
       courseId
     );
     if (!course) {
-      throw new ResourceNotFoundError();
+      throw new CourseNotFoundError();
     }
     return {
       course

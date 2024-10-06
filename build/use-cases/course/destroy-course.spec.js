@@ -15019,6 +15019,13 @@ var index = /* @__PURE__ */ Object.freeze({
 // node_modules/vitest/dist/index.js
 var expectTypeOf = dist.expectTypeOf;
 
+// src/use-cases/errors/course-not-found.ts
+var CourseNotFoundError = class extends Error {
+  constructor() {
+    super("Course not found.");
+  }
+};
+
 // src/use-cases/course/destroy-course.ts
 var DestroyCourseUseCase = class {
   constructor(coursesRepository2) {
@@ -15027,6 +15034,10 @@ var DestroyCourseUseCase = class {
   async execute({
     id
   }) {
+    const findCourse = await this.coursesRepository.findById(id);
+    if (!findCourse) {
+      throw new CourseNotFoundError();
+    }
     return await this.coursesRepository.destroy(
       id
     );

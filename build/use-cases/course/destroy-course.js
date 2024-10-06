@@ -23,6 +23,15 @@ __export(destroy_course_exports, {
   DestroyCourseUseCase: () => DestroyCourseUseCase
 });
 module.exports = __toCommonJS(destroy_course_exports);
+
+// src/use-cases/errors/course-not-found.ts
+var CourseNotFoundError = class extends Error {
+  constructor() {
+    super("Course not found.");
+  }
+};
+
+// src/use-cases/course/destroy-course.ts
 var DestroyCourseUseCase = class {
   constructor(coursesRepository) {
     this.coursesRepository = coursesRepository;
@@ -30,6 +39,10 @@ var DestroyCourseUseCase = class {
   async execute({
     id
   }) {
+    const findCourse = await this.coursesRepository.findById(id);
+    if (!findCourse) {
+      throw new CourseNotFoundError();
+    }
     return await this.coursesRepository.destroy(
       id
     );

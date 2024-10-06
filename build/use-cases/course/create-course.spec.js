@@ -15019,6 +15019,13 @@ var index = /* @__PURE__ */ Object.freeze({
 // node_modules/vitest/dist/index.js
 var expectTypeOf = dist.expectTypeOf;
 
+// src/use-cases/errors/course-already-exists-error.ts
+var CourseAlreadyExistsError = class extends Error {
+  constructor() {
+    super("Course name already exists.");
+  }
+};
+
 // src/use-cases/course/create-course.ts
 var CreateCourseUseCase = class {
   constructor(coursesRepository) {
@@ -15027,6 +15034,10 @@ var CreateCourseUseCase = class {
   async execute({
     name
   }) {
+    const findCourse = await this.coursesRepository.findByName(name);
+    if (findCourse) {
+      throw new CourseAlreadyExistsError();
+    }
     const course = await this.coursesRepository.create({
       name
     });

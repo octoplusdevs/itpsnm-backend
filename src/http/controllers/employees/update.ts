@@ -8,7 +8,7 @@ interface UpdateEmployeeParams {
   id: number;
 }
 
-export async function update(request: FastifyRequest<{ Params: UpdateEmployeeParams }>, reply: FastifyReply) {
+export async function update(request: FastifyRequest, reply: FastifyReply) {
   const updateBodySchema = z.object({
     fullName: z.string().optional(),
     dateOfBirth: z.coerce.date().optional(),
@@ -23,7 +23,7 @@ export async function update(request: FastifyRequest<{ Params: UpdateEmployeePar
   });
 
   try {
-    const { id } = request.params; // O ID agora é do tipo string
+    const { id } = request.params as { id: number };
     const {
       fullName,
       dateOfBirth,

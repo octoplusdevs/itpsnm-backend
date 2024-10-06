@@ -14983,11 +14983,39 @@ var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
 // src/use-cases/authenticate/register.ts
 var import_bcryptjs = __toESM(require("bcryptjs"));
 var import_jsonwebtoken = require("jsonwebtoken");
-var RegisterUseCase = class {
-  constructor(usersRepository) {
-    this.usersRepository = usersRepository;
+
+// src/use-cases/errors/employee-not-found.ts
+var EmployeeNotFoundError = class extends Error {
+  constructor() {
+    super("Employee not found.");
   }
-  async execute({ email, password, role, employeeId, studentId }) {
+};
+
+// src/use-cases/errors/enrollment-not-found.ts
+var EnrollmentNotFoundError = class extends Error {
+  constructor() {
+    super("Enrollment not found.");
+  }
+};
+
+// src/use-cases/errors/employee-student-not-found.ts
+var EmployeeOREnrollmentNotFoundError = class extends Error {
+  constructor() {
+    super("Employee or Enrollment not found.");
+  }
+};
+
+// src/use-cases/authenticate/register.ts
+var RegisterUseCase = class {
+  constructor(usersRepository, enrollmentRepository, employeesRepository) {
+    this.usersRepository = usersRepository;
+    this.enrollmentRepository = enrollmentRepository;
+    this.employeesRepository = employeesRepository;
+  }
+  async execute({ email, password, role, employeeId, enrollmentId }) {
+    if (!employeeId && !enrollmentId) {
+      throw new EmployeeOREnrollmentNotFoundError();
+    }
     const existingUser = await this.usersRepository.findByEmail(email);
     if (existingUser) {
       return {
@@ -14995,13 +15023,26 @@ var RegisterUseCase = class {
         message: "Email already in use"
       };
     }
+    let existingStudent = null;
+    if (enrollmentId !== null && enrollmentId != void 0) {
+      existingStudent = await this.enrollmentRepository.checkStatus(enrollmentId);
+      if (!existingStudent) {
+        throw new EnrollmentNotFoundError();
+      }
+    }
+    if (employeeId !== null && employeeId != void 0) {
+      const existingEmployeeId = await this.employeesRepository.findById(employeeId);
+      if (!existingEmployeeId) {
+        throw new EmployeeNotFoundError();
+      }
+    }
     const hashedPassword = await import_bcryptjs.default.hash(password, 10);
     const user = await this.usersRepository.create({
       email,
       password: hashedPassword,
       role,
       employeeId,
-      studentId
+      studentId: existingStudent?.id
     });
     const token = (0, import_jsonwebtoken.sign)(
       {

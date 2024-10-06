@@ -49,17 +49,17 @@ var CreateNoteUseCase = class {
     this.subjectsRepository = subjectsRepository;
   }
   async execute({
-    pf1 = 0,
-    pf2 = 0,
-    pft = 0,
-    ps1 = 0,
-    ps2 = 0,
-    pst = 0,
-    pt1 = 0,
-    pt2 = 0,
-    ptt = 0,
-    nee = 0,
-    resource = 0,
+    pf1,
+    pf2,
+    pft,
+    ps1,
+    ps2,
+    pst,
+    pt1,
+    pt2,
+    ptt,
+    nee,
+    resource,
     level,
     enrollmentId,
     subjectId
@@ -97,9 +97,28 @@ var CreateNoteUseCase = class {
   }
 };
 
-// src/repositories/prisma/prisma-note-repository.ts
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
+// src/lib/prisma.ts
 var import_client = require("@prisma/client");
-var prisma = new import_client.PrismaClient();
+var prisma = new import_client.PrismaClient({
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
+});
+
+// src/repositories/prisma/prisma-note-repository.ts
 var PrismaNotesRepository = class {
   async addNote(data) {
     const findNote = await prisma.note.findFirst({
@@ -110,7 +129,7 @@ var PrismaNotesRepository = class {
       }
     });
     if (!findNote) {
-      return await prisma.note.create({
+      const newNote = await prisma.note.create({
         data: {
           pf1: data.pf1 ?? 0,
           pf2: data.pf2 ?? 0,
@@ -130,8 +149,9 @@ var PrismaNotesRepository = class {
           update_at: /* @__PURE__ */ new Date()
         }
       });
+      return newNote;
     }
-    return await prisma.note.update({
+    const updated = await prisma.note.update({
       where: {
         id: findNote.id
       },
@@ -140,17 +160,18 @@ var PrismaNotesRepository = class {
         pf1: data.pf1 ?? findNote.pf1,
         pf2: data.pf2 ?? findNote.pf2,
         pft: data.pft ?? findNote.pft,
-        ps1: data.pf1 ?? findNote.ps1,
-        ps2: data.pf2 ?? findNote.ps2,
-        pst: data.pft ?? findNote.pst,
-        pt1: data.pf1 ?? findNote.pt1,
-        pt2: data.pf2 ?? findNote.pt2,
-        ptt: data.pft ?? findNote.ptt,
+        ps1: data.ps1 ?? findNote.ps1,
+        ps2: data.ps2 ?? findNote.ps2,
+        pst: data.pst ?? findNote.pst,
+        pt1: data.pt1 ?? findNote.pt1,
+        pt2: data.pt2 ?? findNote.pt2,
+        ptt: data.ptt ?? findNote.ptt,
         nee: data.nee ?? findNote.nee,
         level: data.level,
         update_at: /* @__PURE__ */ new Date()
       }
     });
+    return updated;
   }
   async update(id, data) {
     const note = await prisma.note.update({
@@ -202,25 +223,46 @@ var PrismaNotesRepository = class {
   }
 };
 
-// src/lib/prisma.ts
-var import_client2 = require("@prisma/client");
-var prisma2 = new import_client2.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
-});
-
 // src/repositories/prisma/prisma-enrollments-repository.ts
 var PrismaEnrollmentsRepository = class {
   async checkStatus(enrollmentId) {
-    let enrollment = await prisma2.enrollment.findUnique({
+    let enrollment = await prisma.enrollment.findUnique({
       where: {
         id: enrollmentId
       },
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -233,6 +275,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -240,7 +288,7 @@ var PrismaEnrollmentsRepository = class {
     return enrollment;
   }
   async findByEnrollmentNumber(enrollmentId) {
-    let enrollment = await prisma2.enrollment.findUnique({
+    let enrollment = await prisma.enrollment.findUnique({
       where: {
         id: enrollmentId
       }
@@ -248,13 +296,41 @@ var PrismaEnrollmentsRepository = class {
     return enrollment;
   }
   async findByIdentityCardNumber(identityCardNumber) {
-    let enrollment = await prisma2.enrollment.findUnique({
+    let enrollment = await prisma.enrollment.findUnique({
       where: { identityCardNumber },
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -268,13 +344,19 @@ var PrismaEnrollmentsRepository = class {
             id: true,
             name: true
           }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
+          }
         }
       }
     });
     return enrollment;
   }
   async toggleStatus(enrollmentId, docsState, paymentState) {
-    let enrollment = await prisma2.enrollment.update({
+    let enrollment = await prisma.enrollment.update({
       where: {
         id: enrollmentId
       },
@@ -290,7 +372,7 @@ var PrismaEnrollmentsRepository = class {
     };
   }
   async destroy(enrollmentId) {
-    let isDeletedEnrollment = await prisma2.enrollment.delete({
+    let isDeletedEnrollment = await prisma.enrollment.delete({
       where: {
         id: enrollmentId
       }
@@ -299,7 +381,7 @@ var PrismaEnrollmentsRepository = class {
   }
   //TODO: Mudar o retorno de any
   async create(data) {
-    let enrollment = await prisma2.enrollment.create({
+    let enrollment = await prisma.enrollment.create({
       data: {
         docsState: data.docsState,
         paymentState: data.paymentState,
@@ -319,30 +401,42 @@ var PrismaEnrollmentsRepository = class {
   }
   async searchMany(paymentState, docsState, page) {
     let pageSize = 20;
-    const totalItems = await prisma2.enrollment.count();
+    const totalItems = await prisma.enrollment.count();
     const totalPages = Math.ceil(totalItems / pageSize);
-    let enrollments = await prisma2.enrollment.findMany({
+    let enrollments = await prisma.enrollment.findMany({
       include: {
         students: {
           select: {
+            id: true,
+            fullName: true,
+            alternativePhone: true,
             dateOfBirth: true,
+            emissionDate: true,
             gender: true,
             height: true,
             identityCardNumber: true,
-            fullName: true,
-            countyId: true,
-            alternativePhone: true,
-            emissionDate: true,
-            expirationDate: true,
-            father: true,
-            files: true,
-            id: true,
             maritalStatus: true,
+            type: true,
             mother: true,
-            phone: true,
-            provinceId: true,
+            father: true,
             residence: true,
-            type: true
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -383,7 +477,7 @@ var PrismaEnrollmentsRepository = class {
 // src/repositories/prisma/prisma-subject-repository.ts
 var PrismaSubjectRepository = class {
   async findByName(name) {
-    const findSubject = await prisma2.subject.findUnique({
+    const findSubject = await prisma.subject.findUnique({
       where: {
         name
       }
@@ -391,7 +485,7 @@ var PrismaSubjectRepository = class {
     return findSubject;
   }
   async create(data) {
-    let newSubject = await prisma2.subject.create({
+    let newSubject = await prisma.subject.create({
       data: {
         name: data.name
       }
@@ -400,7 +494,7 @@ var PrismaSubjectRepository = class {
   }
   async searchMany(query, page) {
     let pageSize = 20;
-    let courses = await prisma2.subject.findMany({
+    let courses = await prisma.subject.findMany({
       where: {
         name: {
           contains: query,
@@ -413,7 +507,7 @@ var PrismaSubjectRepository = class {
     return courses;
   }
   async destroy(id) {
-    let findSubject = await prisma2.subject.delete({
+    let findSubject = await prisma.subject.delete({
       where: {
         id
       }
@@ -421,7 +515,7 @@ var PrismaSubjectRepository = class {
     return findSubject ? true : false;
   }
   async findById(id) {
-    const subject = await prisma2.subject.findUnique({
+    const subject = await prisma.subject.findUnique({
       where: {
         id
       }

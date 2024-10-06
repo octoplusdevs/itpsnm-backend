@@ -31,11 +31,25 @@ var EnrollmentNotFoundError = class extends Error {
   }
 };
 
+// src/env/index.ts
+var import_config = require("dotenv/config");
+var import_zod = require("zod");
+var envSchema = import_zod.z.object({
+  NODE_ENV: import_zod.z.enum(["dev", "test", "production"]).default("dev"),
+  JWT_SECRET: import_zod.z.string().optional(),
+  PORT: import_zod.z.coerce.number().default(3333)
+});
+var _env = envSchema.safeParse(process.env);
+if (_env.success === false) {
+  console.error("Invalid environment variables", _env.error.format());
+  throw new Error("Invalid environment variables.");
+}
+var env = _env.data;
+
 // src/lib/prisma.ts
 var import_client = require("@prisma/client");
 var prisma = new import_client.PrismaClient({
-  // log: env.NODE_ENV === 'dev' ? ['query', 'info', 'warn', 'error'] : [],
-  log: ["query", "info", "warn", "error"]
+  log: env.NODE_ENV === "dev" ? ["query", "info", "warn", "error"] : []
 });
 
 // src/repositories/prisma/prisma-enrollments-repository.ts
@@ -48,8 +62,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -62,6 +104,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -82,8 +130,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
             fullName: true,
-            id: true
+            alternativePhone: true,
+            dateOfBirth: true,
+            emissionDate: true,
+            gender: true,
+            height: true,
+            identityCardNumber: true,
+            maritalStatus: true,
+            type: true,
+            mother: true,
+            father: true,
+            residence: true,
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -96,6 +172,12 @@ var PrismaEnrollmentsRepository = class {
           select: {
             id: true,
             name: true
+          }
+        },
+        documents: {
+          select: {
+            id: true,
+            File: true
           }
         }
       }
@@ -154,24 +236,36 @@ var PrismaEnrollmentsRepository = class {
       include: {
         students: {
           select: {
+            id: true,
+            fullName: true,
+            alternativePhone: true,
             dateOfBirth: true,
+            emissionDate: true,
             gender: true,
             height: true,
             identityCardNumber: true,
-            fullName: true,
-            countyId: true,
-            alternativePhone: true,
-            emissionDate: true,
-            expirationDate: true,
-            father: true,
-            files: true,
-            id: true,
             maritalStatus: true,
+            type: true,
             mother: true,
-            phone: true,
-            provinceId: true,
+            father: true,
             residence: true,
-            type: true
+            phone: true,
+            User: {
+              select: {
+                role: true,
+                email: true,
+                isActive: true,
+                isBlocked: true
+              }
+            }
+          }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
           }
         },
         levels: {
@@ -235,10 +329,10 @@ function makeDestroyEnrollmentUseCase() {
 }
 
 // src/http/controllers/enrollments/destroy.ts
-var import_zod = require("zod");
+var import_zod2 = require("zod");
 async function destroy(request, reply) {
-  const registerBodySchema = import_zod.z.object({
-    id: import_zod.z.coerce.number()
+  const registerBodySchema = import_zod2.z.object({
+    id: import_zod2.z.coerce.number()
   });
   const { id } = registerBodySchema.parse(request.params);
   try {

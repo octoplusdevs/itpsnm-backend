@@ -14976,6 +14976,13 @@ var index = /* @__PURE__ */ Object.freeze({
 // node_modules/vitest/dist/index.js
 var expectTypeOf = dist.expectTypeOf;
 
+// src/use-cases/errors/province-not-found.ts
+var ProvinceNotFoundError = class extends Error {
+  constructor() {
+    super("Province not found.");
+  }
+};
+
 // src/use-cases/province/destroy-province.ts
 var DestroyProvinceUseCase = class {
   constructor(provincesRepository2) {
@@ -14984,6 +14991,10 @@ var DestroyProvinceUseCase = class {
   async execute({
     id
   }) {
+    let findProvince = await this.provincesRepository.findById(id);
+    if (!findProvince) {
+      throw new ProvinceNotFoundError();
+    }
     return await this.provincesRepository.destroy(
       id
     );
