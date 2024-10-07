@@ -1,5 +1,5 @@
 uploads/*
-
+build/*
 # Logs
 logs
 *.log

@@ -17,7 +17,7 @@ export interface EnrollT {
   id: number;
   docsState: EnrollementState;
   paymentState: EnrollementState;
-  student?: Student;
+  students?: Student;
   identityCardNumber: string
   classeId?: number | null
   courseId?: number | null
