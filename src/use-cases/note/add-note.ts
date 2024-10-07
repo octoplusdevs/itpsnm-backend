@@ -16,6 +16,7 @@ interface CreateNoteUseCaseRequest {
   pt1?: number;
   pt2?: number;
   ptt?: number;
+  ims?: number;
   level: LevelName;
   nee?: number;
   resource?: number;
@@ -49,6 +50,7 @@ export class CreateNoteUseCase {
     pst,
     pt1,
     pt2,
+    ims,
     ptt,
     nee,
     resource,
@@ -77,6 +79,7 @@ export class CreateNoteUseCase {
       ps2,
       pst,
       pt1,
+      ims,
       pt2,
       ptt,
       nee,

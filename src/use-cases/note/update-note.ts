@@ -9,6 +9,7 @@ interface UpdateNoteUseCaseRequest {
   ps1?: number;
   ps2?: number;
   pst?: number;
+  ims?: number;
   pt1?: number;
   pt2?: number;
   ptt?: number;
@@ -40,6 +41,7 @@ export class UpdateNoteUseCase {
     pst,
     pt1,
     pt2,
+    ims,
     ptt,
     id,
     nee,
@@ -50,6 +52,7 @@ export class UpdateNoteUseCase {
     const updatedNote = await this.notesRepository.update(id!, {
       pf1,
       pf2,
+      ims,
       pft,
       ps1,
       ps2,

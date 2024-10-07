@@ -1,5 +1,4 @@
 import { NotesData, NotesRepository } from "@/repositories/notes-repository"
-import { Mester } from "@prisma/client"
 
 interface SearchManyNotesUseCaseRequest {
   p1?: number;
@@ -7,7 +6,6 @@ interface SearchManyNotesUseCaseRequest {
   exam?: number;
   nee?: number;
   resource?: number;
-  mester?: Mester;
   studentId?: number;
   subjectId?: number;
 }
@@ -25,7 +23,6 @@ export class SearchManyNotesUseCase {
     exam,
     nee,
     resource,
-    mester,
     studentId,
     subjectId,
   }: SearchManyNotesUseCaseRequest): Promise<SearchManyNotesUseCaseResponse> {
@@ -35,7 +32,6 @@ export class SearchManyNotesUseCase {
       exam,
       nee,
       resource,
-      mester,
       studentId,
       subjectId,
     };

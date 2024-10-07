@@ -13,6 +13,12 @@ enum Gender {
   FEMALE
 }
 
+enum APPROVED_STATE {
+  APPROVED
+  FAILED
+  WITH_DEFICIENCY
+}
+
 // Níveis de acesso
 enum Role {
   STUDENT
@@ -123,7 +129,7 @@ enum Mester {
 
 // Tabela de notas do estudantes
 model Note {
-  id           Int        @id @unique @default(autoincrement())
+  id           Int            @id @unique @default(autoincrement())
   pf1          Float
   pf2          Float
   pft          Float
@@ -140,9 +146,11 @@ model Note {
   mf           Float?
   resource     Float
   mfd          Float?
+  ims          Float?
+  approved     APPROVED_STATE @default(FAILED)
   level        LevelName
-  enrollments  Enrollment @relation(fields: [enrollmentId], references: [id])
-  subjects     Subject    @relation(fields: [subjectId], references: [id])
+  enrollments  Enrollment     @relation(fields: [enrollmentId], references: [id])
+  subjects     Subject        @relation(fields: [subjectId], references: [id])
   created_at   DateTime
   update_at    DateTime
   subjectId    Int

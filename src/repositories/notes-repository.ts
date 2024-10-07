@@ -10,6 +10,7 @@ export type NotesData = {
   pst?: number;
   pt1?: number;
   pt2?: number;
+  ims?: number | null;
   ptt?: number;
   nee?: number | null;
   resource?: number;

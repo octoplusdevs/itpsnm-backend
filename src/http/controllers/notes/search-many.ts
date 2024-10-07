@@ -6,7 +6,6 @@ export async function searchMany(request: FastifyRequest, reply: FastifyReply) {
   const searchManyBodySchema = z.object({
     studentId: z.number().optional(),
     subjectId: z.number().optional(),
-    mester: z.enum(['FIRST', 'SECOND', 'THIRD']).optional(),
     level: z.enum(['CLASS_10', 'CLASS_11', 'CLASS_12', 'CLASS_13']).optional(),
   })
 

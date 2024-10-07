@@ -12,6 +12,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     pft: z.number().optional(),
     ps1: z.number().optional(),
     ps2: z.number().optional(),
+    ims: z.number().optional(),
     pst: z.number().optional(),
     pt1: z.number().optional(),
     pt2: z.number().optional(),
@@ -23,13 +24,12 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     subjectId: z.number(),
   });
 
-  const { pf1, nee, pf2, pft, ps1, ps2, pst, pt1, pt2, ptt, resource, level, enrollmentId, subjectId } = createNoteBodySchema.parse(request.body)
+  const { pf1, nee, pf2, pft, ps1, ps2, ims, pst, pt1, pt2, ptt, resource, level, enrollmentId, subjectId } = createNoteBodySchema.parse(request.body)
   try {
-    console.log("1111")
     const createNoteUseCase = makeCreateNoteUseCase()
 
     const { note } = await createNoteUseCase.execute({
-      pf1, nee, pf2, pft, ps1, ps2, pst, pt1, pt2, ptt,
+      pf1, nee, pf2, pft, ps1, ps2, pst, pt1, ims, pt2, ptt,
       resource,
       level,
       enrollmentId,
