@@ -24,7 +24,7 @@ export class PrismaNotesRepository implements NotesRepository {
           ps2: data.ps2 ?? 0,
           pst: data.pst ?? 0,
           pt1: data.pt1 ?? 0,
-          ims: data.pt1 ?? 0,
+          ims: data.ims ?? 0,
           pt2: data.pt2 ?? 0,
           ptt: data.ptt ?? 0,
           nee: data.nee ?? 0,

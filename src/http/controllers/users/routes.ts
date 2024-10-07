@@ -10,5 +10,5 @@ export async function usersRoutes(app: FastifyInstance) {
   app.get('/users',{ preHandler: accessControlMiddleware([Role.ADMIN])}, fetch)
   app.get('/user',{ preHandler: accessControlMiddleware([Role.ADMIN])}, get)
   app.post('/users/block',{ preHandler: accessControlMiddleware([Role.ADMIN])}, blockUser)
-  app.post('/users/reset-password',{ preHandler: accessControlMiddleware([Role.ADMIN])}, resetPassword)
+  app.post('/users/reset-password',{ preHandler: accessControlMiddleware([Role.ADMIN, Role.STUDENT])}, resetPassword)
 }
