@@ -1,4 +1,4 @@
-import { EnrollementState, Enrollment, Student, StudentType } from '@prisma/client'
+import { EnrollementState, Enrollment, Prisma, Student, StudentType } from '@prisma/client'
 
 export interface EnrollmentType {
   id?: number
@@ -27,12 +27,13 @@ export interface EnrollT {
 }
 
 export interface EnrollmentsRepository {
-  findByIdentityCardNumber(identityCardNumber: string): Promise<EnrollT | any | null>
+  findByIdentityCardNumber(identityCardNumber: string): Promise<Enrollment | null>
   checkStatus(enrollmentId: number): Promise<EnrollT | null>
   // findByEnrollmentNumber(enrollmentId: number): Promise<Enrollment | null>
   toggleStatus(enrollmentId: number, docsState: EnrollementState, paymentState: EnrollementState): Promise<{ id: number; docsState: EnrollementState; paymentState: EnrollementState } | null>
   destroy(enrollmentId: number): Promise<Boolean>
   create(data: EnrollmentType): Promise<EnrollmentType>
+  update(enrollmentId: number, data: Prisma.EnrollmentUncheckedUpdateInput): Promise<Enrollment>
   searchMany(paymentState: EnrollementState, docsState: EnrollementState, page: number): Promise<{
     totalItems: number;
     currentPage: number;

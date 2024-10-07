@@ -1,9 +1,16 @@
 
-import { EnrollementState } from '@prisma/client';
+import { $Enums, EnrollementState, Prisma } from '@prisma/client';
 import { EnrollT, EnrollmentType, EnrollmentsRepository } from '../enrollment-repository';
 import { prisma } from '@/lib/prisma';
 
 export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
+
+  async update(enrollmentId: number, data: Prisma.EnrollmentUncheckedUpdateInput) {
+    return await prisma.enrollment.update({
+      where: { id: Number(enrollmentId) },
+      data,
+    })
+  }
   async checkStatus(enrollmentId: number): Promise<EnrollT | any | null> {
     let enrollment = await prisma.enrollment.findUnique({
       where: {
