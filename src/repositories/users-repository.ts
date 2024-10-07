@@ -28,6 +28,7 @@ export type UserResponse = {
 export interface UsersRepository {
   findById(id: number): Promise<User | null>;
   findByEnrollment(id: number): Promise<User | null>;
+  findByEmployeeId(id: number): Promise<User | null>;
   findByEmail(email: string): Promise<UserResponse | null>;
   create(data: CreateUserDTO): Promise<User>;
   updateLoginAttempt(id: number, attempts: number): Promise<void>;

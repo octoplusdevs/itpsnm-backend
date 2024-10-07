@@ -53,6 +53,8 @@ export class RegisterUseCase {
     let existingStudent = null
     if (enrollmentId !== null && enrollmentId != undefined) {
       existingStudent = await this.enrollmentRepository.checkStatus(enrollmentId)
+      console.log(existingStudent)
+
       if (!existingStudent) {
         throw new EnrollmentNotFoundError()
       }
@@ -66,7 +68,7 @@ export class RegisterUseCase {
       if (!existingEmployeeId) {
         throw new EmployeeNotFoundError()
       }
-      if (await this.employeesRepository.findById(employeeId)) {
+      if (await this.usersRepository.findByEmployeeId(employeeId)) {
         throw new UserEmployeeHasInUseError()
       }
     }
@@ -80,7 +82,7 @@ export class RegisterUseCase {
       password: hashedPassword,
       role,
       employeeId,
-      studentId: existingStudent?.id,
+      studentId: existingStudent?.student?.id,
       enrollmentId,
     });
 
