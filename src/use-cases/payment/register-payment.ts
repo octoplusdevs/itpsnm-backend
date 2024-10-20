@@ -52,12 +52,6 @@ export class RegisterPaymentUseCase {
       throw new InvoiceNotFoundError();
     }
 
-    // Verifica se o pagamento já existe
-    const existingPayment = await this.paymentRepository.findByStudentAndInvoice(enrollmentId, invoiceId);
-    if (existingPayment) {
-      throw new PaymentAlreadyExistsError();
-    }
-
     // Verifica se a transação existe
     let transaction = await this.transactionRepository.findTransactionByNumber(transactionNumber);
     if (!transaction) {
@@ -67,6 +61,14 @@ export class RegisterPaymentUseCase {
     if (transaction.used) {
       throw new TransactionWasUsedError();
     }
+
+
+    // Verifica se o pagamento já existe
+    const existingPayment = await this.paymentRepository.findByStudentAndInvoice(enrollmentId, invoiceId, transaction.id);
+    if (existingPayment) {
+      throw new PaymentAlreadyExistsError();
+    }
+
 
 
     // Verifica se o estudante tem saldo suficiente

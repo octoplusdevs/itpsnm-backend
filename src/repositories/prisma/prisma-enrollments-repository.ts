@@ -68,7 +68,22 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             id: true,
             File: true
           }
-        }
+        },
+        StudentBalance: {
+          select: {
+            balance: true
+          }
+        },
+        Transaction: {
+          select: {
+            amount: true,
+            date: true,
+            transactionNumber: true,
+            used: true,
+            employee: true
+          }
+        },
+        Invoice: true
       }
     })
 
@@ -80,6 +95,23 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
       where: {
         id: enrollmentId
       },
+      include: {
+        StudentBalance: {
+          select: {
+            balance: true
+          }
+        },
+        Transaction: {
+          select: {
+            amount: true,
+            date: true,
+            transactionNumber: true,
+            used: true,
+            employee: true
+          }
+        },
+        Invoice: true
+      }
     })
 
     return enrollment
@@ -139,7 +171,22 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             id: true,
             File: true
           }
-        }
+        },
+        StudentBalance: {
+          select: {
+            balance: true
+          }
+        },
+        Transaction: {
+          select: {
+            amount: true,
+            date: true,
+            transactionNumber: true,
+            used: true,
+            employee: true
+          }
+        },
+        Invoice: true
       }
     })
     return enrollment
@@ -256,7 +303,22 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             id: true,
             File: true
           }
-        }
+        },
+        StudentBalance: {
+          select: {
+            balance: true
+          }
+        },
+        Transaction: {
+          select: {
+            amount: true,
+            date: true,
+            transactionNumber: true,
+            used: true,
+            employee: true
+          }
+        },
+        Invoice: true
       },
       skip: (page - 1) * pageSize,
       take: pageSize,

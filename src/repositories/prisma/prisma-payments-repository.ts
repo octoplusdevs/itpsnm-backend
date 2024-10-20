@@ -30,11 +30,12 @@ export class PrismaPaymentRepository implements PaymentRepository {
       data: { status },
     })
   }
-  async findByStudentAndInvoice(enrollmentId: number, invoiceId: number) {
+  async findByStudentAndInvoice(enrollmentId: number, invoiceId: number, transactionId: number) {
     return await prisma.payment.findFirst({
       where: {
         enrollmentId: enrollmentId,
         invoiceId: invoiceId,
+        transactionId
       },
     });
   }
