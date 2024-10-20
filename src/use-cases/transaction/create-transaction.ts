@@ -8,6 +8,8 @@ import { EmployeeNotFoundError } from '../errors/employee-not-found';
 import { EnrollmentNotFoundError } from '../errors/enrollment-not-found';
 import { EnrollmentsRepository } from '@/repositories/enrollment-repository';
 import { PaymentNotFoundError } from '../errors/payment-not-found';
+import { UpdateStudentBalanceUseCase } from '../payment/update-student-balance';
+import { StudentBalanceRepository } from '@/repositories/student-balance-repository';
 
 interface CreateTransactionDTO {
   transactionNumber: string;
@@ -24,8 +26,8 @@ export class CreateTransactionUseCase {
     private employeeRepository: EmployeeRepository,
     private enrollmentsRepository: EnrollmentsRepository,
     private paymentRepository: PaymentRepository,
+    private studentBalanceRepository: StudentBalanceRepository,
   ) { }
-
   async execute(data: CreateTransactionDTO): Promise<Transaction> {
     const transactionAlreadyExists = await this.transactionRepository.findTransactionByNumber(data.transactionNumber);
     if (transactionAlreadyExists) {
@@ -48,6 +50,9 @@ export class CreateTransactionUseCase {
     if (!findEnrollment) {
       throw new EnrollmentNotFoundError();
     }
+
+    // Atualiza o saldo do estudante
+    await this.studentBalanceRepository.increaseBalance(data.enrollmentId, data.amount);
 
     const transaction = await this.transactionRepository.createTransaction({
       transactionNumber: data.transactionNumber,
