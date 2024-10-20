@@ -1,9 +1,9 @@
-import { Payment, ItemPaymentDetail } from "@prisma/client";
+import { Payment } from '@prisma/client'
 
-export interface PaymentsRepository {
-  create(paymentData: Omit<Payment, 'id' | 'created_at' | 'update_at'>, itemDetailsData: Omit<ItemPaymentDetail, 'id' | 'created_at' | 'update_at' | 'paymentsId'>[]): Promise<Payment>;
-  findById(paymentId: number): Promise<Payment | null>;
-  findManyByIdentityCardNumber(identityCardNumber: string): Promise<Payment[] | null>;
-  destroy(paymentId: number): Promise<boolean>;
-  searchMany(query: string, page: number): Promise<Payment[] | null>;
+export interface PaymentRepository {
+  findByStudentAndInvoice(studentId: number, invoiceId: number): Promise<Payment | null>;
+  createPayment(data: Omit<Payment, 'id'>): Promise<Payment>
+  findPaymentById(paymentId: number): Promise<Payment | null>
+  approvePayment(paymentId: number, employeeId: number): Promise<Payment>
+  updatePaymentStatus(paymentId: number, status: string): Promise<Payment>
 }

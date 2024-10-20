@@ -9,6 +9,7 @@ import { enrollmentsRoutes } from './http/controllers/enrollments/routes'
 import { documentsRoutes } from './http/controllers/documents/routes'
 import { photosRoutes } from './http/controllers/photos/routes'
 import { paymentsRoutes } from './http/controllers/payments/routes'
+import { transactionsRoutes } from './http/controllers/transactions/routes'
 import { notesRoutes } from './http/controllers/notes/routes'
 import { authRoutes } from './http/controllers/auth/routes'
 import { provincesRoutes } from './http/controllers/provinces/routes'
@@ -67,6 +68,7 @@ app.register(enrollmentsRoutes, { prefix: '/api/v1' })
 app.register(documentsRoutes, { prefix: '/api/v1' })
 app.register(photosRoutes, { prefix: '/api/v1' })
 app.register(paymentsRoutes, { prefix: '/api/v1' })
+app.register(transactionsRoutes, { prefix: '/api/v1' })
 app.register(notesRoutes, { prefix: '/api/v1' })
 app.register(authRoutes, { prefix: '/api/v1' })
 app.register(usersRoutes, { prefix: '/api/v1' })
