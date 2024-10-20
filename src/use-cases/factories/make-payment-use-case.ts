@@ -1,4 +1,4 @@
-import { CreatePaymentUseCase } from '../payment/create-payment'
+import { CreatePaymentUseCase } from '../payment/register-payment'
 import { PrismaPaymentRepository } from '@/repositories/prisma/prisma-payments-repository'
 import { PrismaStudentsRepository } from '@/repositories/prisma/prisma-student-repository'
 

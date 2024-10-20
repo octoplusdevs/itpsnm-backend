@@ -1,4 +1,4 @@
-import { ItemPaymentDetailsRepository } from "@/repositories/item-payment-detail-repository";
+import { ItemPaymentDetailsRepository } from "@/repositories/payment-item-repository";
 import { ItemPaymentDetail, PaymentType } from "@prisma/client";
 
 interface CreateItemPaymentDetailRequest {

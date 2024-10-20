@@ -1,39 +1,41 @@
-import { prisma } from '@/lib/prisma';
-import { ItemPaymentDetail, Payment } from '@prisma/client';
-import { PaymentsRepository } from '../payments-repository';
+import { Payment, PAY_STATUS } from '@prisma/client'
+import { PaymentRepository } from '../payments-repository'
+import { prisma } from '@/lib/prisma'
 
-export class PrismaPaymentRepository implements PaymentsRepository {
-  async create(paymentData: Omit<Payment, 'id' | 'created_at' | 'update_at'>, itemDetailsData: Omit<ItemPaymentDetail, 'id' | 'created_at' | 'update_at' | 'paymentsId'>[]): Promise<Payment> {
-    let payment = await prisma.payment.create({
-      data: {
-        identityCardNumber: paymentData.identityCardNumber,
-        amount_paid: paymentData.amount_paid,
-        date: paymentData.date,
-        state: paymentData.state,
-        item_payment_details: {
-          createMany: {
-            data: {
-              price: itemDetailsData.price,
-              type: itemDetailsData.type,
-              quantity: itemDetailsData?.quantity,
-            }
-          }
-        }
-      }
+export class PrismaPaymentRepository implements PaymentRepository {
+
+  async createPayment(data: Omit<Payment, 'id'>): Promise<Payment> {
+    return prisma.payment.create({
+      data,
     })
-    return payment
-  }
-  findById(paymentId: number): Promise<Payment | null> {
-    throw new Error('Method not implemented.');
-  }
-  findManyByIdentityCardNumber(identityCardNumber: string): Promise<Payment[] | null> {
-    throw new Error('Method not implemented.');
-  }
-  destroy(paymentId: number): Promise<boolean> {
-    throw new Error('Method not implemented.');
-  }
-  searchMany(query: string, page: number): Promise<Payment[] | null> {
-    throw new Error('Method not implemented.');
   }
 
+  async findPaymentById(paymentId: number): Promise<Payment | null> {
+    return prisma.payment.findUnique({
+      where: { id: paymentId },
+      include: { transaction: true, invoice: true, PaymentDetails: true },
+    })
+  }
+
+  async approvePayment(paymentId: number, employeeId: number): Promise<Payment> {
+    return prisma.payment.update({
+      where: { id: paymentId },
+      data: { status: PAY_STATUS.PAID, employeeId },
+    })
+  }
+
+  async updatePaymentStatus(paymentId: number, status: PAY_STATUS): Promise<Payment> {
+    return prisma.payment.update({
+      where: { id: paymentId },
+      data: { status },
+    })
+  }
+  async findByStudentAndInvoice(enrollmentId: number, invoiceId: number) {
+    return await prisma.payment.findFirst({
+      where: {
+        enrollmentId: enrollmentId,
+        invoiceId: invoiceId,
+      },
+    });
+  }
 }

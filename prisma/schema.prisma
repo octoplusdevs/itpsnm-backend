@@ -41,8 +41,13 @@ enum MaritalStatus {
 
 enum PaymentState {
   PENDING
-  COMPLETED
-  FAILED
+  PAID
+}
+
+enum PAY_STATUS {
+  PENDING
+  PAID
+  RECUSED
 }
 
 enum EnrollementState {
@@ -65,18 +70,6 @@ enum FileType {
   PHOTO
 }
 
-enum StudentType {
-  SCHOLARSHIP
-  REGULAR
-}
-
-enum LevelName {
-  CLASS_10
-  CLASS_11
-  CLASS_12
-  CLASS_13
-}
-
 enum MonthName {
   JANUARY
   FEBRUARY
@@ -90,6 +83,25 @@ enum MonthName {
   OCTOBER
   NOVEMBER
   DECEMBER
+}
+
+enum StudentType {
+  SCHOLARSHIP
+  REGULAR
+}
+
+enum LevelName {
+  CLASS_10
+  CLASS_11
+  CLASS_12
+  CLASS_13
+}
+
+enum InvoiceType {
+  DECLARATION @map("Declaração")
+  CERTIFICATE @map("Certificado")
+  PASS        @map("Passe")
+  UNIFORM     @map("Uniforme")
 }
 
 // Níveis dos estudantes
@@ -119,6 +131,12 @@ enum PaymentType {
   B
   C
   D
+}
+
+enum PAYMENT_METHOD {
+  A
+  B
+  C
 }
 
 enum Mester {
@@ -170,36 +188,6 @@ model Subject {
   @@map("subjects")
 }
 
-// Detalhes de pagamento do item
-model ItemPaymentDetail {
-  id         Int         @id @unique @default(autoincrement())
-  type       PaymentType
-  quantity   Int
-  price      Float
-  payment    Payment?    @relation(fields: [paymentsId], references: [id])
-  created_at DateTime    @default(now())
-  update_at  DateTime    @updatedAt
-  paymentsId Int?
-
-  @@map("items_payment_details")
-}
-
-// Pagamentos
-model Payment {
-  id                   Int                 @id @unique @default(autoincrement())
-  identityCardNumber   String
-  state                PaymentState
-  amount_paid          Float
-  date                 DateTime
-  created_at           DateTime
-  update_at            DateTime
-  students             Student             @relation(fields: [identityCardNumber], references: [identityCardNumber])
-  receipts             Receipt[]
-  item_payment_details ItemPaymentDetail[]
-
-  @@map("payments")
-}
-
 // Meses
 model MonthPaid {
   id            Int       @id @unique @default(autoincrement())
@@ -247,7 +235,6 @@ model Student {
   provinces          Province?     @relation(fields: [provinceId], references: [id])
   counties           County?       @relation(fields: [countyId], references: [id])
   tuitionFees        Tuition[]
-  payments           Payment[]
   files              File[]
   enrollments        Enrollment[]
   countyId           Int?
@@ -348,10 +335,14 @@ model Enrollment {
   courseId           Int?
   classeId           Int?
 
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
-  Note       Note[]
-  User       User[]
+  created_at     DateTime         @default(now())
+  update_at      DateTime         @updatedAt
+  Note           Note[]
+  User           User[]
+  Invoice        Invoice[]
+  Transaction    Transaction[]
+  StudentBalance StudentBalance[]
+  Payment        Payment[]
 
   @@map("enrollments")
 }
@@ -365,10 +356,11 @@ model File {
   type               FileType
   students           Student?   @relation(fields: [identityCardNumber], references: [identityCardNumber])
   document           Document?  @relation(fields: [documentId], references: [id])
-  created_at         DateTime   @default(now())
-  update_at          DateTime   @updatedAt
   documentId         Int?
   identityCardNumber String?
+
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
 
   @@map("files")
 }
@@ -388,6 +380,9 @@ model Employee {
   created_at         DateTime      @default(now())
   update_at          DateTime      @updatedAt
   User               User?
+  Payment            Payment[]
+  Invoice            Invoice[]
+  Transaction        Transaction[]
 
   @@map("employees")
 }
@@ -422,4 +417,107 @@ model AccessLog {
   status    AccessStatus
 
   @@map("accesslogs")
+}
+
+//Armazena as faturas dos estudantes.
+model Invoice {
+  id           Int          @id @default(autoincrement())
+  totalAmount  Decimal      @db.Decimal(10, 2)
+  status       PAY_STATUS   @default(PENDING)
+  dueDate      DateTime
+  issueDate    DateTime     @default(now())
+  type         InvoiceType?
+  // Relacionamentos
+  Payment      Payment[]
+  Enrollment   Enrollment?  @relation(fields: [enrollmentId], references: [id])
+  enrollmentId Int
+  employeeId   Int?
+  employee     Employee?    @relation(fields: [employeeId], references: [id])
+  created_at   DateTime     @default(now())
+  update_at    DateTime     @updatedAt
+
+  @@map("invoices")
+}
+
+//Armazena as transações bancárias.
+model Transaction {
+  id                Int         @id @default(autoincrement())
+  transactionNumber String      @unique
+  amount            Decimal     @db.Decimal(10, 2)
+  date              DateTime    @default(now())
+  used              Boolean     @default(false)
+  // Relacionamento com Payment
+  payment           Payment?    @relation(name: "PaymentToTransaction", fields: [paymentId], references: [id])
+  paymentId         Int?        @unique
+  Enrollment        Enrollment? @relation(fields: [enrollmentId], references: [id])
+  enrollmentId      Int
+  employeeId        Int?
+  employee          Employee?   @relation(fields: [employeeId], references: [id])
+
+  @@map("transactions")
+}
+
+//Armazena os detalhes do pagamento.
+model Payment {
+  id          Int        @id @default(autoincrement())
+  invoice     Invoice    @relation(fields: [invoiceId], references: [id])
+  invoiceId   Int
+  employee    Employee?  @relation(fields: [employeeId], references: [id])
+  employeeId  Int?
+  totalAmount Decimal    @db.Decimal(10, 2)
+  status      PAY_STATUS @default(PENDING)
+
+  // Relacionamento com Transaction
+  transaction   Transaction? @relation(name: "PaymentToTransaction")
+  transactionId Int?         @unique
+
+  PaymentDetails PaymentDetails[]
+  Receipt        Receipt[]
+  Enrollment     Enrollment?      @relation(fields: [enrollmentId], references: [id])
+  enrollmentId   Int?
+  created_at     DateTime         @default(now())
+  update_at      DateTime         @updatedAt
+
+  @@map("payments")
+}
+
+//Representa os diferentes tipos de pagamento, como propinas, matrículas, etc.
+model PaymentItem {
+  id          Int     @id @default(autoincrement())
+  description String  @db.VarChar(100)
+  price       Decimal @db.Decimal(10, 2)
+  type        String  @db.VarChar(50)
+
+  // Relacionamentos
+  PaymentDetails PaymentDetails[]
+  created_at     DateTime         @default(now())
+  update_at      DateTime         @updatedAt
+
+  @@map("paymentitems")
+}
+
+// Detalhes de pagamento do item
+model PaymentDetails {
+  id            Int         @id @default(autoincrement())
+  payment       Payment     @relation(fields: [paymentId], references: [id])
+  paymentId     Int
+  paymentItem   PaymentItem @relation(fields: [paymentItemId], references: [id])
+  paymentItemId Int
+  amount        Decimal     @db.Decimal(10, 2)
+  created_at    DateTime    @default(now())
+  update_at     DateTime    @updatedAt
+
+  @@map("paymentdetails")
+}
+
+// Gerencia o saldo dos estudantes.
+model StudentBalance {
+  id           Int         @id @default(autoincrement())
+  balance      Decimal     @default(0) @db.Decimal(10, 2)
+  Enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id])
+  enrollmentId Int?        @unique
+  created_at   DateTime    @default(now())
+  update_at    DateTime    @updatedAt
+
+  @@map("studentbalance")
 }

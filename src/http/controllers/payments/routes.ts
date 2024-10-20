@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
-import { payment } from './upload'
+import { create } from './create'
 
 export async function paymentsRoutes(app: FastifyInstance) {
-  app.post('/payments/enrollments', payment)
+  app.post('/payments', create)
 }

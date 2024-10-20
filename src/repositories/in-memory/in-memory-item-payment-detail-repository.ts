@@ -1,6 +1,6 @@
 import { ItemPaymentDetail } from '@prisma/client';
 import { randomInt } from 'crypto';
-import { ItemPaymentDetailsRepository } from '../item-payment-detail-repository';
+import { ItemPaymentDetailsRepository } from '../payment-item-repository';
 
 export class InMemoryItemPaymentDetailsRepository implements ItemPaymentDetailsRepository {
   public itemPaymentDetails: ItemPaymentDetail[] = [];
