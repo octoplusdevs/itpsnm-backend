@@ -17,7 +17,7 @@ import { EmployeeNotFoundError } from "../errors/employee-not-found";
 
 interface RegisterPaymentDTO {
   enrollmentId: number;
-  transactionNumber?: string;
+  transactionNumber: string;
   invoiceId: number;
   employeeId: number;
 }
@@ -52,25 +52,24 @@ export class RegisterPaymentUseCase {
       throw new InvoiceNotFoundError();
     }
 
+    // Verifica se a transação existe
+    let transaction = await this.transactionRepository.findTransactionByNumber(transactionNumber);
+    if (!transaction) {
+      throw new TransactionNotFoundError();
+    }
+
+    if (transaction.used) {
+      throw new TransactionWasUsedError();
+    }
+
+
     // Verifica se o pagamento já existe
-    const existingPayment = await this.paymentRepository.findByStudentAndInvoice(enrollmentId, invoiceId);
+    const existingPayment = await this.paymentRepository.findByStudentAndInvoice(enrollmentId, invoiceId, transaction.id);
     if (existingPayment) {
       throw new PaymentAlreadyExistsError();
     }
 
-    // Verifica se a transação existe
-    let transaction = null
-    if (transactionNumber) {
-      transaction = await this.transactionRepository.findTransactionByNumber(transactionNumber);
-      if (!transaction) {
-        throw new TransactionNotFoundError();
-      }
 
-      if (transaction.used) {
-        throw new TransactionWasUsedError();
-      }
-
-    }
 
     // Verifica se o estudante tem saldo suficiente
     const findBalance = await this.studentBalanceRepository.getBalanceByStudent(enrollmentId);
@@ -102,9 +101,7 @@ export class RegisterPaymentUseCase {
     });
 
     // Atualiza o status da transação e da fatura
-    if (transactionNumber) {
-      await this.transactionRepository.updateTransactionStatus(transactionNumber, true);
-    }
+    await this.transactionRepository.updateTransactionStatus(transactionNumber!, true);
     await this.invoiceRepository.updateInvoiceStatus(invoiceId, PAY_STATUS.PAID);
 
     return payment;
