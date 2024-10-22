@@ -89,7 +89,7 @@ export class RegisterPaymentUseCase {
       totalAmount: new Decimal(invoiceAmount),
       employeeId,
       transactionId: transaction ? transaction.id : null,
-      status: PAY_STATUS.PENDING,
+      status: PAY_STATUS.PAID,
       created_at: new Date(),
       update_at: new Date(),
     });

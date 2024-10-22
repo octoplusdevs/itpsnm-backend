@@ -83,7 +83,25 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             employee: true
           }
         },
-        Invoice: true
+        Invoice: {
+          select: {
+            dueDate: true,
+            issueDate: true,
+            created_at: true,
+            update_at: true,
+            status: true,
+            totalAmount: true,
+            id: true,
+            items: {
+              select: {
+                id: true,
+                amount: true,
+                created_at: true,
+                description: true,
+              }
+            }
+          }
+        }
       }
     })
 
@@ -110,7 +128,25 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             employee: true
           }
         },
-        Invoice: true
+        Invoice: {
+          select: {
+            dueDate: true,
+            issueDate: true,
+            created_at: true,
+            update_at: true,
+            status: true,
+            totalAmount: true,
+            id: true,
+            items: {
+              select: {
+                id: true,
+                amount: true,
+                created_at: true,
+                description: true,
+              }
+            }
+          }
+        }
       }
     })
 
@@ -186,7 +222,25 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             employee: true
           }
         },
-        Invoice: true
+        Invoice: {
+          select: {
+            dueDate: true,
+            issueDate: true,
+            created_at: true,
+            update_at: true,
+            status: true,
+            totalAmount: true,
+            id: true,
+            items: {
+              select: {
+                id: true,
+                amount: true,
+                created_at: true,
+                description: true,
+              }
+            }
+          }
+        }
       }
     })
     return enrollment
@@ -306,11 +360,13 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
         },
         StudentBalance: {
           select: {
+            id: true,
             balance: true
           }
         },
         Transaction: {
           select: {
+            id: true,
             amount: true,
             date: true,
             transactionNumber: true,
@@ -318,7 +374,25 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             employee: true
           }
         },
-        Invoice: true
+        Invoice: {
+          select: {
+            dueDate: true,
+            issueDate: true,
+            created_at: true,
+            update_at: true,
+            status: true,
+            totalAmount: true,
+            id: true,
+            items: {
+              select: {
+                id: true,
+                amount: true,
+                created_at: true,
+                description: true,
+              }
+            }
+          }
+        }
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
