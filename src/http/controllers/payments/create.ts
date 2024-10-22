@@ -11,7 +11,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     enrollmentId: z.number().int().nonnegative(),
     invoiceId: z.number().int().nonnegative(),
     employeeId: z.number().int().nonnegative(),
-    transactionNumber: z.string().optional(),
+    transactionNumber: z.string(),
   });
 
   // Validação do corpo da requisição
