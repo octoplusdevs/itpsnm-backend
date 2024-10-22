@@ -11,10 +11,22 @@ export class PrismaStudentBalanceRepository implements StudentBalanceRepository 
   }
 
   async updateStudentBalance(enrollmentId: number, newBalance: number): Promise<StudentBalance> {
-    return prisma.studentBalance.update({
-      where: { enrollmentId },
-      data: { balance: newBalance },
+    let balance = await prisma.studentBalance.findUnique({
+      where: {
+        enrollmentId
+      }
     })
+    if (balance) {
+      return prisma.studentBalance.update({
+        where: { enrollmentId },
+        data: { balance: newBalance },
+      })
+    }
+
+    return prisma.studentBalance.create({
+      data: { balance: newBalance, enrollmentId },
+    })
+
   }
 
   async increaseBalance(enrollmentId: number, amount: number): Promise<StudentBalance> {
