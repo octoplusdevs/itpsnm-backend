@@ -51,8 +51,7 @@ export class CreateTransactionUseCase {
       throw new EnrollmentNotFoundError();
     }
 
-    // Atualiza o saldo do estudante
-    await this.studentBalanceRepository.increaseBalance(data.enrollmentId, data.amount);
+
 
     const transaction = await this.transactionRepository.createTransaction({
       transactionNumber: data.transactionNumber,
@@ -61,8 +60,10 @@ export class CreateTransactionUseCase {
       enrollmentId: data.enrollmentId,
       paymentId: data.paymentId ?? null,
       employeeId: data.employeeId,
-      used: false
+      used: true
     });
+    // Atualiza o saldo do estudante
+    await this.studentBalanceRepository.increaseBalance(data.enrollmentId, data.amount);
 
     return transaction;
   }
