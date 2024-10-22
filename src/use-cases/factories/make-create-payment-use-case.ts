@@ -13,7 +13,13 @@ export function makeCreatePaymentUseCase() {
   const enrollmentsRepository = new PrismaEnrollmentsRepository()
   const studentBalanceRepository = new PrismaStudentBalanceRepository()
   const employeeRepository = new PrismaEmployeeRepository()
-  const createPaymentUseCase = new RegisterPaymentUseCase(paymentsRepository, transactionRepository, invoiceRepository, enrollmentsRepository, studentBalanceRepository, employeeRepository)
+  const createPaymentUseCase = new RegisterPaymentUseCase(
+    paymentsRepository,
+    transactionRepository,
+    invoiceRepository,
+    enrollmentsRepository,
+    studentBalanceRepository,
+    employeeRepository)
 
   return createPaymentUseCase
 }

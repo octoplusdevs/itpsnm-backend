@@ -8,6 +8,7 @@ import { EmployeeNotFoundError } from "../errors/employee-not-found"
 interface ApprovePaymentDTO {
   paymentId: number
   employeeId: number
+  status: PAY_STATUS
 }
 
 export class ApprovePaymentUseCase {
@@ -27,11 +28,11 @@ export class ApprovePaymentUseCase {
       throw new EmployeeNotFoundError()
     }
 
-    if (payment.status !== PAY_STATUS.PENDING && payment.status !== PAY_STATUS.RECUSED) {
-      throw new PaymentIsNotPendingError()
-    }
+    // if (payment.status !== PAY_STATUS.PENDING && payment.status !== PAY_STATUS.RECUSED) {
+    //   throw new PaymentIsNotPendingError()
+    // }
 
-    const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId)
+    const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId, data.status)
     return approvedPayment
   }
 }

@@ -18,10 +18,10 @@ export class PrismaPaymentRepository implements PaymentRepository {
     })
   }
 
-  async approvePayment(paymentId: number, employeeId: number): Promise<Payment> {
+  async approvePayment(paymentId: number, employeeId: number, status: PAY_STATUS): Promise<Payment> {
     return prisma.payment.update({
       where: { id: paymentId },
-      data: { status: PAY_STATUS.PAID, employeeId },
+      data: { status, employeeId },
     })
   }
 

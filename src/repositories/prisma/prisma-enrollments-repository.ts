@@ -74,6 +74,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             balance: true
           }
         },
+        Payment: true,
         Transaction: {
           select: {
             amount: true,
