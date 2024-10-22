@@ -2,7 +2,6 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { PhoneAlreadyExistsError } from '@/use-cases/errors/phone-already-exists-error';
 import { AlternativePhoneAlreadyExistsError } from '@/use-cases/errors/alternative-phone-already-exists-error';
-import { EmailAlreadyExistsError } from '@/use-cases/errors/email-already-exists-error';
 import { IdentityCardNumberAlreadyExistsError } from '@/use-cases/errors/id-card-already-exists-error';
 import { ProvinceNotFoundError } from '@/use-cases/errors/province-not-found';
 import { CountyNotFoundError } from '@/use-cases/errors/county-not-found';

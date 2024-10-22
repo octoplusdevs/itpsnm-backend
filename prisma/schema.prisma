@@ -421,22 +421,35 @@ model AccessLog {
 
 //Armazena as faturas dos estudantes.
 model Invoice {
-  id           Int          @id @default(autoincrement())
-  totalAmount  Decimal      @db.Decimal(10, 2)
-  status       PAY_STATUS   @default(PENDING)
+  id           Int           @id @default(autoincrement())
+  totalAmount  Decimal       @db.Decimal(10, 2)
+  status       PAY_STATUS    @default(PENDING)
   dueDate      DateTime
-  issueDate    DateTime     @default(now())
-  type         InvoiceType?
+  issueDate    DateTime      @default(now())
+  type         InvoiceType? // Pode ser um enum ou string para representar o tipo de invoice
   // Relacionamentos
+  items        InvoiceItem[] // Relacionamento com os itens da fatura
   Payment      Payment[]
-  Enrollment   Enrollment?  @relation(fields: [enrollmentId], references: [id])
+  Enrollment   Enrollment?   @relation(fields: [enrollmentId], references: [id])
   enrollmentId Int
   employeeId   Int?
-  employee     Employee?    @relation(fields: [employeeId], references: [id])
-  created_at   DateTime     @default(now())
-  update_at    DateTime     @updatedAt
+  employee     Employee?     @relation(fields: [employeeId], references: [id])
+  created_at   DateTime      @default(now())
+  update_at    DateTime      @updatedAt
 
   @@map("invoices")
+}
+
+model InvoiceItem {
+  id          Int      @id @default(autoincrement())
+  description String // Descrição do item, por exemplo: "Uniforme", "Certificado", etc.
+  amount      Decimal  @db.Decimal(10, 2) // Valor de cada item
+  invoiceId   Int
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  created_at  DateTime @default(now())
+  update_at   DateTime @updatedAt
+
+  @@map("invoice_items")
 }
 
 //Armazena as transações bancárias.
