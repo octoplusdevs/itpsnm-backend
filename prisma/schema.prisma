@@ -109,7 +109,7 @@ model Student {
   residence          String
   phone              String        @unique
   alternativePhone   String?
-  countyId           Int?
+  county             String?
   provinceId         Int?
   created_at         DateTime      @default(now())
   update_at          DateTime      @updatedAt

@@ -44,7 +44,7 @@ export class CreateInvoiceUseCase {
     }
 
     // Calcula o valor total dos itens
-    const totalAmount = data.items.reduce((sum, item) => sum + item.amount, 0);
+    const totalAmount = data.items.reduce((sum, item) => sum + (item.amount * item.qty), 0);
 
     // Cria a fatura (invoice)
     const invoice = await this.invoiceRepository.createInvoice({

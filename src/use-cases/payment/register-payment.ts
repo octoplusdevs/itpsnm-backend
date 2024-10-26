@@ -89,7 +89,7 @@ export class RegisterPaymentUseCase {
       totalAmount: new Decimal(invoiceAmount),
       employeeId,
       transactionId: transaction ? transaction.id : null,
-      status: PAY_STATUS.PAID,
+      status: PAY_STATUS.PENDING,
       created_at: new Date(),
       update_at: new Date(),
     });
@@ -102,7 +102,7 @@ export class RegisterPaymentUseCase {
 
     // Atualiza o status da transação e da fatura
     await this.transactionRepository.updateTransactionStatus(transactionNumber!, true);
-    await this.invoiceRepository.updateInvoiceStatus(invoiceId, PAY_STATUS.PAID);
+    await this.invoiceRepository.updateInvoiceStatus(invoiceId, PAY_STATUS.PENDING);
 
     return payment;
   }

@@ -16,7 +16,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     items: z.object({
       description: z.string(),
       amount: z.number().int().nonnegative(),
-      month: z.nativeEnum(MonthName),
+      month: z.nativeEnum(MonthName).optional(),
       qty: z.number().int().nonnegative(),
     }).array().min(1),
   });
