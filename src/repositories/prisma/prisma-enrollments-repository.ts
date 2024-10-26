@@ -96,6 +96,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             created_at: true,
             update_at: true,
             status: true,
+            type: true,
             totalAmount: true,
             id: true,
             items: {
@@ -152,6 +153,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             created_at: true,
             update_at: true,
             status: true,
+            type: true,
             totalAmount: true,
             employee: {
               select: {
@@ -257,6 +259,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             created_at: true,
             update_at: true,
             status: true,
+            type: true,
             totalAmount: true,
             employee: {
               select: {
@@ -420,6 +423,7 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             created_at: true,
             update_at: true,
             status: true,
+            type: true,
             totalAmount: true,
             id: true,
             employee: {
