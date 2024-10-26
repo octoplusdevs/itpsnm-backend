@@ -14,9 +14,19 @@ export async function filterTuitionInvoicesMiddleware(request: FastifyRequest, r
     // Buscar invoices do tipo TUITION e filtrar por items PENDING do ano atual
     const tuitionInvoices = await invoicesRepository.findInvoicesByEnrollmentId(request.user.userId!);
 
-    if (tuitionInvoices && tuitionInvoices.length > 0) {
-      return reply.status(403).send({ message: 'Você possui dívidas de propinas pendentes no sistema' });
-    }
+     // Filtra invoices que estão atrasados, comparando com o mês atual
+     const currentDate = new Date();
+     const overdueInvoices = tuitionInvoices.filter(invoice => {
+       const dueDate = new Date(invoice.dueDate);
+       return (
+         dueDate.getFullYear() < currentDate.getFullYear() ||
+         (dueDate.getFullYear() === currentDate.getFullYear() && dueDate.getMonth() < currentDate.getMonth())
+       );
+     });
+
+     if (overdueInvoices.length > 0) {
+       return reply.status(403).send({ message: 'Você possui dívidas de propinas pendentes e em atraso no sistema' });
+     }
     // Adiciona o resultado ao request para acesso nas próximas camadas
     request.tuitionInvoices = tuitionInvoices;
   } catch (error) {
