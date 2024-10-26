@@ -43,7 +43,7 @@ export class ApprovePaymentUseCase {
       });
     }
 
-    const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId, data.status)
+    const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId, data.status || "PAID")
     return approvedPayment
   }
 }
