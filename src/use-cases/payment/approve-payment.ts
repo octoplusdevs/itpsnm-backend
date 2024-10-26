@@ -17,7 +17,7 @@ export class ApprovePaymentUseCase {
     private paymentRepository: PaymentRepository,
     private employeeRepository: EmployeeRepository,
     private invoiceItemRepository: InvoiceItemRepository,
-  ) {}
+  ) { }
 
   async execute(data: ApprovePaymentDTO) {
     const payment = await this.paymentRepository.findPaymentById(data.paymentId)
@@ -33,7 +33,10 @@ export class ApprovePaymentUseCase {
     // if (payment.status !== PAY_STATUS.PENDING && payment.status !== PAY_STATUS.RECUSED) {
     //   throw new PaymentIsNotPendingError()
     // }
+    console.log("INVOICED ID", payment.invoiceId)
     const items = await this.invoiceItemRepository.findInvoiceItemsByInvoiceId(payment.invoiceId)
+    console.log("ITEMS ID",items)
+
     if (!items) {
       throw new InvoiceItemNotFoundError()
     }
