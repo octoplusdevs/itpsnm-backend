@@ -9,7 +9,7 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     // const startDate = new Date(`${currentYear}-01-01`);
     // const endDate = new Date(`${currentYear}-12-31`);
 
-    const invoices = await prisma.invoice.findMany({
+    return await prisma.invoice.findMany({
       where: {
         enrollmentId,
         type: InvoiceType.TUITION,
@@ -28,7 +28,6 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
       },
     });
 
-    return invoices;
   }
 
   async createInvoice(data: Omit<Invoice, 'id'>): Promise<Invoice> {
