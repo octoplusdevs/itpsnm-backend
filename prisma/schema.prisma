@@ -7,7 +7,382 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Definição dos tipos enum
+model Level {
+  id         Int          @id @unique @default(autoincrement())
+  name       LevelName
+  created_at DateTime     @default(now())
+  update_at  DateTime     @updatedAt
+  Enrollment Enrollment[]
+
+  @@map("levels")
+}
+
+model Province {
+  id         Int       @id @unique @default(autoincrement())
+  name       String    @unique
+  created_at DateTime  @default(now())
+  update_at  DateTime  @updatedAt
+  students   Student[]
+
+  @@map("provinces")
+}
+
+model Note {
+  id           Int            @id @unique @default(autoincrement())
+  nee          Float
+  level        LevelName
+  created_at   DateTime
+  update_at    DateTime
+  subjectId    Int
+  enrollmentId Int
+  mf           Float?
+  mfd          Float?
+  mt1          Float?
+  mt2          Float?
+  mt3          Float?
+  resource     Float
+  pf1          Float
+  pf2          Float
+  pft          Float
+  ps1          Float
+  ps2          Float
+  pst          Float
+  pt1          Float
+  pt2          Float
+  ptt          Float
+  approved     APPROVED_STATE @default(FAILED)
+  ims          Float?
+  enrollments  Enrollment     @relation(fields: [enrollmentId], references: [id])
+  subjects     Subject        @relation(fields: [subjectId], references: [id])
+
+  @@map("notes")
+}
+
+model Subject {
+  id         Int      @id @unique @default(autoincrement())
+  name       String   @unique
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+  Note       Note[]
+
+  @@map("subjects")
+}
+
+model MonthPaid {
+  id            Int       @id @unique @default(autoincrement())
+  name          MonthName
+  price         Float
+  trafic_ticket String
+  tuitionId     Int?
+  tuitions      Tuition?  @relation(fields: [tuitionId], references: [id])
+
+  @@map("month_paids")
+}
+
+model Classe {
+  id           Int          @id @unique @default(autoincrement())
+  name         String
+  course       String
+  id_classroom Int
+  period       String
+  created_at   DateTime     @default(now())
+  update_at    DateTime     @updatedAt
+  classrooms   Classroom    @relation(fields: [id_classroom], references: [id])
+  Enrollment   Enrollment[]
+
+  @@map("classes")
+}
+
+model Student {
+  id                 Int           @id @unique @default(autoincrement())
+  type               StudentType
+  fullName           String
+  father             String
+  mother             String
+  dateOfBirth        DateTime
+  height             Float
+  identityCardNumber String        @unique
+  gender             Gender
+  emissionDate       DateTime
+  expirationDate     DateTime
+  maritalStatus      MaritalStatus
+  residence          String
+  phone              String        @unique
+  alternativePhone   String?
+  countyId           Int?
+  provinceId         Int?
+  created_at         DateTime      @default(now())
+  update_at          DateTime      @updatedAt
+  enrollments        Enrollment?
+  files              File[]
+  counties           String
+  provinces          Province?     @relation(fields: [provinceId], references: [id])
+  tuitionFees        Tuition[]
+  User               User?
+
+  @@map("students")
+}
+
+model Document {
+  id           Int         @id @unique @default(autoincrement())
+  enrollmentId Int?
+  created_at   DateTime    @default(now())
+  update_at    DateTime    @updatedAt
+  enrollments  Enrollment? @relation(fields: [enrollmentId], references: [id])
+  File         File[]
+
+  @@map("documents")
+}
+
+model Receipt {
+  id         Int      @id @unique @default(autoincrement())
+  tuition_id Int
+  path       String
+  payment_id Int
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+  payments   Payment  @relation(fields: [payment_id], references: [id])
+  tuitions   Tuition  @relation(fields: [tuition_id], references: [id])
+
+  @@map("receipts")
+}
+
+model Course {
+  id         Int          @id @unique @default(autoincrement())
+  name       String       @unique
+  created_at DateTime     @default(now())
+  update_at  DateTime     @updatedAt
+  Enrollment Enrollment[]
+
+  @@map("courses")
+}
+
+model Tuition {
+  id          Int         @id @unique @default(autoincrement())
+  student_id  Int
+  state       String
+  pay_data    DateTime
+  quantity    Int
+  amount_paid Float
+  months      MonthPaid[]
+  receipts    Receipt[]
+  students    Student     @relation(fields: [student_id], references: [id])
+
+  @@map("tuition")
+}
+
+model Classroom {
+  id         Int      @id @unique @default(autoincrement())
+  name       String
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+  classes    Classe[]
+
+  @@map("classrooms")
+}
+
+model Enrollment {
+  id                 Int              @id @unique @default(autoincrement())
+  docsState          EnrollementState
+  paymentState       EnrollementState
+  identityCardNumber String?          @unique
+  levelId            Int?
+  courseId           Int?
+  classeId           Int?
+  created_at         DateTime         @default(now())
+  update_at          DateTime         @updatedAt
+  documents          Document[]
+  classes            Classe?          @relation(fields: [classeId], references: [id])
+  courses            Course?          @relation(fields: [courseId], references: [id])
+  students           Student?         @relation(fields: [identityCardNumber], references: [identityCardNumber])
+  levels             Level?           @relation(fields: [levelId], references: [id])
+  Invoice            Invoice[]
+  Note               Note[]
+  Payment            Payment[]
+  StudentBalance     StudentBalance?
+  Transaction        Transaction[]
+  User               User?
+
+  @@map("enrollments")
+}
+
+model File {
+  id                 Int        @id @unique @default(autoincrement())
+  name               String
+  path               String
+  format             FileFormat
+  type               FileType
+  created_at         DateTime   @default(now())
+  update_at          DateTime   @updatedAt
+  documentId         Int?
+  identityCardNumber String?
+  document           Document?  @relation(fields: [documentId], references: [id])
+  students           Student?   @relation(fields: [identityCardNumber], references: [identityCardNumber])
+
+  @@map("files")
+}
+
+model Employee {
+  id                 Int           @id @default(autoincrement())
+  fullName           String
+  dateOfBirth        DateTime
+  identityCardNumber String        @unique
+  gender             Gender
+  emissionDate       DateTime
+  expirationDate     DateTime
+  maritalStatus      MaritalStatus
+  residence          String
+  phone              String        @unique
+  alternativePhone   String?
+  created_at         DateTime      @default(now())
+  update_at          DateTime      @updatedAt
+  Invoice            Invoice[]
+  Payment            Payment[]
+  Transaction        Transaction[]
+  User               User?
+
+  @@map("employees")
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  password     String
+  loginAttempt Int
+  isBlocked    Boolean
+  role         Role
+  isActive     Boolean
+  lastLogin    DateTime    @updatedAt
+  created_at   DateTime    @default(now())
+  update_at    DateTime    @updatedAt
+  employeeId   Int?        @unique
+  studentId    Int?        @unique
+  enrollmentId Int?        @unique
+  accessLogs   AccessLog[]
+  employee     Employee?   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  student      Student?    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("users")
+}
+
+model AccessLog {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  timestamp DateTime     @default(now())
+  status    AccessStatus
+  user      User         @relation(fields: [userId], references: [id])
+
+  @@map("accesslogs")
+}
+
+model Invoice {
+  id           Int           @id @default(autoincrement())
+  totalAmount  Decimal       @db.Decimal(10, 2)
+  dueDate      DateTime
+  issueDate    DateTime      @default(now())
+  enrollmentId Int
+  created_at   DateTime      @default(now())
+  update_at    DateTime      @updatedAt
+  status       PAY_STATUS    @default(PENDING)
+  employeeId   Int?
+  type         InvoiceType?
+  items        InvoiceItem[]
+  employee     Employee?     @relation(fields: [employeeId], references: [id])
+  Enrollment   Enrollment    @relation(fields: [enrollmentId], references: [id])
+  Payment      Payment[]
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id           Int        @id @default(autoincrement())
+  description  String
+  amount       Decimal    @db.Decimal(10, 2)
+  total_amount Decimal    @db.Decimal(10, 2)
+  status       PAY_STATUS
+  invoiceId    Int
+  QTY          Int
+  month        MonthName?
+  created_at   DateTime   @default(now())
+  update_at    DateTime   @updatedAt
+  invoice      Invoice    @relation(fields: [invoiceId], references: [id])
+
+  @@map("invoice_items")
+}
+
+model Transaction {
+  id                Int        @id @default(autoincrement())
+  paymentId         Int?       @unique
+  transactionNumber String     @unique
+  amount            Decimal    @db.Decimal(10, 2)
+  enrollmentId      Int
+  date              DateTime   @default(now())
+  employeeId        Int?
+  used              Boolean    @default(false)
+  employee          Employee?  @relation(fields: [employeeId], references: [id])
+  Enrollment        Enrollment @relation(fields: [enrollmentId], references: [id])
+  payment           Payment?   @relation("PaymentToTransaction", fields: [paymentId], references: [id])
+
+  @@map("transactions")
+}
+
+model Payment {
+  id             Int              @id @default(autoincrement())
+  created_at     DateTime         @default(now())
+  update_at      DateTime         @updatedAt
+  employeeId     Int?
+  enrollmentId   Int?
+  invoiceId      Int
+  totalAmount    Decimal          @db.Decimal(10, 2)
+  status         PAY_STATUS       @default(PENDING)
+  transactionId  Int?             @unique
+  PaymentDetails PaymentDetails[]
+  employee       Employee?        @relation(fields: [employeeId], references: [id])
+  Enrollment     Enrollment?      @relation(fields: [enrollmentId], references: [id])
+  invoice        Invoice          @relation(fields: [invoiceId], references: [id])
+  Receipt        Receipt[]
+  transaction    Transaction?     @relation("PaymentToTransaction")
+
+  @@map("payments")
+}
+
+model PaymentItem {
+  id             Int              @id @default(autoincrement())
+  description    String           @db.VarChar(100)
+  price          Decimal          @db.Decimal(10, 2)
+  type           String           @db.VarChar(50)
+  created_at     DateTime         @default(now())
+  update_at      DateTime         @updatedAt
+  PaymentDetails PaymentDetails[]
+
+  @@map("paymentitems")
+}
+
+model PaymentDetails {
+  id            Int         @id @default(autoincrement())
+  paymentId     Int
+  paymentItemId Int
+  amount        Decimal     @db.Decimal(10, 2)
+  created_at    DateTime    @default(now())
+  update_at     DateTime    @updatedAt
+  payment       Payment     @relation(fields: [paymentId], references: [id])
+  paymentItem   PaymentItem @relation(fields: [paymentItemId], references: [id])
+
+  @@map("paymentdetails")
+}
+
+model StudentBalance {
+  id           Int         @id @default(autoincrement())
+  balance      Decimal     @default(0) @db.Decimal(10, 2)
+  enrollmentId Int?        @unique
+  created_at   DateTime    @default(now())
+  update_at    DateTime    @updatedAt
+  Enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id])
+
+  @@map("studentbalance")
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -19,7 +394,6 @@ enum APPROVED_STATE {
   WITH_DEFICIENCY
 }
 
-// Níveis de acesso
 enum Role {
   STUDENT
   EMPLOYEE
@@ -98,32 +472,12 @@ enum LevelName {
 }
 
 enum InvoiceType {
-  DECLARATION @map("Declaração")
-  CERTIFICATE @map("Certificado")
-  PASS        @map("Passe")
-  UNIFORM     @map("Uniforme")
-}
-
-// Níveis dos estudantes
-model Level {
-  id         Int          @id @unique @default(autoincrement())
-  name       LevelName
-  created_at DateTime     @default(now())
-  update_at  DateTime     @updatedAt
-  Enrollment Enrollment[]
-
-  @@map("levels")
-}
-
-// Províncias
-model Province {
-  id         Int       @id @unique @default(autoincrement())
-  name       String    @unique
-  created_at DateTime  @default(now())
-  update_at  DateTime  @updatedAt
-  students   Student[]
-
-  @@map("provinces")
+  DECLARATION     @map("Declaração")
+  CERTIFICATE     @map("Certificado")
+  PASS            @map("Passe")
+  UNIFORM         @map("Uniforme")
+  TUITION         @map("Propinas")
+  TUITION_PENALTY @map("Multa de Propinas")
 }
 
 enum PaymentType {
@@ -143,394 +497,4 @@ enum Mester {
   FIRST
   SECOND
   THIRD
-}
-
-// Tabela de notas do estudantes
-model Note {
-  id           Int            @id @unique @default(autoincrement())
-  pf1          Float
-  pf2          Float
-  pft          Float
-  ps1          Float
-  ps2          Float
-  pst          Float
-  pt1          Float
-  pt2          Float
-  ptt          Float
-  nee          Float
-  mt1          Float?
-  mt2          Float?
-  mt3          Float?
-  mf           Float?
-  resource     Float
-  mfd          Float?
-  ims          Float?
-  approved     APPROVED_STATE @default(FAILED)
-  level        LevelName
-  enrollments  Enrollment     @relation(fields: [enrollmentId], references: [id])
-  subjects     Subject        @relation(fields: [subjectId], references: [id])
-  created_at   DateTime
-  update_at    DateTime
-  subjectId    Int
-  enrollmentId Int
-
-  @@map("notes")
-}
-
-// Disciplinas
-model Subject {
-  id         Int      @id @unique @default(autoincrement())
-  name       String   @unique
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
-  Note       Note[]
-
-  @@map("subjects")
-}
-
-// Meses
-model MonthPaid {
-  id            Int       @id @unique @default(autoincrement())
-  name          MonthName
-  price         Float
-  trafic_ticket String
-  tuitions      Tuition?  @relation(fields: [tuitionId], references: [id])
-  tuitionId     Int?
-
-  @@map("month_paids")
-}
-
-// Turmas
-model Classe {
-  id           Int          @id @unique @default(autoincrement())
-  name         String
-  course       String
-  id_classroom Int
-  period       String
-  classrooms   Classroom    @relation(fields: [id_classroom], references: [id])
-  Enrollment   Enrollment[]
-  created_at   DateTime     @default(now())
-  update_at    DateTime     @updatedAt
-
-  @@map("classes")
-}
-
-// Estudantes
-model Student {
-  id                 Int           @id @unique @default(autoincrement())
-  type               StudentType
-  fullName           String
-  father             String
-  mother             String
-  dateOfBirth        DateTime
-  height             Float
-  identityCardNumber String        @unique
-  gender             Gender
-  emissionDate       DateTime
-  expirationDate     DateTime
-  maritalStatus      MaritalStatus
-  residence          String
-  phone              String        @unique
-  alternativePhone   String?
-  provinces          Province?     @relation(fields: [provinceId], references: [id])
-  counties           County?       @relation(fields: [countyId], references: [id])
-  tuitionFees        Tuition[]
-  files              File[]
-  enrollments        Enrollment[]
-  countyId           Int?
-  provinceId         Int?
-  created_at         DateTime      @default(now())
-  update_at          DateTime      @updatedAt
-  User               User?
-
-  @@map("students")
-}
-
-// Documentos
-model Document {
-  id           Int         @id @unique @default(autoincrement())
-  enrollments  Enrollment? @relation(fields: [enrollmentId], references: [id])
-  enrollmentId Int?
-  created_at   DateTime    @default(now())
-  update_at    DateTime    @updatedAt
-  File         File[]
-
-  @@map("documents")
-}
-
-// Recibos
-model Receipt {
-  id         Int      @id @unique @default(autoincrement())
-  tuition_id Int
-  path       String
-  payment_id Int
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
-  tuitions   Tuition  @relation(fields: [tuition_id], references: [id])
-  payments   Payment? @relation(fields: [payment_id], references: [id])
-
-  @@map("receipts")
-}
-
-// Cursos
-model Course {
-  id         Int          @id @unique @default(autoincrement())
-  name       String       @unique
-  created_at DateTime     @default(now())
-  update_at  DateTime     @updatedAt
-  Enrollment Enrollment[]
-
-  @@map("courses")
-}
-
-// propinas
-model Tuition {
-  id          Int         @id @unique @default(autoincrement())
-  student_id  Int
-  state       String
-  pay_data    DateTime
-  quantity    Int
-  amount_paid Float
-  students    Student     @relation(fields: [student_id], references: [id])
-  months      MonthPaid[]
-  receipts    Receipt[]
-
-  @@map("tuition")
-}
-
-// municipios
-model County {
-  id         Int       @id @unique @default(autoincrement())
-  name       String
-  created_at DateTime  @default(now())
-  update_at  DateTime  @updatedAt
-  students   Student[]
-
-  @@map("counties")
-}
-
-// Salas de aula
-model Classroom {
-  id         Int      @id @unique @default(autoincrement())
-  name       String
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
-  classes    Classe[]
-
-  @@map("classrooms")
-}
-
-// Matrículas
-model Enrollment {
-  id                 Int              @id @unique @default(autoincrement())
-  docsState          EnrollementState
-  paymentState       EnrollementState
-  students           Student?         @relation(fields: [identityCardNumber], references: [identityCardNumber])
-  documents          Document[]
-  levels             Level?           @relation(fields: [levelId], references: [id])
-  courses            Course?          @relation(fields: [courseId], references: [id])
-  classes            Classe?          @relation(fields: [classeId], references: [id])
-  identityCardNumber String?          @unique
-  levelId            Int?
-  courseId           Int?
-  classeId           Int?
-
-  created_at     DateTime         @default(now())
-  update_at      DateTime         @updatedAt
-  Note           Note[]
-  User           User[]
-  Invoice        Invoice[]
-  Transaction    Transaction[]
-  StudentBalance StudentBalance[]
-  Payment        Payment[]
-
-  @@map("enrollments")
-}
-
-// Arquivos
-model File {
-  id                 Int        @id @unique @default(autoincrement())
-  name               String
-  path               String
-  format             FileFormat
-  type               FileType
-  students           Student?   @relation(fields: [identityCardNumber], references: [identityCardNumber])
-  document           Document?  @relation(fields: [documentId], references: [id])
-  documentId         Int?
-  identityCardNumber String?
-
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
-
-  @@map("files")
-}
-
-model Employee {
-  id                 Int           @id @default(autoincrement())
-  fullName           String
-  dateOfBirth        DateTime
-  identityCardNumber String        @unique
-  gender             Gender
-  emissionDate       DateTime
-  expirationDate     DateTime
-  maritalStatus      MaritalStatus
-  residence          String
-  phone              String        @unique
-  alternativePhone   String?
-  created_at         DateTime      @default(now())
-  update_at          DateTime      @updatedAt
-  User               User?
-  Payment            Payment[]
-  Invoice            Invoice[]
-  Transaction        Transaction[]
-
-  @@map("employees")
-}
-
-model User {
-  id           Int         @id @default(autoincrement())
-  email        String      @unique
-  password     String
-  loginAttempt Int
-  isBlocked    Boolean
-  role         Role
-  isActive     Boolean
-  lastLogin    DateTime    @updatedAt
-  created_at   DateTime    @default(now())
-  update_at    DateTime    @updatedAt
-  accessLogs   AccessLog[]
-  employee     Employee?   @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  employeeId   Int?        @unique
-  student      Student?    @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  studentId    Int?        @unique
-  enrollmentId Int?        @unique
-
-  @@map("users")
-}
-
-model AccessLog {
-  id        Int          @id @default(autoincrement())
-  userId    Int
-  user      User         @relation(fields: [userId], references: [id])
-  timestamp DateTime     @default(now())
-  status    AccessStatus
-
-  @@map("accesslogs")
-}
-
-//Armazena as faturas dos estudantes.
-model Invoice {
-  id           Int           @id @default(autoincrement())
-  totalAmount  Decimal       @db.Decimal(10, 2)
-  status       PAY_STATUS    @default(PENDING)
-  dueDate      DateTime
-  issueDate    DateTime      @default(now())
-  type         InvoiceType? // Pode ser um enum ou string para representar o tipo de invoice
-  // Relacionamentos
-  items        InvoiceItem[] // Relacionamento com os itens da fatura
-  Payment      Payment[]
-  Enrollment   Enrollment?   @relation(fields: [enrollmentId], references: [id])
-  enrollmentId Int
-  employeeId   Int?
-  employee     Employee?     @relation(fields: [employeeId], references: [id])
-  created_at   DateTime      @default(now())
-  update_at    DateTime      @updatedAt
-
-  @@map("invoices")
-}
-
-model InvoiceItem {
-  id          Int      @id @default(autoincrement())
-  description String // Descrição do item, por exemplo: "Uniforme", "Certificado", etc.
-  amount      Decimal  @db.Decimal(10, 2) // Valor de cada item
-  invoiceId   Int
-  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
-  created_at  DateTime @default(now())
-  update_at   DateTime @updatedAt
-
-  @@map("invoice_items")
-}
-
-//Armazena as transações bancárias.
-model Transaction {
-  id                Int         @id @default(autoincrement())
-  transactionNumber String      @unique
-  amount            Decimal     @db.Decimal(10, 2)
-  date              DateTime    @default(now())
-  used              Boolean     @default(false)
-  // Relacionamento com Payment
-  payment           Payment?    @relation(name: "PaymentToTransaction", fields: [paymentId], references: [id])
-  paymentId         Int?        @unique
-  Enrollment        Enrollment? @relation(fields: [enrollmentId], references: [id])
-  enrollmentId      Int
-  employeeId        Int?
-  employee          Employee?   @relation(fields: [employeeId], references: [id])
-
-  @@map("transactions")
-}
-
-//Armazena os detalhes do pagamento.
-model Payment {
-  id          Int        @id @default(autoincrement())
-  invoice     Invoice    @relation(fields: [invoiceId], references: [id])
-  invoiceId   Int
-  employee    Employee?  @relation(fields: [employeeId], references: [id])
-  employeeId  Int?
-  totalAmount Decimal    @db.Decimal(10, 2)
-  status      PAY_STATUS @default(PENDING)
-
-  // Relacionamento com Transaction
-  transaction   Transaction? @relation(name: "PaymentToTransaction")
-  transactionId Int?         @unique
-
-  PaymentDetails PaymentDetails[]
-  Receipt        Receipt[]
-  Enrollment     Enrollment?      @relation(fields: [enrollmentId], references: [id])
-  enrollmentId   Int?
-  created_at     DateTime         @default(now())
-  update_at      DateTime         @updatedAt
-
-  @@map("payments")
-}
-
-//Representa os diferentes tipos de pagamento, como propinas, matrículas, etc.
-model PaymentItem {
-  id          Int     @id @default(autoincrement())
-  description String  @db.VarChar(100)
-  price       Decimal @db.Decimal(10, 2)
-  type        String  @db.VarChar(50)
-
-  // Relacionamentos
-  PaymentDetails PaymentDetails[]
-  created_at     DateTime         @default(now())
-  update_at      DateTime         @updatedAt
-
-  @@map("paymentitems")
-}
-
-// Detalhes de pagamento do item
-model PaymentDetails {
-  id            Int         @id @default(autoincrement())
-  payment       Payment     @relation(fields: [paymentId], references: [id])
-  paymentId     Int
-  paymentItem   PaymentItem @relation(fields: [paymentItemId], references: [id])
-  paymentItemId Int
-  amount        Decimal     @db.Decimal(10, 2)
-  created_at    DateTime    @default(now())
-  update_at     DateTime    @updatedAt
-
-  @@map("paymentdetails")
-}
-
-// Gerencia o saldo dos estudantes.
-model StudentBalance {
-  id           Int         @id @default(autoincrement())
-  balance      Decimal     @default(0) @db.Decimal(10, 2)
-  Enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id])
-  enrollmentId Int?        @unique
-  created_at   DateTime    @default(now())
-  update_at    DateTime    @updatedAt
-
-  @@map("studentbalance")
 }

@@ -1,6 +1,7 @@
 import { EmployeeNotFoundError } from '@/use-cases/errors/employee-not-found';
 import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
 import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invoice-use-case';
+import { InvoiceType, MonthName } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
@@ -10,19 +11,21 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     enrollmentId: z.number().int().nonnegative(),
     employeeId: z.number().int().nonnegative(),
     dueDate: z.coerce.date(),
+    type: z.nativeEnum(InvoiceType),
     issueDate: z.coerce.date(),
     items: z.object({
       description: z.string(),
       amount: z.number().int().nonnegative(),
+      month: z.nativeEnum(MonthName),
+      qty: z.number().int().nonnegative(),
     }).array().min(1),
   });
-
   // Validação do corpo da requisição
   const parsedBody = createPaymentBodySchema.safeParse(request.body);
   if (!parsedBody.success) {
     return reply.status(400).send({ message: 'Invalid request data.', errors: parsedBody.error.errors });
   }
-  const { enrollmentId, employeeId, dueDate,items,issueDate } = parsedBody.data;
+  const { enrollmentId, employeeId, dueDate,items,issueDate,type } = parsedBody.data;
 
   try {
     let createInvoiceUseCase = makeCreateInvoiceUseCase()
@@ -32,6 +35,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       dueDate,
       items,
       issueDate,
+      type
     });
 
     return reply.status(201).send(invoice);

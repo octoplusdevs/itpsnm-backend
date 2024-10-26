@@ -5,16 +5,19 @@ import { EnrollmentNotFoundError } from "../errors/enrollment-not-found";
 import { EmployeeNotFoundError } from "../errors/employee-not-found";
 import { Decimal } from "@prisma/client/runtime/library";
 import { InvoiceItemRepository } from "@/repositories/invoices-item-repository";
-import { PAY_STATUS } from "@prisma/client";
+import { InvoiceType, MonthName, PAY_STATUS } from "@prisma/client";
 
 interface CreateInvoiceDTO {
   enrollmentId: number;
   employeeId: number;
   dueDate: Date;
   issueDate: Date;
+  type: InvoiceType;
   items: Array<{
     description: string;
     amount: number;
+    month: MonthName | null;
+    qty: number;
   }>;
 }
 
@@ -53,7 +56,7 @@ export class CreateInvoiceUseCase {
       created_at: new Date(),
       update_at: new Date(),
       issueDate: data.issueDate,
-      type: null
+      type: data.type
     });
 
     // Cria os itens da fatura (invoice items)
@@ -64,6 +67,10 @@ export class CreateInvoiceUseCase {
         amount: new Decimal(item.amount),
         created_at: new Date(),
         update_at: new Date(),
+        status: PAY_STATUS.PENDING,
+        total_amount: new Decimal(item.amount * item.qty),
+        QTY: item.qty,
+        month: data.type === "TUITION" ? item.month : null
       });
     }
 

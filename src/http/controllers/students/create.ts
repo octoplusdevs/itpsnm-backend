@@ -25,13 +25,11 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     type: z.enum(['SCHOLARSHIP', 'REGULAR']).default('REGULAR'),
     alternativePhone: z.string().optional(),
     provinceId: z.number(),
-    countyId: z.number(),
   });
 
   try {
     const {
       alternativePhone,
-      countyId,
       dateOfBirth,
       emissionDate,
       expirationDate,
@@ -51,7 +49,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     const studentUseCase = makeStudentUseCase();
     await studentUseCase.execute({
       alternativePhone,
-      countyId,
       dateOfBirth,
       emissionDate,
       expirationDate,

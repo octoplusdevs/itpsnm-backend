@@ -17,7 +17,6 @@ export interface StudentCreateInput {
   residence: string
   phone: string
   alternativePhone?: string | null
-  countyId: number
   provinceId: number
   createdAt?: Date
   updatedAt?: Date
