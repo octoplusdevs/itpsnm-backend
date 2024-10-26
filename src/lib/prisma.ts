@@ -48,15 +48,15 @@ async function main() {
   ];
 
 
-  await prisma.province.createMany({
-    data: Provinces,
-  });
-  await prisma.level.createMany({
-    data: levels,
-  });
-  await prisma.course.createMany({
-    data: courses,
-  });
+  // await prisma.province.createMany({
+  //   data: Provinces,
+  // });
+  // await prisma.level.createMany({
+  //   data: levels,
+  // });
+  // await prisma.course.createMany({
+  //   data: courses,
+  // });
 }
 main()
   .then(async () => {
