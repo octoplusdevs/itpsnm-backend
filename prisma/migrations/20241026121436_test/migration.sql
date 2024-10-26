@@ -1,7 +1,6 @@
 /*
   Warnings:
 
-  - Added the required column `QTY` to the `invoice_items` table without a default value. This is not possible if the table is not empty.
   - Added the required column `status` to the `invoice_items` table without a default value. This is not possible if the table is not empty.
   - Added the required column `total_amount` to the `invoice_items` table without a default value. This is not possible if the table is not empty.
 
@@ -18,7 +17,7 @@ ALTER TYPE "InvoiceType" ADD VALUE 'Propinas';
 ALTER TYPE "InvoiceType" ADD VALUE 'Multa de Propinas';
 
 -- AlterTable
-ALTER TABLE "invoice_items" ADD COLUMN     "QTY" INTEGER NOT NULL,
+ALTER TABLE "invoice_items" ADD COLUMN     "QTY" INTEGER DEFAULT 1,
 ADD COLUMN     "month" "MonthName",
 ADD COLUMN     "status" "PAY_STATUS" NOT NULL,
 ADD COLUMN     "total_amount" DECIMAL(10,2) NOT NULL;
