@@ -302,7 +302,7 @@ model InvoiceItem {
   total_amount Decimal    @db.Decimal(10, 2)
   status       PAY_STATUS
   invoiceId    Int
-  QTY          Int
+  QTY          Int?       @default(1)
   month        MonthName?
   created_at   DateTime   @default(now())
   update_at    DateTime   @updatedAt
