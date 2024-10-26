@@ -5,6 +5,7 @@ import { PaymentIsNotPendingError } from '@/use-cases/errors/payment-is-not-pend
 import { EmployeeNotFoundError } from '@/use-cases/errors/employee-not-found'
 import { makeApprovePaymentUseCase } from '@/use-cases/factories/make-approve-payment-use-case'
 import { PAY_STATUS } from '@prisma/client'
+import { InvoiceItemNotFoundError } from '@/use-cases/errors/invoice-item-not-found'
 
 export async function approvePayment(request: FastifyRequest, reply: FastifyReply) {
   const approvePaymentSchema = z.object({
@@ -27,6 +28,10 @@ export async function approvePayment(request: FastifyRequest, reply: FastifyRepl
     return reply.status(200).send(approvedPayment)
   } catch (err) {
     if (err instanceof PaymentNotFoundError) {
+      return reply.status(404).send({ message: err.message })
+    }
+
+    if (err instanceof InvoiceItemNotFoundError) {
       return reply.status(404).send({ message: err.message })
     }
 

@@ -4,6 +4,7 @@ import { PaymentNotFoundError } from "../errors/payment-not-found"
 import { EmployeeRepository } from "@/repositories/employee-repository"
 import { EmployeeNotFoundError } from "../errors/employee-not-found"
 import { InvoiceItemRepository } from "@/repositories/invoices-item-repository"
+import { InvoiceItemNotFoundError } from "../errors/invoice-item-not-found"
 
 interface ApprovePaymentDTO {
   paymentId: number
@@ -33,7 +34,9 @@ export class ApprovePaymentUseCase {
     //   throw new PaymentIsNotPendingError()
     // }
     const items = await this.invoiceItemRepository.findInvoiceItemsByInvoiceId(payment.invoiceId)
-
+    if (!items) {
+      throw new InvoiceItemNotFoundError()
+    }
     for (const item of items) {
       await this.invoiceItemRepository.updateInvoiceItem(item.id, {
         status: PAY_STATUS.PAID,
