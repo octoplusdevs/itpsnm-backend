@@ -8,7 +8,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
   const createPaymentBodySchema = z.object({
     enrollmentId: z.number().int().nonnegative(),
-    invoiceId: z.number().int().nonnegative(),
     employeeId: z.number().int().nonnegative(),
     dueDate: z.coerce.date(),
     issueDate: z.coerce.date(),

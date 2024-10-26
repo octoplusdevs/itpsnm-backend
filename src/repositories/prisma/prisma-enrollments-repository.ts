@@ -81,7 +81,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             date: true,
             transactionNumber: true,
             used: true,
-            employee: true
+            employee: {
+              select: {
+                fullName: true,
+                id: true
+              }
+            }
           }
         },
         Invoice: {
@@ -99,6 +104,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
                 amount: true,
                 created_at: true,
                 description: true,
+              }
+            },
+            employee: {
+              select: {
+                fullName: true,
+                id: true
               }
             }
           }
@@ -126,7 +137,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             date: true,
             transactionNumber: true,
             used: true,
-            employee: true
+            employee: {
+              select: {
+                fullName: true,
+                id: true
+              }
+            }
           }
         },
         Invoice: {
@@ -137,6 +153,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             update_at: true,
             status: true,
             totalAmount: true,
+            employee: {
+              select: {
+                fullName: true,
+                id: true
+              }
+            },
             id: true,
             items: {
               select: {
@@ -220,7 +242,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             date: true,
             transactionNumber: true,
             used: true,
-            employee: true
+            employee: {
+              select: {
+                fullName: true,
+                id: true
+              }
+            }
           }
         },
         Invoice: {
@@ -231,6 +258,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             update_at: true,
             status: true,
             totalAmount: true,
+            employee: {
+              select: {
+                fullName: true,
+                id: true
+              }
+            },
             id: true,
             items: {
               select: {
@@ -372,7 +405,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             date: true,
             transactionNumber: true,
             used: true,
-            employee: true
+            employee: {
+              select: {
+                fullName: true,
+                id: true
+              }
+            }
           }
         },
         Invoice: {
@@ -384,6 +422,12 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
             status: true,
             totalAmount: true,
             id: true,
+            employee: {
+              select: {
+                fullName: true,
+                id: true
+              }
+            },
             items: {
               select: {
                 id: true,
