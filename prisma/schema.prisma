@@ -115,7 +115,6 @@ model Student {
   update_at          DateTime      @updatedAt
   enrollments        Enrollment?
   files              File[]
-  counties           String
   provinces          Province?     @relation(fields: [provinceId], references: [id])
   tuitionFees        Tuition[]
   User               User?

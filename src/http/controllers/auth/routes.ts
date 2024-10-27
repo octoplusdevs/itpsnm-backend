@@ -23,7 +23,7 @@ export async function authRoutes(app: FastifyInstance) {
     {
       preHandler: [
         accessControlMiddleware([Role.STUDENT]),
-        filterTuitionInvoicesMiddleware // Remova os parênteses para passar a função diretamente
+        filterTuitionInvoicesMiddleware
       ]
     },
     async (request, reply) => {

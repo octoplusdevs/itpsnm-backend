@@ -18,6 +18,8 @@ interface CreateInvoiceDTO {
     amount: number;
     month: MonthName | null;
     qty: number;
+    createdAt?: Date;
+    updatedAt?: Date;
   }>;
 }
 
@@ -53,7 +55,7 @@ export class CreateInvoiceUseCase {
       totalAmount: new Decimal(totalAmount),
       dueDate: data.dueDate,
       status: PAY_STATUS.PENDING,
-      created_at: new Date(),
+      created_at:  new Date(),
       update_at: new Date(),
       issueDate: data.issueDate,
       type: data.type
@@ -65,11 +67,12 @@ export class CreateInvoiceUseCase {
         invoiceId: invoice.id,
         description: item.description,
         amount: new Decimal(item.amount),
-        created_at: new Date(),
-        update_at: new Date(),
+        created_at: item.createdAt ?? new Date(),
+        update_at: item.updatedAt ?? new Date(),
         status: PAY_STATUS.PENDING,
         total_amount: new Decimal(item.amount * item.qty),
         QTY: item.qty,
+
         month: data.type === "TUITION" ? item.month : null
       });
     }

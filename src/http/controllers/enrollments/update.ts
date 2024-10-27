@@ -20,6 +20,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     paymentState: z.nativeEnum(EnrollementState).optional(),
     classeId: z.number().optional(),
     employeeId: z.number(),
+    startDate: z.date().default(new Date("01-09-2023")),
   });
 
 
@@ -31,6 +32,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       docsState,
       paymentState,
       classeId,
+      startDate,
       levelId,
       employeeId,
     } = createEnrollmentSchema.parse(request.body);
@@ -50,20 +52,29 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
 
     let months = Object.values(MonthName)
     let items = [];
+    const issueDate = new Date(startDate);
+
+    const dueDate = new Date(issueDate);
+    dueDate.setMonth(dueDate.getMonth() + 10);
+
     for (let month of months) {
       items.push({
         description: "",
         amount: 17000,
+        createdAt: issueDate,
+        updatedAt: issueDate,
         month,
         qty: 1
       })
     }
+
+
     await createInvoiceUseCase.execute({
       enrollmentId: enrollment.enrollment.id,
       employeeId,
-      dueDate: new Date(),
+      dueDate,
       items,
-      issueDate: new Date(),
+      issueDate,
       type: 'TUITION'
     });
 
