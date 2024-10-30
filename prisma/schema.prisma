@@ -85,13 +85,13 @@ model Classe {
   name         ClasseType
   period       PeriodType
   course       Course?      @relation(fields: [courseId], references: [id])
-  id_classroom Int
-  course_id    Int
+  id_classroom Int?
+  course_id    Int?
   created_at   DateTime     @default(now())
   update_at    DateTime     @updatedAt
-  classrooms   Classroom    @relation(fields: [id_classroom], references: [id])
+  classrooms   Classroom?    @relation(fields: [id_classroom], references: [id])
   Enrollment   Enrollment[]
-  courseId     Int
+  courseId     Int?
 
   @@map("classes")
 }
