@@ -12,9 +12,7 @@ async function main() {
   await prisma.province.deleteMany()
   await prisma.itemPrices.deleteMany()
   await prisma.level.deleteMany()
-  await prisma.course.createMany({
-    data: Provinces,
-  });
+  await prisma.course.deleteMany();
 
   await prisma.itemPrices.createMany({
     data: itemPrices,
