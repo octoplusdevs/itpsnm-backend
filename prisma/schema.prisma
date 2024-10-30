@@ -13,6 +13,7 @@ model Level {
   created_at DateTime     @default(now())
   update_at  DateTime     @updatedAt
   Enrollment Enrollment[]
+  ItemPrices ItemPrices[]
 
   @@map("levels")
 }
@@ -81,16 +82,34 @@ model MonthPaid {
 
 model Classe {
   id           Int          @id @unique @default(autoincrement())
-  name         String
-  course       String
+  name         ClasseType
+  period       PeriodType
+  course       Course?      @relation(fields: [courseId], references: [id])
   id_classroom Int
-  period       String
+  course_id    Int
   created_at   DateTime     @default(now())
   update_at    DateTime     @updatedAt
   classrooms   Classroom    @relation(fields: [id_classroom], references: [id])
   Enrollment   Enrollment[]
+  courseId     Int
 
   @@map("classes")
+}
+
+model ItemPrices {
+  id            Int      @id @default(autoincrement())
+  level         Level?   @relation(fields: [levelId], references: [id])
+  itemName      String // Nome do item (exemplo: 'Propina', 'Cartão PVC')
+  basePrice     Decimal // Preço do item antes do IVA
+  ivaPercentage Int? // Percentual de IVA, se aplicável
+  priceWithIva  Decimal? // Preço final com IVA
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  levelId   Int?
+
+  @@unique([levelId, itemName]) // Garante que não haja duplicação de item para a mesma classe
+  @@map("item_prices")
 }
 
 model Student {
@@ -152,6 +171,7 @@ model Course {
   created_at DateTime     @default(now())
   update_at  DateTime     @updatedAt
   Enrollment Enrollment[]
+  Classe     Classe[]
 
   @@map("courses")
 }
@@ -173,6 +193,7 @@ model Tuition {
 model Classroom {
   id         Int      @id @unique @default(autoincrement())
   name       String
+  capacity   Int      @default(40)
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
   classes    Classe[]
@@ -312,7 +333,7 @@ model InvoiceItem {
 
 model Transaction {
   id                Int        @id @default(autoincrement())
-  paymentId         Int?       @unique
+  paymentId         Int?
   transactionNumber String     @unique
   amount            Decimal    @db.Decimal(10, 2)
   enrollmentId      Int
@@ -341,7 +362,7 @@ model Payment {
   Enrollment     Enrollment?      @relation(fields: [enrollmentId], references: [id])
   invoice        Invoice          @relation(fields: [invoiceId], references: [id])
   Receipt        Receipt[]
-  transaction    Transaction?     @relation("PaymentToTransaction")
+  transactions Transaction[] @relation("PaymentToTransaction")
 
   @@map("payments")
 }
@@ -496,4 +517,17 @@ enum Mester {
   FIRST
   SECOND
   THIRD
+}
+
+enum PeriodType {
+  MORNING
+  AFTERNOON
+  EVENING
+}
+
+enum ClasseType {
+  A
+  B
+  C
+  D
 }

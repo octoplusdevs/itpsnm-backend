@@ -105,6 +105,10 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
                 amount: true,
                 created_at: true,
                 description: true,
+                QTY: true,
+                status: true,
+                total_amount: true,
+                month: true
               }
             },
             employee: {
@@ -168,6 +172,10 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
                 amount: true,
                 created_at: true,
                 description: true,
+                QTY: true,
+                status: true,
+                total_amount: true,
+                month: true
               }
             }
           }
@@ -274,6 +282,10 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
                 amount: true,
                 created_at: true,
                 description: true,
+                QTY: true,
+                status: true,
+                total_amount: true,
+                month: true
               }
             }
           }
@@ -438,6 +450,10 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
                 amount: true,
                 created_at: true,
                 description: true,
+                QTY: true,
+                status: true,
+                total_amount: true,
+                month: true
               }
             }
           }
