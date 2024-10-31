@@ -16,9 +16,7 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.employee.deleteMany();
 
-  await prisma.itemPrices.createMany({
-    data: itemPrices,
-  });
+
   await prisma.province.createMany({
     data: Provinces,
   });
@@ -33,6 +31,9 @@ async function main() {
   });
   await prisma.user.createMany({
     data: users,
+  });
+  await prisma.itemPrices.createMany({
+    data: itemPrices,
   });
 }
 main()
