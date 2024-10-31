@@ -1,4 +1,4 @@
-import { Course, ItemPrices, Level, Province } from "@prisma/client";
+import { Course, Employee, ItemPrices, Level, Province, User } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 
 export const Provinces: Province[] = [
@@ -482,4 +482,39 @@ export const itemPrices: ItemPrices[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
+]
+
+export const employees: Employee[] = [
+  {
+    id: 1,
+    fullName: "Aguinaldo Algo",
+    alternativePhone: "923232323",
+    dateOfBirth: new Date("01-01-2005"),
+    emissionDate: new Date("01-01-2005"),
+    expirationDate: new Date("01-01-2005"),
+    gender: "MALE",
+    identityCardNumber: "11112112",
+    maritalStatus: "DIVORCED",
+    phone: "0202020",
+    residence:"22323232swd",
+    created_at: new Date(),
+    update_at: new Date(),
+  }
+]
+export const users: User[] = [
+  {
+    id: 1,
+    email: "admin@itpsnm.com",
+    isActive: true,
+    isBlocked: false,
+    role: "ADMIN",
+    password: "$2a$10$7TGzW5J49aYr3ACm67Rlku09eM1kGcDIb.iTGJm6GIJqqmv97Zo52",
+    employeeId: 1,
+    loginAttempt: 0,
+    enrollmentId: null,
+    studentId: null,
+    lastLogin: new Date(),
+    created_at: new Date(),
+    update_at: new Date(),
+  }
 ]
