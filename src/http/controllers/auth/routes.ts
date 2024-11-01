@@ -22,21 +22,21 @@ export async function authRoutes(app: FastifyInstance) {
 
   app.post("/init", async(request, reply) => {
     try {
-      await prisma.province.createMany({
-        data: Provinces,
-      });
-      await prisma.level.createMany({
-        data: levels,
-      });
-      await prisma.course.createMany({
-        data: courses,
-      });
-      await prisma.employee.createMany({
-        data: employees,
-      });
-      await prisma.user.createMany({
-        data: users,
-      });
+      // await prisma.province.createMany({
+      //   data: Provinces,
+      // });
+      // await prisma.level.createMany({
+      //   data: levels,
+      // });
+      // await prisma.course.createMany({
+      //   data: courses,
+      // });
+      // await prisma.employee.createMany({
+      //   data: employees,
+      // });
+      // await prisma.user.createMany({
+      //   data: users,
+      // });
       await prisma.itemPrices.createMany({
         data: itemPrices,
       });
