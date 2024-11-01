@@ -9,32 +9,32 @@ export const prisma = new PrismaClient({
 async function main() {
 
 
-  await prisma.province.deleteMany()
-  await prisma.itemPrices.deleteMany()
-  await prisma.level.deleteMany()
-  await prisma.course.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.employee.deleteMany();
+  // await prisma.province.deleteMany()
+  // await prisma.itemPrices.deleteMany()
+  // await prisma.level.deleteMany()
+  // await prisma.course.deleteMany();
+  // await prisma.user.deleteMany();
+  // await prisma.employee.deleteMany();
 
 
-  await prisma.province.createMany({
-    data: Provinces,
-  });
-  await prisma.level.createMany({
-    data: levels,
-  });
-  await prisma.course.createMany({
-    data: courses,
-  });
-  await prisma.employee.createMany({
-    data: employees,
-  });
-  await prisma.user.createMany({
-    data: users,
-  });
-  await prisma.itemPrices.createMany({
-    data: itemPrices,
-  });
+  // await prisma.province.createMany({
+  //   data: Provinces,
+  // });
+  // await prisma.level.createMany({
+  //   data: levels,
+  // });
+  // await prisma.course.createMany({
+  //   data: courses,
+  // });
+  // await prisma.employee.createMany({
+  //   data: employees,
+  // });
+  // await prisma.user.createMany({
+  //   data: users,
+  // });
+  // await prisma.itemPrices.createMany({
+  //   data: itemPrices,
+  // });
 }
 main()
   .then(async () => {
