@@ -1,8 +1,8 @@
 import { ItemPrices } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { ItemPricesRepository } from '@/repositories/price-repository';
 import { LevelsRepository } from '@/repositories/level-repository';
 import { LevelNotFoundError } from '../errors/level-not-found';
+import { ItemPricesRepository } from '@/repositories/item-prices-repository';
 
 interface CreateItemPriceDTO {
   name: string,

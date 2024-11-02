@@ -9,15 +9,15 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
   const createPaymentBodySchema = z.object({
     enrollmentId: z.number().int().nonnegative(),
+    levelId: z.number().int().nonnegative(),
     employeeId: z.number().int().nonnegative(),
     dueDate: z.coerce.date(),
     type: z.nativeEnum(InvoiceType),
     issueDate: z.coerce.date(),
     items: z.object({
-      description: z.string(),
-      amount: z.number().int().nonnegative(),
       month: z.nativeEnum(MonthName).optional(),
       qty: z.number().int().nonnegative(),
+      itemPriceId: z.number().int().nonnegative(),
     }).array().min(1),
   });
   // Validação do corpo da requisição
@@ -25,7 +25,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   if (!parsedBody.success) {
     return reply.status(400).send({ message: 'Invalid request data.', errors: parsedBody.error.errors });
   }
-  const { enrollmentId, employeeId, dueDate,items,issueDate,type } = parsedBody.data;
+  const { enrollmentId, employeeId, dueDate, items, issueDate, type } = parsedBody.data;
 
   try {
     let createInvoiceUseCase = makeCreateInvoiceUseCase()

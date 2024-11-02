@@ -1,17 +1,20 @@
 import { Decimal } from '@prisma/client/runtime/library';
-import { ItemPricesRepository } from '../price-repository'
 import { prisma } from '@/lib/prisma';
 import { ItemPrices } from '@prisma/client';
+import { ItemPricesRepository } from '../item-prices-repository';
 
 export class PrismaItemPriceRepository implements ItemPricesRepository {
-  async searchMany(query: string, page: number): Promise<ItemPrices[]> {
+  findByName(name: string): Promise<{ id: number; itemName: string; basePrice: Decimal; ivaPercentage: number | null; priceWithIva: Decimal | null; createdAt: Date; updatedAt: Date; levelId: number | null; } | null> {
+    throw new Error('Method not implemented.');
+  }
+  destroy(id: number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async searchMany(levelId: number, page: number): Promise<ItemPrices[]> {
     let pageSize = 20
     let itemPrices = await prisma.itemPrices.findMany({
       where: {
-        itemName: {
-          contains: query,
-          mode: 'insensitive'
-        }
+        levelId
       },
       skip: (page - 1) * pageSize,
       take: pageSize

@@ -6,6 +6,7 @@ import { EmployeeNotFoundError } from "../errors/employee-not-found";
 import { Decimal } from "@prisma/client/runtime/library";
 import { InvoiceItemRepository } from "@/repositories/invoices-item-repository";
 import { InvoiceType, MonthName, PAY_STATUS } from "@prisma/client";
+import { ItemPricesRepository } from "@/repositories/item-prices-repository";
 
 interface CreateInvoiceDTO {
   enrollmentId: number;
@@ -14,10 +15,9 @@ interface CreateInvoiceDTO {
   issueDate: Date;
   type: InvoiceType;
   items: Array<{
-    description: string;
-    amount: number;
-    month: MonthName | null;
+    month?: MonthName | null;
     qty: number;
+    itemPriceId: number;
     createdAt?: Date;
     updatedAt?: Date;
   }>;
@@ -29,7 +29,8 @@ export class CreateInvoiceUseCase {
     private invoiceRepository: InvoiceRepository,
     private enrollmentsRepository: EnrollmentsRepository,
     private employeeRepository: EmployeeRepository,
-    private invoiceItemRepository: InvoiceItemRepository
+    private invoiceItemRepository: InvoiceItemRepository,
+    private itemPricesRepository: ItemPricesRepository,
   ) { }
 
   async execute(data: CreateInvoiceDTO) {
@@ -46,8 +47,12 @@ export class CreateInvoiceUseCase {
     }
 
     // Calcula o valor total dos itens
-    const totalAmount = data.items.reduce((sum, item) => sum + (item.amount * item.qty), 0);
+    let totalAmount = new Decimal(0)
 
+    for(const item of data.items){
+      let itemPrice = await this.itemPricesRepository.findById(item.itemPriceId)
+      totalAmount = new Decimal(itemPrice?.priceWithIva!)
+    }
     // Cria a fatura (invoice)
     const invoice = await this.invoiceRepository.createInvoice({
       enrollmentId: data.enrollmentId,
@@ -63,17 +68,18 @@ export class CreateInvoiceUseCase {
 
     // Cria os itens da fatura (invoice items)
     for (const item of data.items) {
+      let itemPrice = await this.itemPricesRepository.findById(item.itemPriceId)
       await this.invoiceItemRepository.createInvoiceItem({
         invoiceId: invoice.id,
-        description: item.description,
-        amount: new Decimal(item.amount),
+        description: itemPrice?.itemName!,
+        amount: new Decimal(itemPrice?.basePrice!),
         created_at: item.createdAt ?? new Date(),
         update_at: item.updatedAt ?? new Date(),
         status: PAY_STATUS.PENDING,
-        total_amount: new Decimal(item.amount * item.qty),
+        total_amount: new Decimal(item.qty * Number(itemPrice?.priceWithIva)),
         QTY: item.qty,
 
-        month: data.type === "TUITION" ? item.month : null
+        month: data.type === "TUITION" ? item.month! : null
       });
     }
 

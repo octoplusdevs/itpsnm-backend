@@ -1,9 +1,16 @@
-import { ItemPrices, Prisma } from '@prisma/client'
+import { ItemPrices } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library';
 
 export interface ItemPricesRepository {
   findById(id: number): Promise<ItemPrices | null>
   findByName(name: string): Promise<ItemPrices | null>
-  create(data: Prisma.ItemPricesCreateInput): Promise<ItemPrices>
-  searchMany(query: string, page: number): Promise<ItemPrices[]>
+  create(data: {
+    itemName: string;
+    basePrice: Decimal;
+    ivaPercentage?: number | null;
+    priceWithIva: Decimal | null;
+    levelId: number | null;
+  }): Promise<ItemPrices>
+  searchMany(levelId: number, page: number): Promise<ItemPrices[]>
   destroy(id: number): Promise<boolean>;
 }
