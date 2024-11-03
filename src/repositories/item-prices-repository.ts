@@ -3,7 +3,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 
 export interface ItemPricesRepository {
   findById(id: number): Promise<ItemPrices | null>
-  findByName(name: string): Promise<ItemPrices | null>
+  findByName(itemName: string, levelId: number): Promise<ItemPrices | null>
   create(data: {
     itemName: string;
     basePrice: Decimal;

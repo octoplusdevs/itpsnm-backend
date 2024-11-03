@@ -22,7 +22,7 @@ export async function approvePayment(request: FastifyRequest, reply: FastifyRepl
     const approvedPayment = await approvePaymentUseCase.execute({
       paymentId,
       employeeId,
-      status
+      status,
     })
 
     return reply.status(200).send(approvedPayment)

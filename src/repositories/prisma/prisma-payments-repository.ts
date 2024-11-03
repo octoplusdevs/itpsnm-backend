@@ -14,7 +14,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
   async findPaymentById(paymentId: number): Promise<Payment | null> {
     return prisma.payment.findUnique({
       where: { id: paymentId },
-      include: { transaction: true, invoice: true, PaymentDetails: true },
+      include: { transactions: true, invoice: true, PaymentDetails: true },
     })
   }
 

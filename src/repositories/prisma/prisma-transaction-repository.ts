@@ -4,6 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { Decimal } from '@prisma/client/runtime/library'
 
 export class PrismaTransactionRepository implements TransactionRepository {
+  async findTransactionById(id: number): Promise<{ id: number; paymentId: number | null; transactionNumber: string; amount: Decimal; enrollmentId: number; date: Date; employeeId: number | null; used: boolean; } | null> {
+    return await prisma.transaction.findUnique({
+      where: { id },
+    })
+  }
   async updateTransactionStatus(transactionNumber: string, used: boolean): Promise<{ id: number; transactionNumber: string; amount: Decimal; date: Date; used: boolean; paymentId: number | null; enrollmentId: number; employeeId: number | null }> {
     return await prisma.transaction.update({
       where: {

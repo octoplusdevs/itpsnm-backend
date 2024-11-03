@@ -4,8 +4,13 @@ import { ItemPrices } from '@prisma/client';
 import { ItemPricesRepository } from '../item-prices-repository';
 
 export class PrismaItemPriceRepository implements ItemPricesRepository {
-  findByName(name: string): Promise<{ id: number; itemName: string; basePrice: Decimal; ivaPercentage: number | null; priceWithIva: Decimal | null; createdAt: Date; updatedAt: Date; levelId: number | null; } | null> {
-    throw new Error('Method not implemented.');
+  async findByName(itemName: string, levelId: number): Promise<{ id: number; itemName: string; basePrice: Decimal; ivaPercentage: number | null; priceWithIva: Decimal | null; createdAt: Date; updatedAt: Date; levelId: number | null; } | null> {
+    return await prisma.itemPrices.findFirst({
+      where:{
+        itemName,
+        levelId
+      }
+    })
   }
   destroy(id: number): Promise<boolean> {
     throw new Error('Method not implemented.');

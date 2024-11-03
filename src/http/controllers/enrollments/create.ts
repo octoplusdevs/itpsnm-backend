@@ -6,6 +6,11 @@ import { LevelNotFoundError } from '@/use-cases/errors/level-not-found';
 import { EnrollmentAlreadyExistsError } from '@/use-cases/errors/enrollment-already-exists';
 import { makeCreateEnrollmentUseCase } from '@/use-cases/factories/make-enrollment-use-case';
 import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invoice-use-case';
+import { GetItemPriceUseCase } from '@/use-cases/itemPrices/get-item-price';
+import { makeGetItemPriceUseCase } from '@/use-cases/factories/make-get-item-prices-use-case';
+import { makeGetItemPriceByNameUseCase } from '@/use-cases/factories/make-get-item-prices-by-name-use-case';
+import { MonthName } from '@prisma/client';
+
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
@@ -30,39 +35,30 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       levelId,
     });
 
+    let itemsForPay = ["Matrícula", "Ficha de Propina", "Cartão PVC", "Propina"]
+    let getItemPriceUseCase = makeGetItemPriceByNameUseCase()
+    let items: {
+      month?: MonthName[] | null;
+      qty: number;
+      itemPriceId: number;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }[] = [];
+    for(let itemName of itemsForPay){
+      let newItem = await getItemPriceUseCase.execute({ itemName, levelId })
+      items.push({
+        qty: 1,
+        itemPriceId: newItem.itemPrice?.id!
+      })
+    }
+
     await createInvoiceUseCase.execute({
       type: "ENROLLMENT",
       enrollmentId: enrollment.enrollment.id!,
       employeeId: employeeId ?? 935,
       dueDate: new Date(),
       issueDate: new Date(),
-      items: [
-        {
-          itemPriceId: 35,
-          qty: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          itemPriceId: 37,
-          qty: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          itemPriceId: 38,
-          qty: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          itemPriceId: 36,
-          month: ["SEPTEMBER"],
-          qty: 0,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }
-      ]
+      items
     })
     return reply.status(201).send(enrollment)
 

@@ -13,7 +13,6 @@ interface ApprovePaymentDTO {
   paymentId: number
   employeeId: number
   status: PAY_STATUS
-  transactionByNumber: string
 }
 
 export class ApprovePaymentUseCase {
@@ -36,7 +35,7 @@ export class ApprovePaymentUseCase {
       throw new EmployeeNotFoundError()
     }
 
-    const transaction = await this.transactionRepository.findTransactionByNumber(data.transactionByNumber)
+    const transaction = await this.transactionRepository.findTransactionById(payment.transactionId!)
     if (!transaction) {
       throw new TransactionNotFoundError()
     }
@@ -44,23 +43,20 @@ export class ApprovePaymentUseCase {
     // if (payment.status !== PAY_STATUS.PENDING && payment.status !== PAY_STATUS.RECUSED) {
     //   throw new PaymentIsNotPendingError()
     // }
-    console.log("INVOICED ID", payment.invoiceId)
     const items = await this.invoiceItemRepository.findInvoiceItemsByInvoiceId(payment.invoiceId)
-    console.log("ITEMS ID",items)
-
 
     if (!items) {
       throw new InvoiceItemNotFoundError()
     }
     for (const item of items) {
       await this.invoiceItemRepository.updateInvoiceItem(item.id, {
-        status: PAY_STATUS.PAID,
+        status: data.status,
       });
     }
     await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
-    await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, PAY_STATUS.PAID)
+    await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, data.status)
 
-    const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId, data.status || "PAID")
+    const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId, data.status)
     return approvedPayment
   }
 }
