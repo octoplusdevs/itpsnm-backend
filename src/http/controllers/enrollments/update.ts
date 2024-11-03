@@ -43,7 +43,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     let { enrollment: enroll } = await getEnrollmentUseCase.execute({ identityCardNumber })
 
     const getInvoiceUseCase = makeGetInvoiceUseCase()
-    let findInvoices = await getInvoiceUseCase.execute({ enrollmentId: enroll.id!, type: "ENROLLMENT_CONFIRMATION", status: "PENDING" })
+    let findInvoices = await getInvoiceUseCase.execute({ enrollmentId: enroll.id!, type: "ENROLLMENT", status: "PENDING" })
 
     if(findInvoices.invoice?.length! > 0){
       throw new StudentHasOutstanding()
