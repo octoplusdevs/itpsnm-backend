@@ -62,6 +62,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     return reply.status(201).send(enrollment)
 
   } catch (err) {
+    console.log(err)
     if (err instanceof StudentNotFoundError) {
       return reply.status(404).send({ message: err.message });
     } else if (err instanceof CourseNotFoundError) {
