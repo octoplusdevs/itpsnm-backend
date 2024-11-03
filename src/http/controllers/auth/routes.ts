@@ -56,7 +56,7 @@ export async function authRoutes(app: FastifyInstance) {
       try {
         return reply.send({ message: 'STUDENT data', invoices: request.tuitionInvoices });
       } catch (err) {
-        console.log(err)
+        // console.log(err)
       }
     }
   );

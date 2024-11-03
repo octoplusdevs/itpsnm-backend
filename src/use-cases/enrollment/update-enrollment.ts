@@ -8,8 +8,6 @@ import { EnrollmentNotFoundError } from '../errors/enrollment-not-found';
 import { StudentsRepository } from '@/repositories/student-repository';
 import { IdentityCardNumberNotExistsError } from '../errors/id-card-not-exists-error';
 import { IdentityCardNumberHasInUseExistsError } from '../errors/id-card-already-in-use-error';
-import { ClassNotExists } from '../errors/class-not-exists-error';
-import { ClasseRepository } from '@/repositories/classe-repository';
 
 interface UpdateEnrollmentUseCaseRequest {
   id: number;

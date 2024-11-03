@@ -18,8 +18,8 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     identityCardNumber: z.string(),
     courseId: z.number().optional(),
     levelId: z.number().optional(),
-    docsState: z.nativeEnum(EnrollementState).default('APPROVED'),
-    paymentState: z.nativeEnum(EnrollementState).default('APPROVED'),
+    docsState: z.nativeEnum(EnrollementState),
+    paymentState: z.nativeEnum(EnrollementState),
     classeId: z.number().optional(),
     employeeId: z.number(),
     startDate: z.date().default(new Date("01-09-2023")),
@@ -63,7 +63,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
 
     return reply.status(200).send(enrollment);
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     if (err instanceof LevelNotFoundError) {
       return reply.status(404).send({ message: err.message });
     }

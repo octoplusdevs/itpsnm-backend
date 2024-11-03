@@ -17,7 +17,7 @@ export async function resetPassword(request: FastifyRequest, reply: FastifyReply
 
   try {
     const resetUserPasswordUseCase = makeResetUserPasswordUseCase()
-    console.log("AAAAAA",request.user?.id)
+    // console.log("AAAAAA",request.user?.id)
     await resetUserPasswordUseCase.execute({
       email,
       currentPassword,

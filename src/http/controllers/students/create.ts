@@ -70,7 +70,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
     return reply.status(201).send();
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     if (err instanceof PhoneAlreadyExistsError ||
         err instanceof AlternativePhoneAlreadyExistsError ||
         err instanceof ProvinceNotFoundError ||

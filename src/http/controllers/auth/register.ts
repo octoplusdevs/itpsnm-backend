@@ -71,7 +71,7 @@ export async function registerController(request: FastifyRequest, reply: Fastify
       return reply.status(409).send({ message: err.message })
     }
 
-    console.log(err)
+    // console.log(err)
     // Tratar exceções inesperadas
     return reply.status(500).send({
       success: false,

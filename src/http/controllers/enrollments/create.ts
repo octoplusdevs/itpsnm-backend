@@ -6,8 +6,6 @@ import { LevelNotFoundError } from '@/use-cases/errors/level-not-found';
 import { EnrollmentAlreadyExistsError } from '@/use-cases/errors/enrollment-already-exists';
 import { makeCreateEnrollmentUseCase } from '@/use-cases/factories/make-enrollment-use-case';
 import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invoice-use-case';
-import { GetItemPriceUseCase } from '@/use-cases/itemPrices/get-item-price';
-import { makeGetItemPriceUseCase } from '@/use-cases/factories/make-get-item-prices-use-case';
 import { makeGetItemPriceByNameUseCase } from '@/use-cases/factories/make-get-item-prices-by-name-use-case';
 import { MonthName } from '@prisma/client';
 

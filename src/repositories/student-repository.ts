@@ -10,6 +10,7 @@ export interface StudentCreateInput {
   dateOfBirth: Date
   height: number
   identityCardNumber: string
+  county: string
   gender: Gender
   emissionDate: Date
   expirationDate: Date
@@ -29,7 +30,7 @@ export interface StudentsRepository {
   findByAlternativePhone(phone: string): Promise<Student | null>
   findByPhone(phone: string): Promise<Student | null>
   findByName(name: string): Promise<Student | null>
-  create(data: StudentCreateInput): Promise<Student | StudentCreateInput>
+  create(data: StudentCreateInput): Promise<Student>
   searchMany(query: string, page: number): Promise<{
     totalItems: number;
     currentPage: number;

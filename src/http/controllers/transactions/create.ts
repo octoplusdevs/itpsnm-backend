@@ -33,7 +33,7 @@ export async function createTransaction(request: FastifyRequest, reply: FastifyR
 
     return reply.status(201).send();
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     if (
       err instanceof TransactionWasUsedError ||
       err instanceof EmployeeNotFoundError ||

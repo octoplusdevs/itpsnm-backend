@@ -23,6 +23,7 @@ export class CreateStudentUseCase {
     expirationDate,
     father,
     fullName,
+    county,
     gender,
     height,
     identityCardNumber,
@@ -57,6 +58,7 @@ export class CreateStudentUseCase {
       emissionDate,
       expirationDate,
       father,
+      county,
       fullName,
       gender,
       height,
@@ -70,8 +72,6 @@ export class CreateStudentUseCase {
       alternativePhone: alternativePhone!,
     })
 
-    return {
-      student,
-    }
+    return { student }
   }
 }

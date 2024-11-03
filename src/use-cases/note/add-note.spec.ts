@@ -73,7 +73,7 @@ describe('Create Note Use Case', () => {
       subjectId: 1,
       level: 'CLASS_10'
     })
-    console.log(response.note)
+    // console.log(response.note)
     expect(response.note.pf1).toEqual(0)
     expect(response.note.pf2).toEqual(0)
     expect(response.note.pft).toEqual(0)

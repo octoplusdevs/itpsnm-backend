@@ -46,7 +46,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     if (err instanceof SubjectNotFoundError) {
       return reply.status(409).send({ message: err.message })
     }
-    console.log(err)
+    // console.log(err)
     return reply.status(500).send({ message: 'Internal Server Error' })
   }
 
