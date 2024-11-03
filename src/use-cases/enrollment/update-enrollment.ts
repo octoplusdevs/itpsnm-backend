@@ -31,7 +31,7 @@ export class UpdateEnrollmentUseCase {
     private coursesRepository: CoursesRepository,
     private enrollmentRepository: EnrollmentsRepository,
     private studentRepository: StudentsRepository,
-    private classeRepository: ClasseRepository,
+    // private classeRepository: ClasseRepository,
 
   ) { }
 
@@ -83,12 +83,12 @@ export class UpdateEnrollmentUseCase {
     }
 
 
-    if (classeId) {
-      const classe = await this.classeRepository.findById(classeId);
-      if (!classe) {
-        throw new ClassNotExists();
-      }
-    }
+    // if (classeId) {
+    //   const classe = await this.classeRepository.findById(classeId);
+    //   if (!classe) {
+    //     throw new ClassNotExists();
+    //   }
+    // }
 
     // Atualiza a matrícula com os novos valores
     const updatedEnrollment = await this.enrollmentRepository.update(id, {

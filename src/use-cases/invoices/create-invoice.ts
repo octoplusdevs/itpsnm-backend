@@ -7,6 +7,8 @@ import { Decimal } from "@prisma/client/runtime/library";
 import { InvoiceItemRepository } from "@/repositories/invoices-item-repository";
 import { InvoiceType, MonthName, PAY_STATUS } from "@prisma/client";
 import { ItemPricesRepository } from "@/repositories/item-prices-repository";
+import { LevelsRepository } from "@/repositories/level-repository";
+import { LevelNotFoundError } from "../errors/level-not-found";
 
 interface CreateInvoiceDTO {
   enrollmentId: number;
@@ -15,7 +17,7 @@ interface CreateInvoiceDTO {
   issueDate: Date;
   type: InvoiceType;
   items: Array<{
-    month?: MonthName | null;
+    month?: MonthName[] | null;
     qty: number;
     itemPriceId: number;
     createdAt?: Date;
@@ -47,12 +49,8 @@ export class CreateInvoiceUseCase {
     }
 
     // Calcula o valor total dos itens
-    let totalAmount = new Decimal(0)
+    let totalAmount = 0
 
-    for(const item of data.items){
-      let itemPrice = await this.itemPricesRepository.findById(item.itemPriceId)
-      totalAmount = new Decimal(itemPrice?.priceWithIva!)
-    }
     // Cria a fatura (invoice)
     const invoice = await this.invoiceRepository.createInvoice({
       enrollmentId: data.enrollmentId,
@@ -60,7 +58,7 @@ export class CreateInvoiceUseCase {
       totalAmount: new Decimal(totalAmount),
       dueDate: data.dueDate,
       status: PAY_STATUS.PENDING,
-      created_at:  new Date(),
+      created_at: new Date(),
       update_at: new Date(),
       issueDate: data.issueDate,
       type: data.type
@@ -69,20 +67,46 @@ export class CreateInvoiceUseCase {
     // Cria os itens da fatura (invoice items)
     for (const item of data.items) {
       let itemPrice = await this.itemPricesRepository.findById(item.itemPriceId)
-      await this.invoiceItemRepository.createInvoiceItem({
-        invoiceId: invoice.id,
-        description: itemPrice?.itemName!,
-        amount: new Decimal(itemPrice?.basePrice!),
-        created_at: item.createdAt ?? new Date(),
-        update_at: item.updatedAt ?? new Date(),
-        status: PAY_STATUS.PENDING,
-        total_amount: new Decimal(item.qty * Number(itemPrice?.priceWithIva)),
-        QTY: item.qty,
+      if (data.type === "ENROLLMENT_CONFIRMATION") {
+        if (item.month !== null && item.month !== undefined) {
+          for (let month of item.month) {
+            await this.invoiceItemRepository.createInvoiceItem({
+              invoiceId: invoice.id,
+              description: itemPrice?.itemName!,
+              amount: new Decimal(itemPrice?.basePrice!),
+              created_at: item.createdAt ?? new Date(),
+              update_at: item.updatedAt ?? new Date(),
+              status: PAY_STATUS.PENDING,
+              total_amount: new Decimal(itemPrice?.priceWithIva!),
+              QTY: 1,
+              month
+            });
+          }
+        } else {
+          await this.invoiceItemRepository.createInvoiceItem({
+            invoiceId: invoice.id,
+            description: itemPrice?.itemName!,
+            amount: new Decimal(itemPrice?.basePrice!),
+            created_at: item.createdAt ?? new Date(),
+            update_at: item.updatedAt ?? new Date(),
+            status: PAY_STATUS.PENDING,
+            total_amount: new Decimal(item.qty * Number(itemPrice?.priceWithIva)),
+            QTY: item.qty,
+            month: null
+          });
+        }
+      }
 
-        month: data.type === "TUITION" ? item.month! : null
-      });
     }
+    let items = await this.invoiceItemRepository.findInvoiceItemsByInvoiceId(invoice.id);
+    let finalTotal = 0;
+    items.forEach((item)=>{
+      finalTotal += Number(item.total_amount!)
+    })
+    let finalInvoice = await this.invoiceRepository.updateInvoice(invoice.id, {
+      totalAmount: finalTotal
+    });
 
-    return invoice;
+    return finalInvoice;
   }
 }

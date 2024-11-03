@@ -10,13 +10,13 @@ export function makeUpdateEnrollmentUseCase() {
   const coursesRepository = new PrismaCoursesRepository();
   const levelsRepository = new PrismaLevelsRepository();
   const studentsRepository = new PrismaStudentsRepository();
-  const classeRepository = new PrismaClasseRepository();
+  // const classeRepository = new PrismaClasseRepository();
 
   return new UpdateEnrollmentUseCase(
     levelsRepository,
     coursesRepository,
     enrollmentsRepository,
     studentsRepository,
-    classeRepository
+    // classeRepository
   );
 }

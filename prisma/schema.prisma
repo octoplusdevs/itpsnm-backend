@@ -89,7 +89,7 @@ model Classe {
   course_id    Int?
   created_at   DateTime     @default(now())
   update_at    DateTime     @updatedAt
-  classrooms   Classroom?    @relation(fields: [id_classroom], references: [id])
+  classrooms   Classroom?   @relation(fields: [id_classroom], references: [id])
   Enrollment   Enrollment[]
   courseId     Int?
 
@@ -362,7 +362,7 @@ model Payment {
   Enrollment     Enrollment?      @relation(fields: [enrollmentId], references: [id])
   invoice        Invoice          @relation(fields: [invoiceId], references: [id])
   Receipt        Receipt[]
-  transactions Transaction[] @relation("PaymentToTransaction")
+  transactions   Transaction[]    @relation("PaymentToTransaction")
 
   @@map("payments")
 }
@@ -492,12 +492,14 @@ enum LevelName {
 }
 
 enum InvoiceType {
-  DECLARATION     @map("Declaração")
-  CERTIFICATE     @map("Certificado")
-  PASS            @map("Passe")
-  UNIFORM         @map("Uniforme")
-  TUITION         @map("Propinas")
-  TUITION_PENALTY @map("Multa de Propinas")
+  ENROLLMENT              @map("Matrícula")
+  ENROLLMENT_CONFIRMATION @map("Confirmação de Matrícula")
+  DECLARATION             @map("Declaração")
+  CERTIFICATE             @map("Certificado")
+  PASS                    @map("Passe")
+  UNIFORM                 @map("Uniforme")
+  TUITION                 @map("Propinas")
+  TUITION_PENALTY         @map("Multa de Propinas")
 }
 
 enum PaymentType {

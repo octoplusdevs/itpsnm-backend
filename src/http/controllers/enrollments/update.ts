@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { date, z } from 'zod';
+import { z } from 'zod';
 import { makeUpdateEnrollmentUseCase } from '@/use-cases/factories/update-enrollment-use-case';
-import { EnrollementState, MonthName } from '@prisma/client';
+import { EnrollementState } from '@prisma/client';
 import { StudentNotFoundError } from '@/use-cases/errors/student-not-found';
 import { CourseNotFoundError } from '@/use-cases/errors/course-not-found';
 import { LevelNotFoundError } from '@/use-cases/errors/level-not-found';
@@ -9,15 +9,17 @@ import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found
 import { IdentityCardNumberNotExistsError } from '@/use-cases/errors/id-card-not-exists-error';
 import { IdentityCardNumberHasInUseExistsError } from '@/use-cases/errors/id-card-already-in-use-error';
 import { ClassNotExists } from '@/use-cases/errors/class-not-exists-error';
-import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invoice-use-case';
+import { makeGetInvoiceUseCase } from '@/use-cases/factories/make-get-invoice-use-case';
+import { makeGetEnrollmentByIdentityCardUseCase } from '@/use-cases/factories/make-get-enrollment-by-identity-card-use-case';
+import { StudentHasOutstanding } from '@/use-cases/errors/student-has-outstanding-error';
 
 export async function update(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
-    identityCardNumber: z.string().optional(),
+    identityCardNumber: z.string(),
     courseId: z.number().optional(),
     levelId: z.number().optional(),
-    docsState: z.nativeEnum(EnrollementState).optional(),
-    paymentState: z.nativeEnum(EnrollementState).optional(),
+    docsState: z.nativeEnum(EnrollementState).default('APPROVED'),
+    paymentState: z.nativeEnum(EnrollementState).default('APPROVED'),
     classeId: z.number().optional(),
     employeeId: z.number(),
     startDate: z.date().default(new Date("01-09-2023")),
@@ -37,6 +39,16 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       employeeId,
     } = createEnrollmentSchema.parse(request.body);
 
+    const getEnrollmentUseCase = makeGetEnrollmentByIdentityCardUseCase()
+    let { enrollment: enroll } = await getEnrollmentUseCase.execute({ identityCardNumber })
+
+    const getInvoiceUseCase = makeGetInvoiceUseCase()
+    let findInvoices = await getInvoiceUseCase.execute({ enrollmentId: enroll.id!, type: "ENROLLMENT_CONFIRMATION", status: "PENDING" })
+
+    if(findInvoices.invoice?.length! > 0){
+      throw new StudentHasOutstanding()
+    }
+
     const updateEnrollmentUseCase = makeUpdateEnrollmentUseCase();
     const enrollment = await updateEnrollmentUseCase.execute({
       id: Number(id),
@@ -48,41 +60,15 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       paymentState
     });
 
-    let createInvoiceUseCase = makeCreateInvoiceUseCase()
-
-    let months = Object.values(MonthName)
-    let items = [];
-    const issueDate = new Date(startDate);
-
-    const dueDate = new Date(issueDate);
-    dueDate.setMonth(dueDate.getMonth() + 10);
-
-    for (let month of months) {
-      items.push({
-        description: "",
-        amount: 17000,
-        createdAt: issueDate,
-        updatedAt: issueDate,
-        month,
-        qty: 1
-      })
-    }
-
-
-    await createInvoiceUseCase.execute({
-      enrollmentId: enrollment.enrollment.id,
-      employeeId,
-      dueDate,
-      items,
-      issueDate,
-      type: 'TUITION'
-    });
 
     return reply.status(200).send(enrollment);
   } catch (err) {
     console.log(err)
     if (err instanceof LevelNotFoundError) {
       return reply.status(404).send({ message: err.message });
+    }
+    if (err instanceof StudentHasOutstanding) {
+      return reply.status(409).send({ message: err.message });
     }
     if (err instanceof StudentNotFoundError) {
       return reply.status(404).send({ message: err.message });
