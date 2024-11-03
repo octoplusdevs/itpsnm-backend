@@ -31,27 +31,33 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     });
 
     await createInvoiceUseCase.execute({
-      type: "ENROLLMENT_CONFIRMATION",
+      type: "ENROLLMENT",
       enrollmentId: enrollment.enrollment.id!,
       employeeId: employeeId ?? 935,
       dueDate: new Date(),
       issueDate: new Date(),
       items: [
         {
-          itemPriceId: 1,
+          itemPriceId: 35,
           qty: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          itemPriceId: 2,
+          itemPriceId: 37,
+          qty: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          itemPriceId: 38,
           qty: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
           itemPriceId: 36,
-          month: ["APRIL", "AUGUST"],
+          month: ["SEPTEMBER"],
           qty: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
