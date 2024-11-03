@@ -8,6 +8,8 @@ import { EnrollmentAlreadyExistsError } from '../errors/enrollment-already-exist
 import { randomInt } from 'crypto';
 import { StudentNotFoundError } from '../errors/student-not-found';
 import { StudentsRepository } from '@/repositories/student-repository';
+import { EmployeeRepository } from '@/repositories/employee-repository';
+import { EmployeeNotFoundError } from '../errors/employee-not-found';
 
 interface CreateEnrollmentUseCaseResponse {
   enrollment: {
@@ -29,6 +31,7 @@ interface CreateEnrollmentUseCaseRequest {
   docsState?: EnrollementState,
   identityCardNumber: string,
   courseId: number,
+  employeeId: number,
   levelId: number,
   created_at?: Date,
   update_at?: Date
@@ -41,6 +44,7 @@ export class CreateEnrollmentUseCase {
     private coursesRepository: CoursesRepository,
     private enrollmentRepository: EnrollmentsRepository,
     private studentRepository: StudentsRepository,
+    private employeeRepository: EmployeeRepository,
   ) { }
 
   async execute({
@@ -49,6 +53,7 @@ export class CreateEnrollmentUseCase {
     docsState,
     identityCardNumber,
     levelId,
+    employeeId,
     courseId,
     created_at,
     update_at
@@ -57,6 +62,11 @@ export class CreateEnrollmentUseCase {
     const course = await this.coursesRepository.findById(courseId);
     if (!course) {
       throw new CourseNotFoundError();
+    }
+
+    const employee = await this.employeeRepository.findById(employeeId);
+    if (!employee) {
+      throw new EmployeeNotFoundError();
     }
 
     const level = await this.levelsRepository.findById(levelId);

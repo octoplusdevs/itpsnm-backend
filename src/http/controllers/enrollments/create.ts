@@ -9,6 +9,7 @@ import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invo
 import { makeGetItemPriceByNameUseCase } from '@/use-cases/factories/make-get-item-prices-by-name-use-case';
 import { MonthName } from '@prisma/client';
 import { ItemPriceNotFoundError } from '@/use-cases/errors/item-price-not-found copy';
+import { EmployeeNotFoundError } from '@/use-cases/errors/employee-not-found';
 
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
@@ -16,7 +17,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     identityCardNumber: z.string(),
     courseId: z.number(),
     levelId: z.number(),
-    employeeId: z.number().optional(),
+    employeeId: z.number().default(935),
   });
   const {
     identityCardNumber,
@@ -28,10 +29,12 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   try {
     const createEnrollmentUseCase = makeCreateEnrollmentUseCase();
     const createInvoiceUseCase = makeCreateInvoiceUseCase();
+
     let enrollment = await createEnrollmentUseCase.execute({
       identityCardNumber,
       courseId,
       levelId,
+      employeeId
     });
 
     let itemsForPay = ["Matrícula", "Ficha de Propina", "Cartão PVC", "Propina"]
@@ -43,7 +46,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       createdAt?: Date;
       updatedAt?: Date;
     }[] = [];
-    for(let itemName of itemsForPay){
+    for (let itemName of itemsForPay) {
       let newItem = await getItemPriceUseCase.execute({ itemName, levelId })
       items.push({
         qty: 1,
@@ -54,7 +57,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     await createInvoiceUseCase.execute({
       type: "ENROLLMENT",
       enrollmentId: enrollment.enrollment.id!,
-      employeeId: employeeId ?? 935,
+      employeeId,
       dueDate: new Date(),
       issueDate: new Date(),
       items
@@ -62,16 +65,22 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     return reply.status(201).send(enrollment)
 
   } catch (err) {
-    console.log(err)
     if (err instanceof StudentNotFoundError) {
       return reply.status(404).send({ message: err.message });
-    } else if (err instanceof CourseNotFoundError) {
+    }
+    if (err instanceof CourseNotFoundError) {
       return reply.status(404).send({ message: err.message });
-    } else if (err instanceof LevelNotFoundError) {
+    }
+    if (err instanceof LevelNotFoundError) {
       return reply.status(404).send({ message: err.message });
-    } else if (err instanceof EnrollmentAlreadyExistsError) {
+    }
+    if (err instanceof EnrollmentAlreadyExistsError) {
       return reply.status(409).send({ message: err.message });
-    }else if (err instanceof ItemPriceNotFoundError) {
+    }
+    if (err instanceof ItemPriceNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof EmployeeNotFoundError) {
       return reply.status(409).send({ message: err.message });
     }
     return reply.status(500).send(err);
