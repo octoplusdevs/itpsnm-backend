@@ -19,7 +19,6 @@ export async function get(request: FastifyRequest, reply: FastifyReply) {
     let enrollment = await getEnrollmentUseCase.execute({
       enrollmentNumber,
       identityCardNumber
-
     });
 
     return reply.status(201).send(enrollment)

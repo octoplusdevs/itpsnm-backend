@@ -67,22 +67,8 @@ export class CreateInvoiceUseCase {
     // Cria os itens da fatura (invoice items)
     for (const item of data.items) {
       let itemPrice = await this.itemPricesRepository.findById(item.itemPriceId)
-      if (data.type === "ENROLLMENT") {
-        if (item.month !== null && item.month !== undefined) {
-          for (let month of item.month) {
-            await this.invoiceItemRepository.createInvoiceItem({
-              invoiceId: invoice.id,
-              description: itemPrice?.itemName!,
-              amount: new Decimal(itemPrice?.basePrice!),
-              created_at: item.createdAt ?? new Date(),
-              update_at: item.updatedAt ?? new Date(),
-              status: PAY_STATUS.PENDING,
-              total_amount: new Decimal(itemPrice?.priceWithIva!),
-              QTY: 1,
-              month
-            });
-          }
-        } else {
+      if (item.month !== null && item.month !== undefined) {
+        for (let month of item.month) {
           await this.invoiceItemRepository.createInvoiceItem({
             invoiceId: invoice.id,
             description: itemPrice?.itemName!,
@@ -90,17 +76,29 @@ export class CreateInvoiceUseCase {
             created_at: item.createdAt ?? new Date(),
             update_at: item.updatedAt ?? new Date(),
             status: PAY_STATUS.PENDING,
-            total_amount: new Decimal(item.qty * Number(itemPrice?.priceWithIva)),
-            QTY: item.qty,
-            month: null
+            total_amount: new Decimal(itemPrice?.priceWithIva!),
+            QTY: 1,
+            month
           });
         }
+      } else {
+        await this.invoiceItemRepository.createInvoiceItem({
+          invoiceId: invoice.id,
+          description: itemPrice?.itemName!,
+          amount: new Decimal(itemPrice?.basePrice!),
+          created_at: item.createdAt ?? new Date(),
+          update_at: item.updatedAt ?? new Date(),
+          status: PAY_STATUS.PENDING,
+          total_amount: new Decimal(item.qty * Number(itemPrice?.priceWithIva)),
+          QTY: item.qty,
+          month: null
+        });
       }
 
     }
     let items = await this.invoiceItemRepository.findInvoiceItemsByInvoiceId(invoice.id);
     let finalTotal = 0;
-    items.forEach((item)=>{
+    items.forEach((item) => {
       finalTotal += Number(item.total_amount!)
     })
     let finalInvoice = await this.invoiceRepository.updateInvoice(invoice.id, {

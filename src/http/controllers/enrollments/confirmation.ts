@@ -4,36 +4,40 @@ import { StudentNotFoundError } from '@/use-cases/errors/student-not-found';
 import { CourseNotFoundError } from '@/use-cases/errors/course-not-found';
 import { LevelNotFoundError } from '@/use-cases/errors/level-not-found';
 import { EnrollmentAlreadyExistsError } from '@/use-cases/errors/enrollment-already-exists';
-import { makeCreateEnrollmentUseCase } from '@/use-cases/factories/make-enrollment-use-case';
 import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invoice-use-case';
 import { makeGetItemPriceByNameUseCase } from '@/use-cases/factories/make-get-item-prices-by-name-use-case';
 import { MonthName } from '@prisma/client';
+import { makeGetEnrollmentUseCase } from '@/use-cases/factories/make-get-enrollment-use-case';
 import { ItemPriceNotFoundError } from '@/use-cases/errors/item-price-not-found copy';
+import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
+import { ConfirmationOnlyForStudentsEnrolled } from '@/use-cases/errors/county-already-exists-error copy';
 
 
-export async function create(request: FastifyRequest, reply: FastifyReply) {
+export async function confirmation(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
-    identityCardNumber: z.string(),
-    courseId: z.number(),
     levelId: z.number(),
     employeeId: z.number().optional(),
+    enrollmentNumber: z.coerce.number().optional(),
+    identityCardNumber: z.coerce.string().optional(),
   });
+
   const {
     identityCardNumber,
-    courseId,
+    enrollmentNumber,
     levelId,
     employeeId
   } = createEnrollmentSchema.parse(request.body);
 
   try {
-    const createEnrollmentUseCase = makeCreateEnrollmentUseCase();
+    const getEnrollmentUseCase = makeGetEnrollmentUseCase();
     const createInvoiceUseCase = makeCreateInvoiceUseCase();
-    let enrollment = await createEnrollmentUseCase.execute({
-      identityCardNumber,
-      courseId,
-      levelId,
+    let { enrollment } = await getEnrollmentUseCase.execute({
+      identityCardNumber, enrollmentNumber
     });
 
+    if (enrollment.paymentState !== "APPROVED" || enrollment.docsState !== "APPROVED") {
+      throw new ConfirmationOnlyForStudentsEnrolled()
+    }
     let itemsForPay = ["Matrícula", "Ficha de Propina", "Cartão PVC", "Propina"]
     let getItemPriceUseCase = makeGetItemPriceByNameUseCase()
     let items: {
@@ -43,17 +47,16 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       createdAt?: Date;
       updatedAt?: Date;
     }[] = [];
-    for(let itemName of itemsForPay){
+    for (let itemName of itemsForPay) {
       let newItem = await getItemPriceUseCase.execute({ itemName, levelId })
       items.push({
         qty: 1,
         itemPriceId: newItem.itemPrice?.id!
       })
     }
-
     await createInvoiceUseCase.execute({
-      type: "ENROLLMENT",
-      enrollmentId: enrollment.enrollment.id!,
+      type: "ENROLLMENT_CONFIRMATION",
+      enrollmentId: enrollment.id!,
       employeeId: employeeId ?? 935,
       dueDate: new Date(),
       issueDate: new Date(),
@@ -70,9 +73,14 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(404).send({ message: err.message });
     } else if (err instanceof EnrollmentAlreadyExistsError) {
       return reply.status(409).send({ message: err.message });
-    }else if (err instanceof ItemPriceNotFoundError) {
+    } else if (err instanceof ItemPriceNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    } else if (err instanceof EnrollmentNotFoundError) {
+      return reply.status(409).send({ message: err.message });
+    }else if (err instanceof ConfirmationOnlyForStudentsEnrolled) {
       return reply.status(409).send({ message: err.message });
     }
+
     return reply.status(500).send(err);
   }
 }
