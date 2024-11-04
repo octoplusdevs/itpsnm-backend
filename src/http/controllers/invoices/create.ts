@@ -15,7 +15,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     type: z.nativeEnum(InvoiceType),
     issueDate: z.coerce.date(),
     items: z.object({
-      month: z.nativeEnum(MonthName).array(),
+      month: z.nativeEnum(MonthName).array().optional(),
       qty: z.number().int().nonnegative(),
       itemPriceId: z.number().int().nonnegative(),
     }).array().min(1),
