@@ -51,10 +51,10 @@ export class ApprovePaymentUseCase {
     let findInvoice = await this.invoiceRepository.findInvoiceById(payment.invoiceId)
     let totalTransaction = 0;
 
-    for(const transaction of getAllTransanctionsPayment){
+    for (const transaction of getAllTransanctionsPayment) {
       totalTransaction += Number(transaction.totalAmount);
     }
-    if(totalTransaction < Number(findInvoice?.totalAmount)){
+    if (totalTransaction < Number(findInvoice?.totalAmount)) {
       throw new InsufficientFoundsError()
     }
 
@@ -68,6 +68,7 @@ export class ApprovePaymentUseCase {
         status: data.status,
       });
     }
+    await this.transactionRepository.updateTransactionStatusByPaymentId(transaction.paymentId!, true)
     await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
     await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, data.status)
     // Atualiza o saldo do estudante

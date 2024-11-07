@@ -1,9 +1,19 @@
-import { Transaction } from '@prisma/client'
+import { Prisma, Transaction } from '@prisma/client'
 import { TransactionRepository } from '../transaction-repository'
 import { prisma } from '@/lib/prisma'
 import { Decimal } from '@prisma/client/runtime/library'
 
 export class PrismaTransactionRepository implements TransactionRepository {
+  async updateTransactionStatusByPaymentId(paymentId: number, used: boolean): Promise<Prisma.BatchPayload> {
+    return await prisma.transaction.updateMany({
+      where:{
+        paymentId
+      },
+      data:{
+        used
+      }
+    })
+  }
   async findTransactionById(id: number): Promise<{ id: number; paymentId: number | null; transactionNumber: string; amount: Decimal; enrollmentId: number; date: Date; employeeId: number | null; used: boolean; } | null> {
     return await prisma.transaction.findUnique({
       where: { id },
