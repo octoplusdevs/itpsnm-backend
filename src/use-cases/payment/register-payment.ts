@@ -95,10 +95,10 @@ export class RegisterPaymentUseCase {
     });
 
     // Atualiza o saldo do estudante
-    await this.updateStudentBalanceUseCase.execute({
-      enrollmentId,
-      invoiceAmount, // Passamos o valor da fatura para ser deduzido do saldo
-    });
+    // await this.updateStudentBalanceUseCase.execute({
+    //   enrollmentId,
+    //   invoiceAmount, // Passamos o valor da fatura para ser deduzido do saldo
+    // });
 
     // Atualiza o status da transação e da fatura
     await this.transactionRepository.updateTransactionStatus(transactionNumber!, true);

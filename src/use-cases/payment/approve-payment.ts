@@ -9,6 +9,8 @@ import { TransactionRepository } from "@/repositories/transaction-repository"
 import { TransactionNotFoundError } from "../errors/transaction-not-found"
 import { InvoiceRepository } from "@/repositories/invoices-repository"
 import { InsufficientFoundsError } from "../errors/insuficient-founds"
+import { UpdateStudentBalanceUseCase } from "./update-student-balance"
+import { PrismaStudentBalanceRepository } from "@/repositories/prisma/prisma-balance-student-repository"
 
 interface ApprovePaymentDTO {
   paymentId: number
@@ -23,6 +25,7 @@ export class ApprovePaymentUseCase {
     private invoiceItemRepository: InvoiceItemRepository,
     private invoiceRepository: InvoiceRepository,
     private transactionRepository: TransactionRepository,
+    private prismaStudentBalanceRepository: PrismaStudentBalanceRepository,
   ) { }
 
   async execute(data: ApprovePaymentDTO) {
@@ -54,6 +57,7 @@ export class ApprovePaymentUseCase {
     if(totalTransaction < Number(findInvoice?.totalAmount)){
       throw new InsufficientFoundsError()
     }
+
     const items = await this.invoiceItemRepository.findInvoiceItemsByInvoiceId(payment.invoiceId)
 
     if (!items) {
@@ -66,6 +70,12 @@ export class ApprovePaymentUseCase {
     }
     await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
     await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, data.status)
+    // Atualiza o saldo do estudante
+    const UpdateBalance = new UpdateStudentBalanceUseCase(this.prismaStudentBalanceRepository)
+    await UpdateBalance.execute({
+      enrollmentId: payment.enrollmentId!,
+      invoiceAmount: Number(payment.totalAmount), // Passamos o valor da fatura para ser deduzido do saldo
+    });
 
 
 
