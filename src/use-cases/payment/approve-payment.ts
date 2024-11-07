@@ -68,7 +68,6 @@ export class ApprovePaymentUseCase {
         status: data.status,
       });
     }
-    await this.transactionRepository.updateTransactionStatusByPaymentId(transaction.paymentId!, true)
     await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
     await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, data.status)
     // Atualiza o saldo do estudante

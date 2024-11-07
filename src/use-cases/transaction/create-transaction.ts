@@ -60,7 +60,7 @@ export class CreateTransactionUseCase {
       enrollmentId: data.enrollmentId,
       paymentId: data.paymentId ?? null,
       employeeId: data.employeeId,
-      used: false
+      used: data.paymentId ? true : false
     });
     // Atualiza o saldo do estudante
     await this.studentBalanceRepository.increaseBalance(data.enrollmentId, data.amount);
