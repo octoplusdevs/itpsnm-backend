@@ -8,6 +8,7 @@ import { InvoiceItemNotFoundError } from "../errors/invoice-item-not-found"
 import { TransactionRepository } from "@/repositories/transaction-repository"
 import { TransactionNotFoundError } from "../errors/transaction-not-found"
 import { InvoiceRepository } from "@/repositories/invoices-repository"
+import { InsufficientFoundsError } from "../errors/insuficient-founds"
 
 interface ApprovePaymentDTO {
   paymentId: number
@@ -43,6 +44,16 @@ export class ApprovePaymentUseCase {
     // if (payment.status !== PAY_STATUS.PENDING && payment.status !== PAY_STATUS.RECUSED) {
     //   throw new PaymentIsNotPendingError()
     // }
+    let getAllTransanctionsPayment = await this.paymentRepository.findManyTransactionsByPaymentId(payment.id)
+    let findInvoice = await this.invoiceRepository.findInvoiceById(payment.invoiceId)
+    let totalTransaction = 0;
+
+    for(const transaction of getAllTransanctionsPayment){
+      totalTransaction += Number(transaction.totalAmount);
+    }
+    if(totalTransaction < Number(findInvoice?.totalAmount)){
+      throw new InsufficientFoundsError()
+    }
     const items = await this.invoiceItemRepository.findInvoiceItemsByInvoiceId(payment.invoiceId)
 
     if (!items) {
@@ -55,6 +66,9 @@ export class ApprovePaymentUseCase {
     }
     await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
     await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, data.status)
+
+
+
 
     const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId, data.status)
     return approvedPayment

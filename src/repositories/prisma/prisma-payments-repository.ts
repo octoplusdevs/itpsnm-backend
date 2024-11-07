@@ -1,9 +1,18 @@
-import { Payment, PAY_STATUS } from '@prisma/client'
-import { PaymentRepository } from '../payments-repository'
+import { PAY_STATUS, Payment, Transaction } from '@prisma/client'
+import { PaymentRepository, paymentType } from '../payments-repository'
 import { prisma } from '@/lib/prisma'
-import { Decimal } from '@prisma/client/runtime/library'
 
 export class PrismaPaymentRepository implements PaymentRepository {
+  async findManyTransactionsByPaymentId(paymentId: number): Promise<paymentType[]> {
+    return prisma.payment.findMany({
+      where:{
+        id: paymentId
+      },
+      include:{
+        transactions: true
+      }
+    })
+  }
 
   async createPayment(data: Omit<Payment, 'id'>): Promise<Payment> {
     return prisma.payment.create({

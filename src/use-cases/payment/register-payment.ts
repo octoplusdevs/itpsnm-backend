@@ -72,15 +72,15 @@ export class RegisterPaymentUseCase {
 
 
     // Verifica se o estudante tem saldo suficiente
-    const findBalance = await this.studentBalanceRepository.getBalanceByStudent(enrollmentId);
-    const studentBalance = findBalance?.balance?.toNumber() ?? 0;
+    // const findBalance = await this.studentBalanceRepository.getBalanceByStudent(enrollmentId);
+    // const studentBalance = findBalance?.balance?.toNumber() ?? 0;
 
     // O valor da fatura é o que será deduzido do saldo
     const invoiceAmount = Number(findInvoice.totalAmount);
 
-    if (studentBalance < invoiceAmount) {
-      throw new InsufficientFoundsError();
-    }
+    // if (studentBalance < invoiceAmount) {
+    //   throw new InsufficientFoundsError();
+    // }
 
     // Cria o pagamento
     const payment = await this.paymentRepository.createPayment({
