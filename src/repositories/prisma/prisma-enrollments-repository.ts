@@ -1,5 +1,5 @@
 
-import { $Enums, EnrollementState, Prisma } from '@prisma/client';
+import {EnrollementState, Prisma } from '@prisma/client';
 import { EnrollT, EnrollmentType, EnrollmentsRepository } from '../enrollment-repository';
 import { prisma } from '@/lib/prisma';
 

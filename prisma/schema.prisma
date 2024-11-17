@@ -14,6 +14,7 @@ model Level {
   update_at  DateTime     @updatedAt
   Enrollment Enrollment[]
   ItemPrices ItemPrices[]
+  Classe     Classe[]
 
   @@map("levels")
 }
@@ -82,33 +83,34 @@ model MonthPaid {
 
 model Classe {
   id           Int          @id @unique @default(autoincrement())
+  id_classroom Int?
+  created_at   DateTime     @default(now())
+  update_at    DateTime     @updatedAt
+  courseId     Int?
+  course_id    Int?
+  level        Level        @relation(fields: [levelId], references: [id])
   name         ClasseType
   period       PeriodType
   course       Course?      @relation(fields: [courseId], references: [id])
-  id_classroom Int?
-  course_id    Int?
-  created_at   DateTime     @default(now())
-  update_at    DateTime     @updatedAt
   classrooms   Classroom?   @relation(fields: [id_classroom], references: [id])
   Enrollment   Enrollment[]
-  courseId     Int?
+  levelId      Int
 
   @@map("classes")
 }
 
 model ItemPrices {
   id            Int      @id @default(autoincrement())
+  itemName      String
+  basePrice     Decimal
+  ivaPercentage Int?
+  priceWithIva  Decimal?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  levelId       Int?
   level         Level?   @relation(fields: [levelId], references: [id])
-  itemName      String // Nome do item (exemplo: 'Propina', 'Cartão PVC')
-  basePrice     Decimal // Preço do item antes do IVA
-  ivaPercentage Int? // Percentual de IVA, se aplicável
-  priceWithIva  Decimal? // Preço final com IVA
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  levelId   Int?
-
-  @@unique([levelId, itemName]) // Garante que não haja duplicação de item para a mesma classe
+  @@unique([levelId, itemName])
   @@map("item_prices")
 }
 
@@ -128,10 +130,10 @@ model Student {
   residence          String
   phone              String        @unique
   alternativePhone   String?
-  county             String?
   provinceId         Int?
   created_at         DateTime      @default(now())
   update_at          DateTime      @updatedAt
+  county             String?
   enrollments        Enrollment?
   files              File[]
   provinces          Province?     @relation(fields: [provinceId], references: [id])
@@ -170,8 +172,8 @@ model Course {
   name       String       @unique
   created_at DateTime     @default(now())
   update_at  DateTime     @updatedAt
-  Enrollment Enrollment[]
   Classe     Classe[]
+  Enrollment Enrollment[]
 
   @@map("courses")
 }
@@ -190,13 +192,15 @@ model Tuition {
   @@map("tuition")
 }
 
+// SALA
 model Classroom {
-  id         Int      @id @unique @default(autoincrement())
-  name       String
-  capacity   Int      @default(40)
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
-  classes    Classe[]
+  id               Int      @id @unique @default(autoincrement())
+  name             String
+  created_at       DateTime @default(now())
+  update_at        DateTime @updatedAt
+  capacity         Int      @default(40)
+  currentOccupancy Int
+  classes          Classe[]
 
   @@map("classrooms")
 }
@@ -319,13 +323,13 @@ model InvoiceItem {
   id           Int        @id @default(autoincrement())
   description  String
   amount       Decimal    @db.Decimal(10, 2)
-  total_amount Decimal    @db.Decimal(10, 2)
-  status       PAY_STATUS
   invoiceId    Int
-  QTY          Int?       @default(1)
-  month        MonthName?
   created_at   DateTime   @default(now())
   update_at    DateTime   @updatedAt
+  QTY          Int?       @default(1)
+  month        MonthName?
+  status       PAY_STATUS
+  total_amount Decimal    @db.Decimal(10, 2)
   invoice      Invoice    @relation(fields: [invoiceId], references: [id])
 
   @@map("invoice_items")
@@ -492,14 +496,14 @@ enum LevelName {
 }
 
 enum InvoiceType {
-  ENROLLMENT              @map("Matrícula")
-  ENROLLMENT_CONFIRMATION @map("Confirmação de Matrícula")
   DECLARATION             @map("Declaração")
   CERTIFICATE             @map("Certificado")
   PASS                    @map("Passe")
   UNIFORM                 @map("Uniforme")
   TUITION                 @map("Propinas")
   TUITION_PENALTY         @map("Multa de Propinas")
+  ENROLLMENT              @map("Matrícula")
+  ENROLLMENT_CONFIRMATION @map("Confirmação de Matrícula")
 }
 
 enum PaymentType {

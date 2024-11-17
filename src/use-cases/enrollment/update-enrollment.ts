@@ -1,5 +1,5 @@
 import { EnrollmentsRepository } from '@/repositories/enrollment-repository';
-import { EnrollementState, Enrollment } from '@prisma/client';
+import { EnrollementState, Enrollment, PeriodType } from '@prisma/client';
 import { CourseNotFoundError } from '../errors/course-not-found';
 import { CoursesRepository } from '@/repositories/course-repository';
 import { LevelsRepository } from '@/repositories/level-repository';
@@ -8,15 +8,17 @@ import { EnrollmentNotFoundError } from '../errors/enrollment-not-found';
 import { StudentsRepository } from '@/repositories/student-repository';
 import { IdentityCardNumberNotExistsError } from '../errors/id-card-not-exists-error';
 import { IdentityCardNumberHasInUseExistsError } from '../errors/id-card-already-in-use-error';
+import { ClassroomRepository } from '@/repositories/classroom-repository';
 
 interface UpdateEnrollmentUseCaseRequest {
   id: number;
   paymentState?: EnrollementState;
   docsState?: EnrollementState;
   identityCardNumber?: string;
-  courseId?: number;
-  levelId?: number;
-  classeId?: number | null;
+  courseId: number;
+  levelId: number;
+  period: PeriodType;
+  classeId?: number;
 }
 
 interface UpdateEnrollmentUseCaseResponse {
@@ -29,6 +31,7 @@ export class UpdateEnrollmentUseCase {
     private coursesRepository: CoursesRepository,
     private enrollmentRepository: EnrollmentsRepository,
     private studentRepository: StudentsRepository,
+    private classroomRepository: ClassroomRepository,
     // private classeRepository: ClasseRepository,
 
   ) { }
@@ -40,6 +43,7 @@ export class UpdateEnrollmentUseCase {
     identityCardNumber,
     levelId,
     courseId,
+    period,
     classeId,
   }: UpdateEnrollmentUseCaseRequest): Promise<UpdateEnrollmentUseCaseResponse> {
 
@@ -80,6 +84,16 @@ export class UpdateEnrollmentUseCase {
       }
     }
 
+    // Busca uma sala e turma disponíveis
+    const classroom = await this.classroomRepository.findAvailableClassroom({
+      courseId,
+      levelId,
+      periodType: period
+    });
+
+    if (!classroom) {
+      throw new Error("No available classroom found for the given parameters.");
+    }
 
     // if (classeId) {
     //   const classe = await this.classeRepository.findById(classeId);
@@ -93,11 +107,11 @@ export class UpdateEnrollmentUseCase {
       docsState: docsState ?? enrollment.docsState,
       paymentState: paymentState ?? enrollment.paymentState,
       identityCardNumber: identityCardNumber ?? enrollment.identityCardNumber,
-      classeId: classeId ?? enrollment.classeId,
+      classeId: classeId ?? classroom?.classes[0]?.id,
       courseId: courseId ?? enrollment.courseId,
       levelId: levelId ?? enrollment.levelId,
     });
-
+    await this.classroomRepository.incrementClassroomOccupancy(classroom.id);
     return {
       enrollment: updatedEnrollment,
     };

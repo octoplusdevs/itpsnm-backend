@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { makeUpdateEnrollmentUseCase } from '@/use-cases/factories/update-enrollment-use-case';
-import { EnrollementState } from '@prisma/client';
+import { EnrollementState, PeriodType } from '@prisma/client';
 import { StudentNotFoundError } from '@/use-cases/errors/student-not-found';
 import { CourseNotFoundError } from '@/use-cases/errors/course-not-found';
 import { LevelNotFoundError } from '@/use-cases/errors/level-not-found';
@@ -16,8 +16,9 @@ import { StudentHasOutstanding } from '@/use-cases/errors/student-has-outstandin
 export async function update(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
     identityCardNumber: z.string(),
-    courseId: z.number().optional(),
-    levelId: z.number().optional(),
+    period: z.nativeEnum(PeriodType),
+    courseId: z.number(),
+    levelId: z.number(),
     docsState: z.nativeEnum(EnrollementState),
     paymentState: z.nativeEnum(EnrollementState),
     classeId: z.number().optional(),
@@ -34,9 +35,8 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       docsState,
       paymentState,
       classeId,
-      startDate,
       levelId,
-      employeeId,
+      period,
     } = createEnrollmentSchema.parse(request.body);
 
     const getEnrollmentUseCase = makeGetEnrollmentByIdentityCardUseCase()
@@ -57,7 +57,8 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       courseId,
       docsState,
       levelId,
-      paymentState
+      paymentState,
+      period
     });
 
 
@@ -93,6 +94,6 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(409).send({ message: err.message });
     }
 
-    return reply.status(500).send({ error: err });
+    return reply.status(500).send({ message: err?.message });
   }
 }
