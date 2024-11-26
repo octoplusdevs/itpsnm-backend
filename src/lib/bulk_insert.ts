@@ -493,6 +493,21 @@ export const employees: Employee[] = [
     residence: "22323232swd",
     created_at: new Date(),
     update_at: new Date(),
+  },
+  {
+    id: 935,
+    fullName: "default",
+    alternativePhone: "null",
+    dateOfBirth: new Date("01-01-2005"),
+    emissionDate: new Date("01-01-2005"),
+    expirationDate: new Date("01-01-2005"),
+    gender: "MALE",
+    identityCardNumber: "935",
+    maritalStatus: "DIVORCED",
+    phone: "null",
+    residence: "null",
+    created_at: new Date(),
+    update_at: new Date(),
   }
 ]
 export const users: User[] = [
