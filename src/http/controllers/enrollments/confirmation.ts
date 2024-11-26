@@ -6,11 +6,12 @@ import { LevelNotFoundError } from '@/use-cases/errors/level-not-found';
 import { EnrollmentAlreadyExistsError } from '@/use-cases/errors/enrollment-already-exists';
 import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invoice-use-case';
 import { makeGetItemPriceByNameUseCase } from '@/use-cases/factories/make-get-item-prices-by-name-use-case';
-import { MonthName } from '@prisma/client';
+import { MonthName, PeriodType } from '@prisma/client';
 import { makeGetEnrollmentUseCase } from '@/use-cases/factories/make-get-enrollment-use-case';
 import { ItemPriceNotFoundError } from '@/use-cases/errors/item-price-not-found copy';
 import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
 import { ConfirmationOnlyForStudentsEnrolled } from '@/use-cases/errors/county-already-exists-error copy';
+import { makeUpdateEnrollmentUseCase } from '@/use-cases/factories/update-enrollment-use-case';
 
 
 export async function confirmation(request: FastifyRequest, reply: FastifyReply) {
@@ -19,12 +20,16 @@ export async function confirmation(request: FastifyRequest, reply: FastifyReply)
     employeeId: z.number().optional(),
     enrollmentNumber: z.coerce.number().optional(),
     identityCardNumber: z.coerce.string().optional(),
+    classeId: z.number().optional(),
+    period: z.nativeEnum(PeriodType),
   });
 
   const {
     identityCardNumber,
     enrollmentNumber,
     levelId,
+    period,
+    classeId,
     employeeId
   } = createEnrollmentSchema.parse(request.body);
 
@@ -35,7 +40,7 @@ export async function confirmation(request: FastifyRequest, reply: FastifyReply)
       identityCardNumber, enrollmentNumber
     });
 
-    if (enrollment.paymentState !== "APPROVED" || enrollment.docsState !== "APPROVED") {
+    if (!enrollment.isEnrolled) {
       throw new ConfirmationOnlyForStudentsEnrolled()
     }
     let itemsForPay = ["Matrícula", "Ficha de Propina", "Cartão PVC", "Propina"]
@@ -62,7 +67,19 @@ export async function confirmation(request: FastifyRequest, reply: FastifyReply)
       issueDate: new Date(),
       items
     })
-    return reply.status(201).send(enrollment)
+    const updateEnrollmentUseCase = makeUpdateEnrollmentUseCase();
+
+    const updatedEnrollment = await updateEnrollmentUseCase.execute({
+      id: enrollment.id,
+      identityCardNumber: enrollment.identityCardNumber,
+      classeId: classeId ?? enrollment.classeId!,
+      courseId: enrollment.courseId!,
+      docsState: "PENDING",
+      paymentState: "PENDING",
+      levelId,
+      period
+    });
+    return reply.status(201).send(updatedEnrollment)
 
   } catch (err) {
     if (err instanceof StudentNotFoundError) {

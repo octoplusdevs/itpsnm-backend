@@ -29,16 +29,10 @@ export const levels: Level[] = [
   { name: "CLASS_13", id: 4, created_at: new Date(), update_at: new Date() },
 ]
 export const courses: Course[] = [
-  { name: "Ensino Médio Geral", id: 1, created_at: new Date(), update_at: new Date() },
-  { name: "Ciências Sociais", id: 2, created_at: new Date(), update_at: new Date() },
-  { name: "Ciências Exatas", id: 3, created_at: new Date(), update_at: new Date() },
-  { name: "Humanidades", id: 4, created_at: new Date(), update_at: new Date() },
-  { name: "Curso Técnico em Informática", id: 5, created_at: new Date(), update_at: new Date() },
-  { name: "Curso Técnico em Enfermagem", id: 6, created_at: new Date(), update_at: new Date() },
-  { name: "Curso Técnico em Gestão", id: 7, created_at: new Date(), update_at: new Date() },
-  { name: "Curso de Formação Profissional", id: 8, created_at: new Date(), update_at: new Date() },
-  { name: "Curso de Artes", id: 9, created_at: new Date(), update_at: new Date() },
-  { name: "Curso de Línguas Estrangeiras", id: 10, created_at: new Date(), update_at: new Date() },
+  { name: "Enfermagem", id: 1, created_at: new Date(), update_at: new Date() },
+  { name: "Análises Clínica", id: 2, created_at: new Date(), update_at: new Date() },
+  { name: "Fisioterapia", id: 3, created_at: new Date(), update_at: new Date() },
+  { name: "Farmácia", id: 4, created_at: new Date(), update_at: new Date() },
 ];
 
 export const itemPrices: ItemPrices[] = [

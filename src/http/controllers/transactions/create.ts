@@ -5,6 +5,7 @@ import { makeCreateTransactionUseCase } from '@/use-cases/factories/make-create-
 import { EmployeeNotFoundError } from '@/use-cases/errors/employee-not-found';
 import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
 import { PaymentNotFoundError } from '@/use-cases/errors/payment-not-found';
+import { TransactionBelongsToAnotherStudentError } from '@/use-cases/errors/transaction-belongs-to-another-student-error';
 
 export async function createTransaction(request: FastifyRequest, reply: FastifyReply) {
   const createTransactionSchema = z.object({
@@ -38,6 +39,7 @@ export async function createTransaction(request: FastifyRequest, reply: FastifyR
       err instanceof TransactionWasUsedError ||
       err instanceof EmployeeNotFoundError ||
       err instanceof EnrollmentNotFoundError ||
+      err instanceof TransactionBelongsToAnotherStudentError ||
       err instanceof PaymentNotFoundError
     ) {
       return reply.status(409).send({ message: err.message });

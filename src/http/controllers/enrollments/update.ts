@@ -12,6 +12,9 @@ import { ClassNotExists } from '@/use-cases/errors/class-not-exists-error';
 import { makeGetInvoiceUseCase } from '@/use-cases/factories/make-get-invoice-use-case';
 import { makeGetEnrollmentByIdentityCardUseCase } from '@/use-cases/factories/make-get-enrollment-by-identity-card-use-case';
 import { StudentHasOutstanding } from '@/use-cases/errors/student-has-outstanding-error';
+import { GetPaymentUseCase } from '@/use-cases/payment/get-payment';
+import { PrismaPaymentRepository } from '@/repositories/prisma/prisma-payments-repository';
+import { PaymentNotPaidError } from '@/use-cases/errors/payment-not-paid';
 
 export async function update(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
@@ -21,6 +24,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     levelId: z.number(),
     docsState: z.nativeEnum(EnrollementState),
     paymentState: z.nativeEnum(EnrollementState),
+    paymentId: z.number().optional(),
     classeId: z.number().optional(),
     employeeId: z.number(),
     startDate: z.date().default(new Date("01-09-2023")),
@@ -34,6 +38,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       courseId,
       docsState,
       paymentState,
+      paymentId,
       classeId,
       levelId,
       period,
@@ -45,8 +50,17 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     const getInvoiceUseCase = makeGetInvoiceUseCase()
     let findInvoices = await getInvoiceUseCase.execute({ enrollmentId: enroll.id!, type: "ENROLLMENT", status: "PENDING" })
 
-    if(findInvoices.invoice?.length! > 0){
+    if (findInvoices.invoice?.length! > 0) {
       throw new StudentHasOutstanding()
+    }
+    const getPaymentUseCase = new GetPaymentUseCase(new PrismaPaymentRepository)
+
+    if (paymentState && paymentId) {
+      let newPayment = await getPaymentUseCase.execute({ paymentId })
+      if(newPayment.payment?.status !== "PAID"){
+        throw new PaymentNotPaidError()
+      }
+
     }
 
     const updateEnrollmentUseCase = makeUpdateEnrollmentUseCase();
@@ -58,6 +72,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       docsState,
       levelId,
       paymentState,
+      isEnrolled: (docsState === "APPROVED" && paymentState === "APPROVED"),
       period
     });
 
@@ -69,6 +84,9 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(404).send({ message: err.message });
     }
     if (err instanceof StudentHasOutstanding) {
+      return reply.status(409).send({ message: err.message });
+    }
+    if (err instanceof PaymentNotPaidError) {
       return reply.status(409).send({ message: err.message });
     }
     if (err instanceof StudentNotFoundError) {
@@ -94,6 +112,6 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       return reply.status(409).send({ message: err.message });
     }
 
-    return reply.status(500).send({ message: err?.message });
+    return reply.status(500).send({ message: err });
   }
 }

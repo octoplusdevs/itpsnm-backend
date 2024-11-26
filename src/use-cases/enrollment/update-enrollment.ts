@@ -17,6 +17,7 @@ interface UpdateEnrollmentUseCaseRequest {
   identityCardNumber?: string;
   courseId: number;
   levelId: number;
+  isEnrolled?: boolean;
   period: PeriodType;
   classeId?: number;
 }

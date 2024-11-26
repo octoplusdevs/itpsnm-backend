@@ -67,7 +67,7 @@ export class CreateInvoiceUseCase {
     // Cria os itens da fatura (invoice items)
     for (const item of data.items) {
       let itemPrice = await this.itemPricesRepository.findById(item.itemPriceId)
-      if ((data.type === "TUITION" || data.type === "TUITION_PENALTY") && item.month !== null && item.month !== undefined) {
+      if ((data.type === "TUITION" || data.type === "TUITION_PENALTY" || data.type === "ENROLLMENT" || data.type === "ENROLLMENT_CONFIRMATION") && item.month !== null && item.month !== undefined) {
         for (let month of item.month) {
           await this.invoiceItemRepository.createInvoiceItem({
             invoiceId: invoice.id,

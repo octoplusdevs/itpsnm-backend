@@ -10,6 +10,8 @@ import { EnrollmentsRepository } from '@/repositories/enrollment-repository';
 import { PaymentNotFoundError } from '../errors/payment-not-found';
 import { UpdateStudentBalanceUseCase } from '../payment/update-student-balance';
 import { StudentBalanceRepository } from '@/repositories/student-balance-repository';
+import { TransactionAlreadyAssignedError } from '../errors/transaction-already-assigned-error';
+import { TransactionBelongsToAnotherStudentError } from '../errors/transaction-belongs-to-another-student-error';
 
 interface CreateTransactionDTO {
   transactionNumber: string;
@@ -30,6 +32,11 @@ export class CreateTransactionUseCase {
   ) { }
   async execute(data: CreateTransactionDTO): Promise<Transaction> {
     const transactionAlreadyExists = await this.transactionRepository.findTransactionByNumber(data.transactionNumber);
+    if (transactionAlreadyExists) {
+      if (transactionAlreadyExists?.enrollmentId !== data.enrollmentId) {
+        throw new TransactionBelongsToAnotherStudentError();
+      }
+    }
     if (transactionAlreadyExists) {
       throw new TransactionWasUsedError();
     }

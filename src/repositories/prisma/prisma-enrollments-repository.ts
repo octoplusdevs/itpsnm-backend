@@ -179,7 +179,21 @@ export class PrismaEnrollmentsRepository implements EnrollmentsRepository {
               }
             }
           }
-        }
+        },
+        classes: {
+          select: {
+            name: true,
+            period: true,
+            id: true,
+            classrooms: true
+          }
+        },
+        levels: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
       }
     })
 

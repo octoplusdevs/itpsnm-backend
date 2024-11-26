@@ -25,8 +25,8 @@ export async function authRoutes(app: FastifyInstance) {
       const periods: PeriodType[] = ["MORNING", "AFTERNOON"];
       const names: ClasseType[] = [ClasseType.A, ClasseType.B, ClasseType.C];
       const classRooms: Classroom[] = [];
-      // Criar 50 salas
-      for (let i = 1; i <= 45; i++) {
+      // Criar 34 salas
+      for (let i = 1; i <= 34; i++) {
         classRooms.push({
           id: i,
           name: `SALA ${i}`,
@@ -44,14 +44,14 @@ export async function authRoutes(app: FastifyInstance) {
       const savedClassrooms = await prisma.classroom.findMany();
       const classroomsCount = savedClassrooms.length;
 
-      if (classroomsCount < 45) {
-        throw new Error("Não há salas suficientes (45 necessárias).");
+      if (classroomsCount < 34) {
+        throw new Error("Não há salas suficientes (34 necessárias).");
       }
 
       let classes: Classe[] = [];
       let i = 1; // Inicializa o identificador único para turmas
 
-      for (let courseId = 1; courseId <= 10; courseId++) {
+      for (let courseId = 1; courseId <= 4; courseId++) {
         for (let levelId = 1; levelId <= 4; levelId++) {
           for (const period of periods) {
             for (const name of names) {

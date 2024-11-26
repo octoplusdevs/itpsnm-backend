@@ -7,13 +7,13 @@ import { InvoiceNotFoundError } from "../errors/invoice-not-found";
 import { PaymentAlreadyExistsError } from "../errors/payment-already-exists-error";
 import { EnrollmentsRepository } from "@/repositories/enrollment-repository";
 import { EnrollmentNotFoundError } from "../errors/enrollment-not-found";
-import { InsufficientFoundsError } from "../errors/insuficient-founds";
 import { StudentBalanceRepository } from "@/repositories/student-balance-repository";
 import { UpdateStudentBalanceUseCase } from "./update-student-balance";
 import { Decimal } from "@prisma/client/runtime/library";
 import { TransactionWasUsedError } from "../errors/transaction-was-used-error";
 import { EmployeeRepository } from "@/repositories/employee-repository";
 import { EmployeeNotFoundError } from "../errors/employee-not-found";
+import { TransactionAlreadyAssignedError } from "../errors/transaction-already-assigned-error";
 
 interface RegisterPaymentDTO {
   enrollmentId: number;
@@ -60,6 +60,9 @@ export class RegisterPaymentUseCase {
 
     if (transaction.used) {
       throw new TransactionWasUsedError();
+    }
+    if (transaction.enrollmentId != findEnrollment.id) {
+      throw new TransactionAlreadyAssignedError();
     }
 
 

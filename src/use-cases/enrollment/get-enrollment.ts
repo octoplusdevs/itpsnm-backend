@@ -16,6 +16,7 @@ interface GetEnrollmentUseCaseResponse {
     student?: Student;
     identityCardNumber: string
     classeId?: number | null
+    isEnrolled?: number | null
     courseId?: number | null
     levelId?: number | null
     created_at?: Date

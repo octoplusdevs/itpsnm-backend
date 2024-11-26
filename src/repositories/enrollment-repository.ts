@@ -22,6 +22,7 @@ export interface EnrollT {
   classeId?: number | null
   courseId?: number | null
   levelId?: number | null
+  isEnrolled?: number | null
   created_at?: Date
   update_at?: Date
 }

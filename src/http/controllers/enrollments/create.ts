@@ -34,7 +34,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       identityCardNumber,
       courseId,
       levelId,
-      employeeId
+      employeeId,
     });
 
     let itemsForPay = ["Matrícula", "Ficha de Propina", "Cartão PVC", "Propina"]
@@ -50,7 +50,8 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       let newItem = await getItemPriceUseCase.execute({ itemName, levelId })
       items.push({
         qty: 1,
-        itemPriceId: newItem.itemPrice?.id!
+        itemPriceId: newItem.itemPrice?.id!,
+        month: itemName === "Propina" ? [MonthName.SEPTEMBER] : null
       })
     }
 

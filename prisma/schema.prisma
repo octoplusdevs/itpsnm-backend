@@ -211,6 +211,7 @@ model Enrollment {
   paymentState       EnrollementState
   identityCardNumber String?          @unique
   levelId            Int?
+  isEnrolled         Boolean?         @default(false)
   courseId           Int?
   classeId           Int?
   created_at         DateTime         @default(now())
@@ -269,23 +270,24 @@ model Employee {
 }
 
 model User {
-  id           Int         @id @default(autoincrement())
-  email        String      @unique
-  password     String
-  loginAttempt Int
-  isBlocked    Boolean
-  role         Role
-  isActive     Boolean
-  lastLogin    DateTime    @updatedAt
-  created_at   DateTime    @default(now())
-  update_at    DateTime    @updatedAt
-  employeeId   Int?        @unique
-  studentId    Int?        @unique
-  enrollmentId Int?        @unique
-  accessLogs   AccessLog[]
-  employee     Employee?   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  enrollment   Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  student      Student?    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  id                    Int                     @id @default(autoincrement())
+  email                 String                  @unique
+  password              String
+  loginAttempt          Int
+  isBlocked             Boolean
+  role                  Role
+  isActive              Boolean
+  lastLogin             DateTime                @updatedAt
+  created_at            DateTime                @default(now())
+  update_at             DateTime                @updatedAt
+  employeeId            Int?                    @unique
+  studentId             Int?                    @unique
+  enrollmentId          Int?                    @unique
+  accessLogs            AccessLog[]
+  employee              Employee?               @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  enrollment            Enrollment?             @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  student               Student?                @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  NotificationRecipient NotificationRecipient[]
 
   @@map("users")
 }
@@ -367,6 +369,7 @@ model Payment {
   invoice        Invoice          @relation(fields: [invoiceId], references: [id])
   Receipt        Receipt[]
   transactions   Transaction[]    @relation("PaymentToTransaction")
+  Notification   Notification[]
 
   @@map("payments")
 }
@@ -407,6 +410,28 @@ model StudentBalance {
   @@map("studentbalance")
 }
 
+model Notification {
+  id         Int                     @id @default(autoincrement())
+  title      String
+  message    String
+  payment    Payment?                @relation(fields: [paymentId], references: [id])
+  status     NotificationStatus      @default(NEW)
+  createdAt  DateTime                @default(now())
+  recipients NotificationRecipient[]
+  paymentId  Int
+}
+
+model NotificationRecipient {
+  id             Int       @id @default(autoincrement())
+  notificationId Int
+  userId         Int
+  seenAt         DateTime?
+  isResponsible  Boolean   @default(false)
+
+  user         User         @relation(fields: [userId], references: [id])
+  Notification Notification @relation(fields: [notificationId], references: [id])
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -423,6 +448,13 @@ enum Role {
   EMPLOYEE
   ADMIN
   TEACHER
+}
+
+enum NotificationStatus {
+  NEW
+  UNSEEN
+  SEEN
+  CONFIRMED
 }
 
 enum AccessStatus {
