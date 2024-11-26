@@ -1,13 +1,17 @@
 import { prisma } from '@/lib/prisma'
-import { Classe } from '@prisma/client'
+import { Classe, ClasseType, Prisma } from '@prisma/client'
 import { ClasseRepository } from '../classe-repository';
 
 
 export class PrismaClasseRepository implements ClasseRepository {
-  create(data: { id?: number | undefined; name: string; }): Promise<{ id: number; name: string; course: string; id_classroom: number; period: string; created_at: Date; update_at: Date; }> {
-    throw new Error('Method not implemented.');
+  async create(data: Prisma.ClasseCreateInput): Promise<Classe | null> {
+    const newClasse = await prisma.classe.create({
+      data,
+    });
+
+    return newClasse
   }
-  async findByName(name: string): Promise<Classe | null> {
+  async findByName(name: ClasseType): Promise<Classe | null> {
     const findClasse = await prisma.classe.findFirst({
       where: {
         name
@@ -16,19 +20,16 @@ export class PrismaClasseRepository implements ClasseRepository {
     return findClasse
   }
 
-  async searchMany(query: string, page: number): Promise<Classe[]> {
+  async searchMany(name: ClasseType, page: number): Promise<Classe[]> {
     let pageSize = 20
-    let courses = await prisma.classe.findMany({
+    let classes = await prisma.classe.findMany({
       where: {
-        name: {
-          contains: query,
-          mode: 'insensitive'
-        }
+        name
       },
       skip: (page - 1) * pageSize,
       take: pageSize
     })
-    return courses
+    return classes
   }
   async destroy(id: number): Promise<boolean> {
     let findClasse = await prisma.classe.delete({
