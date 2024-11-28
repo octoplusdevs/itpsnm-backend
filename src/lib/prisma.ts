@@ -11,30 +11,32 @@ async function main() {
 
   // await prisma.province.deleteMany({where:{}})
   // await prisma.itemPrices.deleteMany({where:{}})
+  // await prisma.classe.deleteMany({where:{}})
   // await prisma.level.deleteMany({where:{}})
   // await prisma.course.deleteMany({where:{}});
+  // await prisma.accessLog.deleteMany({where:{}});
   // await prisma.user.deleteMany({where:{}});
   // await prisma.employee.deleteMany({where:{}});
 
 
-  await prisma.province.createMany({
-    data: Provinces,
-  });
-  await prisma.level.createMany({
-    data: levels,
-  });
-  await prisma.course.createMany({
-    data: courses,
-  });
-  await prisma.employee.createMany({
-    data: employees,
-  });
-  await prisma.user.createMany({
-    data: users,
-  });
-  await prisma.itemPrices.createMany({
-    data: itemPrices,
-  });
+  // await prisma.province.createMany({
+  //   data: Provinces,
+  // });
+  // await prisma.level.createMany({
+  //   data: levels,
+  // });
+  // await prisma.course.createMany({
+  //   data: courses,
+  // });
+  // await prisma.employee.createMany({
+  //   data: employees,
+  // });
+  // await prisma.user.createMany({
+  //   data: users,
+  // });
+  // await prisma.itemPrices.createMany({
+  //   data: itemPrices,
+  // });
 
 }
 main()
