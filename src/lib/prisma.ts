@@ -9,12 +9,12 @@ export const prisma = new PrismaClient({
 async function main() {
 
 
-  await prisma.province.deleteMany({where:{}})
-  await prisma.itemPrices.deleteMany({where:{}})
-  await prisma.level.deleteMany({where:{}})
-  await prisma.course.deleteMany({where:{}});
-  await prisma.user.deleteMany({where:{}});
-  await prisma.employee.deleteMany({where:{}});
+  // await prisma.province.deleteMany({where:{}})
+  // await prisma.itemPrices.deleteMany({where:{}})
+  // await prisma.level.deleteMany({where:{}})
+  // await prisma.course.deleteMany({where:{}});
+  // await prisma.user.deleteMany({where:{}});
+  // await prisma.employee.deleteMany({where:{}});
 
 
   await prisma.province.createMany({
