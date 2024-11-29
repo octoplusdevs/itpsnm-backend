@@ -44,6 +44,7 @@ export class UpdateEnrollmentUseCase {
     identityCardNumber,
     levelId,
     courseId,
+    isEnrolled,
     period,
     classeId,
   }: UpdateEnrollmentUseCaseRequest): Promise<UpdateEnrollmentUseCaseResponse> {
@@ -111,6 +112,7 @@ export class UpdateEnrollmentUseCase {
       classeId: classeId ?? classroom?.classes[0]?.id,
       courseId: courseId ?? enrollment.courseId,
       levelId: levelId ?? enrollment.levelId,
+      isEnrolled
     });
     await this.classroomRepository.incrementClassroomOccupancy(classroom.id);
     return {
