@@ -213,6 +213,7 @@ model Enrollment {
   levelId            Int?
   isEnrolled         Boolean?         @default(false)
   courseId           Int?
+  academicYear       String?
   classeId           Int?
   created_at         DateTime         @default(now())
   update_at          DateTime         @updatedAt
@@ -313,6 +314,7 @@ model Invoice {
   status       PAY_STATUS    @default(PENDING)
   employeeId   Int?
   type         InvoiceType?
+  academicYear String?
   items        InvoiceItem[]
   employee     Employee?     @relation(fields: [employeeId], references: [id])
   Enrollment   Enrollment    @relation(fields: [enrollmentId], references: [id])
@@ -329,6 +331,7 @@ model InvoiceItem {
   created_at   DateTime   @default(now())
   update_at    DateTime   @updatedAt
   QTY          Int?       @default(1)
+  academicYear String?
   month        MonthName?
   status       PAY_STATUS
   total_amount Decimal    @db.Decimal(10, 2)

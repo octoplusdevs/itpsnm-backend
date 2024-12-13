@@ -9,12 +9,14 @@ import { InvoiceType, MonthName, PAY_STATUS } from "@prisma/client";
 import { ItemPricesRepository } from "@/repositories/item-prices-repository";
 import { LevelsRepository } from "@/repositories/level-repository";
 import { LevelNotFoundError } from "../errors/level-not-found";
+import { InvoiceMonthYearAlreadyExistsError } from "../errors/invoice-month-year-exists";
 
 interface CreateInvoiceDTO {
   enrollmentId: number;
   employeeId: number;
   dueDate: Date;
   issueDate: Date;
+  academicYear: string;
   type: InvoiceType;
   items: Array<{
     month?: MonthName[] | null;
@@ -58,17 +60,28 @@ export class CreateInvoiceUseCase {
       totalAmount: new Decimal(totalAmount),
       dueDate: data.dueDate,
       status: PAY_STATUS.PENDING,
+      academicYear: data.academicYear,
       created_at: new Date(),
       update_at: new Date(),
       issueDate: data.issueDate,
       type: data.type
     });
 
+     // Verifica se já existem itens de fatura para o mês e ano letivo
+    for (const item of data.items) {
+    for (let month of item.month || []) {
+        if (await this.invoiceItemRepository.findInvoiceItemsByAcademicYearAndMonth(data.academicYear, month)) {
+          throw new InvoiceMonthYearAlreadyExistsError(data.academicYear,month)
+        }
+      }
+    }
+
     // Cria os itens da fatura (invoice items)
     for (const item of data.items) {
       let itemPrice = await this.itemPricesRepository.findById(item.itemPriceId)
       if ((data.type === "TUITION" || data.type === "TUITION_PENALTY" || data.type === "ENROLLMENT" || data.type === "ENROLLMENT_CONFIRMATION") && item.month !== null && item.month !== undefined) {
         for (let month of item.month) {
+
           await this.invoiceItemRepository.createInvoiceItem({
             invoiceId: invoice.id,
             description: itemPrice?.itemName!,
@@ -76,6 +89,7 @@ export class CreateInvoiceUseCase {
             created_at: item.createdAt ?? new Date(),
             update_at: item.updatedAt ?? new Date(),
             status: PAY_STATUS.PENDING,
+            academicYear: data.academicYear,
             total_amount: new Decimal(itemPrice?.priceWithIva!),
             QTY: 1,
             month
@@ -91,6 +105,7 @@ export class CreateInvoiceUseCase {
           status: PAY_STATUS.PENDING,
           total_amount: new Decimal(item.qty * Number(itemPrice?.priceWithIva)),
           QTY: item.qty,
+          academicYear: data.academicYear,
           month: null
         });
       }

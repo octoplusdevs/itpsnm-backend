@@ -3,6 +3,7 @@ import { EnrollementState, Enrollment, Prisma, Student, StudentType } from '@pri
 export interface EnrollmentType {
   id?: number
   courseId?: number | null
+  academicYear: string,
   levelId: number
   docsState: EnrollementState
   paymentState: EnrollementState
@@ -18,6 +19,7 @@ export interface EnrollT {
   docsState: EnrollementState;
   paymentState: EnrollementState;
   students?: Student;
+  academicYear: string;
   identityCardNumber: string
   classeId?: number | null
   courseId?: number | null

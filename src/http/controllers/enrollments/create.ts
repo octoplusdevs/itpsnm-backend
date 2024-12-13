@@ -16,6 +16,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
     identityCardNumber: z.string(),
     courseId: z.number(),
+    academicYear: z.string(),
     levelId: z.number(),
     employeeId: z.number().default(935),
   });
@@ -23,6 +24,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     identityCardNumber,
     courseId,
     levelId,
+    academicYear,
     employeeId
   } = createEnrollmentSchema.parse(request.body);
 
@@ -33,6 +35,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     let enrollment = await createEnrollmentUseCase.execute({
       identityCardNumber,
       courseId,
+      academicYear,
       levelId,
       employeeId,
     });
@@ -61,6 +64,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       employeeId,
       dueDate: new Date(),
       issueDate: new Date(),
+      academicYear,
       items
     })
     return reply.status(201).send(enrollment)

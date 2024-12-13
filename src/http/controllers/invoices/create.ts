@@ -1,5 +1,6 @@
 import { EmployeeNotFoundError } from '@/use-cases/errors/employee-not-found';
 import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
+import { InvoiceMonthYearAlreadyExistsError } from '@/use-cases/errors/invoice-month-year-exists';
 import { makeCreateInvoiceUseCase } from '@/use-cases/factories/make-create-invoice-use-case';
 import { InvoiceType, MonthName } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -12,6 +13,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     levelId: z.number().int().nonnegative(),
     employeeId: z.number().int().nonnegative(),
     dueDate: z.coerce.date(),
+    academicYear: z.string(),
     type: z.nativeEnum(InvoiceType),
     issueDate: z.coerce.date(),
     items: z.object({
@@ -25,7 +27,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   if (!parsedBody.success) {
     return reply.status(400).send({ message: 'Invalid request data.', errors: parsedBody.error.errors });
   }
-  const { enrollmentId, employeeId, dueDate, items, issueDate, type } = parsedBody.data;
+  const { enrollmentId, employeeId, dueDate, items, issueDate, type, academicYear } = parsedBody.data;
 
   try {
     let createInvoiceUseCase = makeCreateInvoiceUseCase()
@@ -35,6 +37,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       dueDate,
       items,
       issueDate,
+      academicYear,
       type
     });
 
@@ -45,6 +48,9 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     }
 
     if (err instanceof EmployeeNotFoundError) {
+      return reply.status(404).send({ message: err.message })
+    }
+    if(err instanceof InvoiceMonthYearAlreadyExistsError){
       return reply.status(404).send({ message: err.message })
     }
 

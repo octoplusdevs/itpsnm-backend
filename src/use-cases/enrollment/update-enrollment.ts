@@ -16,6 +16,7 @@ interface UpdateEnrollmentUseCaseRequest {
   docsState?: EnrollementState;
   identityCardNumber?: string;
   courseId: number;
+  academicYear?: string;
   levelId: number;
   isEnrolled?: boolean;
   period: PeriodType;
@@ -45,6 +46,7 @@ export class UpdateEnrollmentUseCase {
     levelId,
     courseId,
     isEnrolled,
+    academicYear,
     period,
     classeId,
   }: UpdateEnrollmentUseCaseRequest): Promise<UpdateEnrollmentUseCaseResponse> {
@@ -112,6 +114,7 @@ export class UpdateEnrollmentUseCase {
       classeId: classeId ?? classroom?.classes[0]?.id,
       courseId: courseId ?? enrollment.courseId,
       levelId: levelId ?? enrollment.levelId,
+      academicYear: academicYear ?? enrollment.academicYear,
       isEnrolled
     });
     await this.classroomRepository.incrementClassroomOccupancy(classroom.id);

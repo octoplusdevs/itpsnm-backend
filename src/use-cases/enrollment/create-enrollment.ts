@@ -30,6 +30,7 @@ interface CreateEnrollmentUseCaseRequest {
   paymentState?: EnrollementState,
   docsState?: EnrollementState,
   identityCardNumber: string,
+  academicYear: string,
   courseId: number,
   employeeId: number,
   levelId: number,
@@ -52,6 +53,7 @@ export class CreateEnrollmentUseCase {
     paymentState,
     docsState,
     identityCardNumber,
+    academicYear,
     levelId,
     employeeId,
     courseId,
@@ -89,6 +91,7 @@ export class CreateEnrollmentUseCase {
     const enrollment = await this.enrollmentRepository.create({
       id: id ?? randomInt(9999),
       docsState: docsState ?? "PENDING",
+      academicYear,
       paymentState: paymentState ?? "PENDING",
       identityCardNumber: identityCardNumber,
       classeId: null,
