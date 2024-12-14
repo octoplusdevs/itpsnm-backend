@@ -18,6 +18,7 @@ export async function confirmation(request: FastifyRequest, reply: FastifyReply)
   const createEnrollmentSchema = z.object({
     levelId: z.number(),
     employeeId: z.number().optional(),
+    academicYear: z.string(),
     enrollmentNumber: z.coerce.number().optional(),
     identityCardNumber: z.coerce.string().optional(),
     classeId: z.number().optional(),
@@ -29,6 +30,7 @@ export async function confirmation(request: FastifyRequest, reply: FastifyReply)
     enrollmentNumber,
     levelId,
     period,
+    academicYear,
     classeId,
     employeeId
   } = createEnrollmentSchema.parse(request.body);
@@ -63,6 +65,7 @@ export async function confirmation(request: FastifyRequest, reply: FastifyReply)
       type: "ENROLLMENT_CONFIRMATION",
       enrollmentId: enrollment.id!,
       employeeId: employeeId ?? 935,
+      academicYear,
       dueDate: new Date(),
       issueDate: new Date(),
       items
@@ -74,6 +77,7 @@ export async function confirmation(request: FastifyRequest, reply: FastifyReply)
       identityCardNumber: enrollment.identityCardNumber,
       classeId: classeId ?? enrollment.classeId!,
       courseId: enrollment.courseId!,
+      academicYear,
       docsState: "PENDING",
       paymentState: "PENDING",
       levelId,
