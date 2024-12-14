@@ -101,7 +101,7 @@ export async function authRoutes(app: FastifyInstance) {
     }
   );
 
-  app.post("bulk",async(_, reply) => {
+  app.post("/bulk",async(_, reply) => {
     try{
       await prisma.province.createMany({
         data: Provinces,
