@@ -17,9 +17,11 @@ export type paymentType = {
 
 export interface PaymentRepository {
   findByStudentAndInvoice(studentId: number, invoiceId: number, transactionId: number): Promise<Payment | null>;
+  findByInvoiceId(invoiceId: number): Promise<Payment | null>;
   createPayment(data: Omit<Payment, 'id'>): Promise<Payment>
   findPaymentById(paymentId: number): Promise<Payment | null>
   findManyTransactionsByPaymentId(paymentId: number): Promise<paymentType[]>
   approvePayment(paymentId: number, employeeId: number, status: PAY_STATUS): Promise<Payment>
   updatePaymentStatus(paymentId: number, status: string): Promise<Payment>
+  updatePaymentUsed(paymentId: number, used: boolean): Promise<Payment>
 }

@@ -366,6 +366,7 @@ model Payment {
   totalAmount    Decimal          @db.Decimal(10, 2)
   status         PAY_STATUS       @default(PENDING)
   transactionId  Int?             @unique
+  used           Boolean          @default(false)
   PaymentDetails PaymentDetails[]
   employee       Employee?        @relation(fields: [employeeId], references: [id])
   Enrollment     Enrollment?      @relation(fields: [enrollmentId], references: [id])

@@ -1,17 +1,16 @@
-import { $Enums, Invoice, InvoiceType, PAY_STATUS, Prisma } from '@prisma/client'
+import { Invoice, InvoiceType, PAY_STATUS, Prisma } from '@prisma/client'
 import { InvoiceRepository } from '../invoices-repository'
 import { prisma } from '@/lib/prisma'
-import { Decimal } from '@prisma/client/runtime/library';
 
 export class PrismaInvoiceRepository implements InvoiceRepository {
-  async findInvoicesByStudentAndType(enrollmentId: number, type: InvoiceType, status: PAY_STATUS): Promise<{ id: number; totalAmount: Prisma.Decimal; dueDate: Date; issueDate: Date; enrollmentId: number; created_at: Date; update_at: Date; status: $Enums.PAY_STATUS; employeeId: number | null; type: $Enums.InvoiceType | null; }[]> {
+  async findInvoicesByStudentAndType(enrollmentId: number, type: InvoiceType, status: PAY_STATUS): Promise<Invoice[]> {
     return await  prisma.invoice.findMany({
       where: { enrollmentId, type, status:{
         not: "PAID"
       } },
     })
   }
-  async updateInvoice(id: number, data: Prisma.InvoiceUncheckedUpdateInput): Promise<{ id: number; totalAmount: Decimal; dueDate: Date; issueDate: Date; enrollmentId: number; created_at: Date; update_at: Date; status: $Enums.PAY_STATUS; employeeId: number | null; type: $Enums.InvoiceType | null; }> {
+  async updateInvoice(id: number, data: Prisma.InvoiceUncheckedUpdateInput): Promise<Invoice> {
     return await prisma.invoice.update({
       where:{
         id

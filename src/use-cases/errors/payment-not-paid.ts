@@ -1,5 +1,5 @@
 export class PaymentNotPaidError extends Error {
-  constructor() {
-    super('The payment status is not PAID.');
+  constructor(status: string) {
+    super(`The payment status is ${status}`);
   }
 }

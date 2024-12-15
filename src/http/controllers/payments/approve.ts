@@ -7,6 +7,7 @@ import { makeApprovePaymentUseCase } from '@/use-cases/factories/make-approve-pa
 import { PAY_STATUS } from '@prisma/client'
 import { InvoiceItemNotFoundError } from '@/use-cases/errors/invoice-item-not-found'
 import { InsufficientFoundsError } from '@/use-cases/errors/insuficient-founds'
+import { PrismaPaymentRepository } from '@/repositories/prisma/prisma-payments-repository'
 
 export async function approvePayment(request: FastifyRequest, reply: FastifyReply) {
   const approvePaymentSchema = z.object({

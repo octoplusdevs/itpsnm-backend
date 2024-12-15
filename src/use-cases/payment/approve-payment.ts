@@ -79,6 +79,9 @@ export class ApprovePaymentUseCase {
 
 
 
+    if(findInvoice?.type !== "ENROLLMENT" && findInvoice?.type === "ENROLLMENT_CONFIRMATION"){
+      await this.paymentRepository.updatePaymentUsed(payment.id, true)
+    }
 
     const approvedPayment = await this.paymentRepository.approvePayment(data.paymentId, data.employeeId, data.status)
     return approvedPayment

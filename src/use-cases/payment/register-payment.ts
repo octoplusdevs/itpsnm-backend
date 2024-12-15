@@ -14,6 +14,8 @@ import { TransactionWasUsedError } from "../errors/transaction-was-used-error";
 import { EmployeeRepository } from "@/repositories/employee-repository";
 import { EmployeeNotFoundError } from "../errors/employee-not-found";
 import { TransactionAlreadyAssignedError } from "../errors/transaction-already-assigned-error";
+import { InsufficientFoundsError } from "../errors/insuficient-founds";
+import { InvoiceWasPaidError } from "../errors/invoice-was-paid";
 
 interface RegisterPaymentDTO {
   enrollmentId: number;
@@ -52,11 +54,27 @@ export class RegisterPaymentUseCase {
       throw new InvoiceNotFoundError();
     }
 
+    // // Verifica se o invoice ja foi associado a um pagamento
+    // const findInvoiceAssocietedWithPayment = await this.paymentRepository.findByInvoiceId(invoiceId);
+    // if (findInvoiceAssocietedWithPayment?.invoiceId ) {
+    //   throw new PaymentAlreadyExistsError();
+    // }
+
     // Verifica se a transação existe
     let transaction = await this.transactionRepository.findTransactionByNumber(transactionNumber);
     if (!transaction) {
       throw new TransactionNotFoundError();
     }
+
+    // Verifica se a fatura ja foi paga
+    if (findInvoice.status === PAY_STATUS.PAID) {
+      throw new InvoiceWasPaidError();
+    }
+
+     // Verifica se a fatura ja foi paga
+    // if (findInvoice.status === PAY_STATUS.PENDING) {
+    //   throw new InvoiceWasPaidError();
+    // }
 
     if (transaction.used) {
       throw new TransactionWasUsedError();
@@ -81,9 +99,9 @@ export class RegisterPaymentUseCase {
     // O valor da fatura é o que será deduzido do saldo
     const invoiceAmount = Number(findInvoice.totalAmount);
 
-    // if (studentBalance < invoiceAmount) {
-    //   throw new InsufficientFoundsError();
-    // }
+    if (Number(transaction.amount) < invoiceAmount) {
+      throw new InsufficientFoundsError();
+    }
 
     // Cria o pagamento
     const payment = await this.paymentRepository.createPayment({
@@ -95,6 +113,7 @@ export class RegisterPaymentUseCase {
       status: PAY_STATUS.PENDING,
       created_at: new Date(),
       update_at: new Date(),
+      used: false
     });
 
     // Atualiza o saldo do estudante

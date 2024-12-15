@@ -1,20 +1,19 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { makeUpdateEnrollmentUseCase } from '@/use-cases/factories/update-enrollment-use-case';
-import { EnrollementState, PeriodType } from '@prisma/client';
-import { StudentNotFoundError } from '@/use-cases/errors/student-not-found';
-import { CourseNotFoundError } from '@/use-cases/errors/course-not-found';
-import { LevelNotFoundError } from '@/use-cases/errors/level-not-found';
-import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
-import { IdentityCardNumberNotExistsError } from '@/use-cases/errors/id-card-not-exists-error';
-import { IdentityCardNumberHasInUseExistsError } from '@/use-cases/errors/id-card-already-in-use-error';
-import { ClassNotExists } from '@/use-cases/errors/class-not-exists-error';
+import { EnrollementState, PAY_STATUS, PeriodType } from '@prisma/client';
 import { makeGetInvoiceUseCase } from '@/use-cases/factories/make-get-invoice-use-case';
 import { makeGetEnrollmentByIdentityCardUseCase } from '@/use-cases/factories/make-get-enrollment-by-identity-card-use-case';
-import { StudentHasOutstanding } from '@/use-cases/errors/student-has-outstanding-error';
 import { GetPaymentUseCase } from '@/use-cases/payment/get-payment';
 import { PrismaPaymentRepository } from '@/repositories/prisma/prisma-payments-repository';
+import { PaymentBelongsToAnotherStudentError } from '@/use-cases/errors/payment-belongs-other-student';
 import { PaymentNotPaidError } from '@/use-cases/errors/payment-not-paid';
+import { PaymentWasUsedError } from '@/use-cases/errors/payment-was-used';
+import { StudentHasOutstanding } from '@/use-cases/errors/student-has-outstanding-error';
+import { EnrollmentNotFoundError } from '@/use-cases/errors/enrollment-not-found';
+import { handleKnownErrors } from '@/utils/error-handler';
+import { PaymentTypeIsNotValidError } from '@/use-cases/errors/payment-is-not-valid';
+import { makeFindInvoiceUseCase } from '@/use-cases/factories/make-find-invoice-use-case';
 
 export async function update(request: FastifyRequest, reply: FastifyReply) {
   const createEnrollmentSchema = z.object({
@@ -27,9 +26,8 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     paymentId: z.number().optional(),
     classeId: z.number().optional(),
     employeeId: z.number(),
-    startDate: z.date().default(new Date("01-09-2023")),
+    startDate: z.date().default(new Date('01-09-2023')),
   });
-
 
   try {
     const { id } = request.params as { id: number };
@@ -44,74 +42,94 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       period,
     } = createEnrollmentSchema.parse(request.body);
 
-    const getEnrollmentUseCase = makeGetEnrollmentByIdentityCardUseCase()
-    let { enrollment: enroll } = await getEnrollmentUseCase.execute({ identityCardNumber })
+    const enrollment = await validateEnrollment(identityCardNumber);
 
-    const getInvoiceUseCase = makeGetInvoiceUseCase()
-    let findInvoices = await getInvoiceUseCase.execute({ enrollmentId: enroll.id!, type: "ENROLLMENT", status: "PENDING" })
+    await checkOutstandingInvoices(enrollment.id!);
 
-    if (findInvoices.invoice?.length! > 0) {
-      throw new StudentHasOutstanding()
-    }
-    const getPaymentUseCase = new GetPaymentUseCase(new PrismaPaymentRepository)
-
-    if (paymentState && paymentId) {
-      let newPayment = await getPaymentUseCase.execute({ paymentId })
-      if(newPayment.payment?.status !== "PAID"){
-        throw new PaymentNotPaidError()
-      }
-
-    }
+    const newPaymentState = await processPaymentState(paymentState, paymentId, enrollment.id);
 
     const updateEnrollmentUseCase = makeUpdateEnrollmentUseCase();
-    const enrollment = await updateEnrollmentUseCase.execute({
+    const updatedEnrollment = await updateEnrollmentUseCase.execute({
       id: Number(id),
       identityCardNumber,
       classeId,
       courseId,
       docsState,
       levelId,
-      paymentState,
-      isEnrolled: (docsState === "APPROVED" && paymentState === "APPROVED"),
-      period
+      paymentState: newPaymentState,
+      isEnrolled: docsState === EnrollementState.APPROVED && newPaymentState === EnrollementState.APPROVED,
+      period,
     });
 
+    // TODO: Refatorar para useCase
+    let payment = new PrismaPaymentRepository();
+    await payment.updatePaymentUsed(paymentId!, true);
 
-    return reply.status(200).send(enrollment);
+
+    return reply.status(200).send(updatedEnrollment);
   } catch (err) {
-    // console.log(err)
-    if (err instanceof LevelNotFoundError) {
-      return reply.status(404).send({ message: err.message });
-    }
-    if (err instanceof StudentHasOutstanding) {
-      return reply.status(409).send({ message: err.message });
-    }
-    if (err instanceof PaymentNotPaidError) {
-      return reply.status(409).send({ message: err.message });
-    }
-    if (err instanceof StudentNotFoundError) {
-      return reply.status(404).send({ message: err.message });
-    }
-    if (err instanceof CourseNotFoundError) {
-      return reply.status(404).send({ message: err.message });
-    }
-    if (err instanceof LevelNotFoundError) {
-      return reply.status(404).send({ message: err.message });
-    }
-    if (err instanceof EnrollmentNotFoundError) {
-      return reply.status(409).send({ message: err.message });
-    }
-    if (err instanceof IdentityCardNumberHasInUseExistsError) {
-      return reply.status(409).send({ message: err.message });
-    }
-    if (err instanceof IdentityCardNumberNotExistsError) {
-      return reply.status(409).send({ message: err.message });
-    }
-
-    if (err instanceof ClassNotExists) {
-      return reply.status(409).send({ message: err.message });
-    }
-
-    return reply.status(500).send({ message: err });
+    return handleKnownErrors(err, reply);
   }
+}
+
+async function validateEnrollment(identityCardNumber: string) {
+  const getEnrollmentUseCase = makeGetEnrollmentByIdentityCardUseCase();
+  const { enrollment } = await getEnrollmentUseCase.execute({ identityCardNumber });
+
+  if (!enrollment) {
+    throw new EnrollmentNotFoundError();
+  }
+
+  return enrollment;
+}
+
+async function checkOutstandingInvoices(enrollmentId: number) {
+  const getInvoiceUseCase = makeGetInvoiceUseCase();
+
+  const pendingEnrollmentInvoices = await getInvoiceUseCase.execute({
+    enrollmentId,
+    type: 'ENROLLMENT',
+    status: 'PENDING',
+  });
+
+  const pendingConfirmationInvoices = await getInvoiceUseCase.execute({
+    enrollmentId,
+    type: 'ENROLLMENT_CONFIRMATION',
+    status: 'PENDING',
+  });
+
+  if (pendingEnrollmentInvoices.invoice?.length || pendingConfirmationInvoices.invoice?.length) {
+    throw new StudentHasOutstanding();
+  }
+}
+
+async function processPaymentState(paymentState: EnrollementState, paymentId?: number, enrollmentId?: number) {
+  if (!paymentState || !paymentId) return paymentState;
+
+  const getPaymentUseCase = new GetPaymentUseCase(new PrismaPaymentRepository());
+  const { payment } = await getPaymentUseCase.execute({ paymentId });
+
+  if (!payment || payment.enrollmentId !== enrollmentId) {
+    throw new PaymentBelongsToAnotherStudentError();
+  }
+
+  if (payment.status !== PAY_STATUS.PAID) {
+    throw new PaymentNotPaidError(payment.status);
+  }
+
+  if (payment.used) {
+    throw new PaymentWasUsedError();
+  }
+
+  const findInvoiceUseCase = makeFindInvoiceUseCase()
+
+  const paidConfirmationInvoices = await findInvoiceUseCase.execute({ invoiceId: payment.invoiceId! });
+
+  if (!(paidConfirmationInvoices.invoice?.type === "ENROLLMENT" || paidConfirmationInvoices.invoice?.type === "ENROLLMENT_CONFIRMATION")) {
+    throw new PaymentTypeIsNotValidError();
+  }
+
+
+
+  return EnrollementState.APPROVED;
 }
