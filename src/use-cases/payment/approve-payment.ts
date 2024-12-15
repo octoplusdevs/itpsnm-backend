@@ -73,11 +73,11 @@ export class ApprovePaymentUseCase {
     // await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
     await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, data.status)
     // Atualiza o saldo do estudante
-    // const UpdateBalance = new UpdateStudentBalanceUseCase(this.prismaStudentBalanceRepository)
-    // await UpdateBalance.execute({
-    //   enrollmentId: payment.enrollmentId!,
-    //   invoiceAmount: Number(payment.totalAmount), // Passamos o valor da fatura para ser deduzido do saldo
-    // });
+    const UpdateBalance = new UpdateStudentBalanceUseCase(this.prismaStudentBalanceRepository)
+    await UpdateBalance.execute({
+      enrollmentId: payment.enrollmentId!,
+      invoiceAmount: Number(payment.totalAmount), // Passamos o valor da fatura para ser deduzido do saldo
+    });
 
 
 
