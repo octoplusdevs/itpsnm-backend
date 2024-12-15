@@ -56,6 +56,7 @@ export class ApprovePaymentUseCase {
         totalTransaction += Number(tr.amount);
       }
     }
+
     if (totalTransaction < Number(findInvoice?.totalAmount)) {
       throw new InsufficientFoundsError()
     }
@@ -81,7 +82,8 @@ export class ApprovePaymentUseCase {
 
 
 
-    if(findInvoice?.type !== "ENROLLMENT" && findInvoice?.type === "ENROLLMENT_CONFIRMATION"){
+
+    if(findInvoice?.type !== "ENROLLMENT" && findInvoice?.type !== "ENROLLMENT_CONFIRMATION"){
       await this.paymentRepository.updatePaymentUsed(payment.id, true)
     }
 
