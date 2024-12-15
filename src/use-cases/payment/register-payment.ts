@@ -99,9 +99,9 @@ export class RegisterPaymentUseCase {
     // O valor da fatura é o que será deduzido do saldo
     const invoiceAmount = Number(findInvoice.totalAmount);
 
-    if (Number(transaction.amount) < invoiceAmount) {
-      throw new InsufficientFoundsError();
-    }
+    // if (Number(transaction.amount) < invoiceAmount) {
+    //   throw new InsufficientFoundsError();
+    // }
 
     // Cria o pagamento
     const payment = await this.paymentRepository.createPayment({

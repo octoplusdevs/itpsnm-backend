@@ -39,10 +39,10 @@ export class ApprovePaymentUseCase {
       throw new EmployeeNotFoundError()
     }
 
-    const transaction = await this.transactionRepository.findTransactionById(payment.transactionId!)
-    if (!transaction) {
-      throw new TransactionNotFoundError()
-    }
+    // const transaction = await this.transactionRepository.findTransactionById(payment.transactionId!)
+    // if (!transaction) {
+    //   throw new TransactionNotFoundError()
+    // }
 
     // if (payment.status !== PAY_STATUS.PENDING && payment.status !== PAY_STATUS.RECUSED) {
     //   throw new PaymentIsNotPendingError()
@@ -52,7 +52,9 @@ export class ApprovePaymentUseCase {
     let totalTransaction = 0;
 
     for (const transaction of getAllTransanctionsPayment) {
-      totalTransaction += Number(transaction.totalAmount);
+      for(const tr of transaction.transactions || []){
+        totalTransaction += Number(tr.amount);
+      }
     }
     if (totalTransaction < Number(findInvoice?.totalAmount)) {
       throw new InsufficientFoundsError()
@@ -68,14 +70,14 @@ export class ApprovePaymentUseCase {
         status: data.status,
       });
     }
-    await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
+    // await this.transactionRepository.updateTransactionStatus(transaction.transactionNumber, true)
     await this.invoiceRepository.updateInvoiceStatus(payment.invoiceId, data.status)
     // Atualiza o saldo do estudante
-    const UpdateBalance = new UpdateStudentBalanceUseCase(this.prismaStudentBalanceRepository)
-    await UpdateBalance.execute({
-      enrollmentId: payment.enrollmentId!,
-      invoiceAmount: Number(payment.totalAmount), // Passamos o valor da fatura para ser deduzido do saldo
-    });
+    // const UpdateBalance = new UpdateStudentBalanceUseCase(this.prismaStudentBalanceRepository)
+    // await UpdateBalance.execute({
+    //   enrollmentId: payment.enrollmentId!,
+    //   invoiceAmount: Number(payment.totalAmount), // Passamos o valor da fatura para ser deduzido do saldo
+    // });
 
 
 
