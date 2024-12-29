@@ -48,6 +48,7 @@ export class ApprovePaymentUseCase {
     //   throw new PaymentIsNotPendingError()
     // }
     let getAllTransanctionsPayment = await this.paymentRepository.findManyTransactionsByPaymentId(payment.id)
+    let findTransanctionsPayment = await this.transactionRepository.findTransactionById(payment.transactionId!)
     let findInvoice = await this.invoiceRepository.findInvoiceById(payment.invoiceId)
     let totalTransaction = 0;
 
@@ -56,6 +57,8 @@ export class ApprovePaymentUseCase {
         totalTransaction += Number(tr.amount);
       }
     }
+    totalTransaction += Number(findTransanctionsPayment?.amount)
+
 
     if (totalTransaction < Number(findInvoice?.totalAmount)) {
       throw new InsufficientFoundsError()
